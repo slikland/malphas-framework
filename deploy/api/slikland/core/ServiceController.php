@@ -1,6 +1,10 @@
 <?php
 class ServiceController
 {
+
+	private static $prependAnnotation = array('authenticate', 'validate');
+	private static $appendAnnotation = array('');
+
 	public static function execute($service = NULL, $data = NULL, $output = TRUE)
 	{
 		if(!$service)
@@ -18,8 +22,7 @@ class ServiceController
 			{
 				if(array_key_exists('class', $service))
 				{
-					$class = new $service['class']();
-					if($service['cms'])
+					if(isset($service['cms']) && $service['cms'])
 					{
 						if(isset($service['path']))
 						{
@@ -29,9 +32,19 @@ class ServiceController
 							return;
 						}
 					}
+					$class = new $service['class']();
+
 					if(array_key_exists('method', $service))
 					{
 						$method = $service['method'];
+						$annotations = sl_annotation_AnnotationParser::getAnnotations($class, $method, ServiceController::$prependAnnotation);
+						if($annotations)
+						{
+							foreach($annotations as $annotation)
+							{
+								var_dump($annotation);
+							}
+						}
 						if(!$data)
 						{
 							$data = $_REQUEST;
@@ -137,14 +150,17 @@ class ServiceController
 				if(count($methodArr) > 0)
 				{
 					$method = $methodArr[0];
+					$response['path'] = $fileName . '/' . $method;
 					if(in_array($method, get_class_methods($service)))
 					{
 						$response['method'] = $method;
-						$response['path'] = $fileName . '/' . $method;
 						array_shift($methodArr);
-						$response['params'] = $methodArr;
-						$response['cms'] = (bool)preg_match('/^\/?cms/', $fileName);
+					}else if(in_array('_run', get_class_methods($service)))
+					{
+						$response['method'] = '_run';
 					}
+					$response['params'] = $methodArr;
+					$response['cms'] = (bool)preg_match('/^\/?cms/', $fileName);
 				}
 				return $response;
 			}

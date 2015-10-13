@@ -47,11 +47,15 @@ function sl_autoloader($class)
 
 		if(!$found)
 		{
-			$path = dirname(debug_backtrace()[1]['file']) . '/';
-			if(file_exists($path . $classPath))
+			$dbt = debug_backtrace();
+			if(array_key_exists(1, $dbt) && array_key_exists('file', $dbt[1]))
 			{
-				include_once($path . $classPath);
-				$found = TRUE;
+				$path = dirname(debug_backtrace()[1]['file']) . '/';
+				if(file_exists($path . $classPath))
+				{
+					include_once($path . $classPath);
+					$found = TRUE;
+				}
 			}
 		}
 	}
