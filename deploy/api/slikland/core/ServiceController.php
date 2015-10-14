@@ -1,12 +1,13 @@
 <?php
+namespace slikland\core;
 class ServiceController
 {
-
-	private static $prependAnnotation = array('authenticate', 'validate');
+	private static $prependAnnotation = array('authenticate'=>'controller\cms\User::checkPermission', 'validate');
 	private static $appendAnnotation = array('');
 
 	public static function execute($service = NULL, $data = NULL, $output = TRUE)
 	{
+		$a = new controller\cms\User();
 		if(!$service)
 		{
 			$service = substr(preg_replace('/\?.*?$/', '', $_SERVER['REQUEST_URI']), strlen(dirname($_SERVER['SCRIPT_NAME'])));
@@ -26,7 +27,7 @@ class ServiceController
 					{
 						if(isset($service['path']))
 						{
-							$this->checkPermissions($service['path']);
+							\controller\cms\User::checkPermission($service['path']);
 						}else
 						{
 							return;
@@ -37,17 +38,17 @@ class ServiceController
 					if(array_key_exists('method', $service))
 					{
 						$method = $service['method'];
-						$annotations = sl_annotation_AnnotationParser::getAnnotations($class, $method, ServiceController::$prependAnnotation);
+						if(!$data)
+						{
+							$data = $_REQUEST;
+						}
+						$annotations = \slikland\annotation\AnnotationParser::getAnnotations($class, $method, ServiceController::$prependAnnotation);
 						if($annotations)
 						{
 							foreach($annotations as $annotation)
 							{
-								var_dump($annotation);
+								call_user_func($annotation['func'], $data);
 							}
-						}
-						if(!$data)
-						{
-							$data = $_REQUEST;
 						}
 						$params = array_merge($data, array('__path'=>$service['path']), $service['params']);
 						$response = $class->$method($params);
@@ -74,38 +75,38 @@ class ServiceController
 		}
 	}
 
-	private static function checkPermissions($path)
-	{
-		global $db;
-		global $user;
-		$path = preg_replace('/^(?:\/|cms)*/', '', $path);
+	// private static function checkPermission($path)
+	// {
+	// 	global $db;
+	// 	global $user;
+	// 	$path = preg_replace('/^(?:\/|cms)*/', '', $path);
 
-		$roles = $db->fetch_all("SELECT crc.fk_cms_role FROM cms_role_content crc LEFT JOIN cms_content cc ON cc.pk_cms_content = crc.fk_cms_content WHERE cc.path = '{$path}';", TRUE);
-		if(count($roles) == 0)
-		{
-			return TRUE;
-		}
-		$roles = array_map('current', $roles);
-		@include_once('model/cms/CMSUser.php');
-		$retries = 3;
-		$user = NULL;
-		while($retries-- > 0)
-		{
-			if($user = CMSUser::getInstance()->checkSession())
-			{
-				$user->getSession();
-				if($user->logged)
-				{
-					if(in_array($user->role, $roles))
-					{
-						return TRUE;
-					}
-				}
-			}
-			usleep(10);
-		}
-		throw new Exception('No permission');
-	}
+	// 	$roles = $db->fetch_all("SELECT crc.fk_cms_role FROM cms_role_content crc LEFT JOIN cms_content cc ON cc.pk_cms_content = crc.fk_cms_content WHERE cc.path = '{$path}';", TRUE);
+	// 	if(count($roles) == 0)
+	// 	{
+	// 		return TRUE;
+	// 	}
+	// 	$roles = array_map('current', $roles);
+	// 	@include_once('model/cms/CMSUser.php');
+	// 	$retries = 3;
+	// 	$user = NULL;
+	// 	while($retries-- > 0)
+	// 	{
+	// 		if($user = CMSUser::getInstance()->checkSession())
+	// 		{
+	// 			$user->getSession();
+	// 			if($user->logged)
+	// 			{
+	// 				if(in_array($user->role, $roles))
+	// 				{
+	// 					return TRUE;
+	// 				}
+	// 			}
+	// 		}
+	// 		usleep(10);
+	// 	}
+	// 	throw new Exception('No permission');
+	// }
 
 	private static function output($data)
 	{
@@ -134,23 +135,28 @@ class ServiceController
 
 	private static function findService($service)
 	{
+		$service = trim($service, '/');
 		$serviceArr = explode('/', $service);
 		$methodArr = array();
 
-		$path = API_PATH . 'model/';
+		$path = 'model/';
 
 		while(count($serviceArr) > 0)
 		{
 			$fileName = implode('/', $serviceArr);
-			if(file_exists($path . ($fileName) . '.php'))
+			if(file_exists(API_PATH . $path . ($fileName) . '.php'))
 			{
-				include_once($path . ($fileName) . '.php');
-				$service = $serviceArr[count($serviceArr) - 1];
+				include_once(API_PATH . $path . ($fileName) . '.php');
+				$service = preg_replace('/\//', '\\', $path) . implode('\\', $serviceArr);
 				$response = array('class'=>$service);
 				if(count($methodArr) > 0)
 				{
 					$method = $methodArr[0];
 					$response['path'] = $fileName . '/' . $method;
+					if(!class_exists($service))
+					{
+						return null;
+					}
 					if(in_array($method, get_class_methods($service)))
 					{
 						$response['method'] = $method;

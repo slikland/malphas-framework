@@ -1,4 +1,5 @@
 <?php
+namespace model;
 class view
 {
 	function __construct(){

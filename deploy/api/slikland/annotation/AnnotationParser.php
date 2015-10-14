@@ -1,9 +1,11 @@
 <?php
+namespace slikland\annotation;
+
 class AnnotationParser
 {
-	public static function getAnnotations($class, $method, $filter = NULL)
+	public static function getAnnotations($class, $method, $filters = NULL)
 	{
-		$refl = new ReflectionMethod($class, $method);
+		$refl = new \ReflectionMethod($class, $method);
 		$doc = $refl->getDocComment();
 		preg_match_all('/\*\s*@(\w+)(?:\((.*?)\))?$/m', $doc, $annotations, PREG_SET_ORDER);
 		if(!$annotations || count($annotations) == 0)
@@ -14,9 +16,9 @@ class AnnotationParser
 		foreach($annotations as $annotation)
 		{
 			$name = $annotation[1];
-			if(!$filter || ($filter && in_array($name, $filter)))
+			if(!$filters || ($filters && array_key_exists($name, $filters)))
 			{
-				$arr[] = array('name'=>$name, 'values'=>json_decode('[' . $annotation[2] . ']'));
+				$arr[] = array('name'=>$name, 'values'=>json_decode('[' . $annotation[2] . ']'), 'func'=>$filters[$name]);
 			}
 		}
 		return $arr;

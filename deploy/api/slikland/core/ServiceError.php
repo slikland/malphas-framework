@@ -1,5 +1,5 @@
 <?php
-
+namespace slikland\core;
 class ServiceError extends Exception
 {
 
