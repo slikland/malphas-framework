@@ -1,6 +1,6 @@
 <?php
 namespace model;
-class user
+class user extends Model
 {
 
 	/**
@@ -12,6 +12,8 @@ class user
 
 	function test($data = NULL)
 	{
+		var_dump($this->db);
+		var_dump($this->controller);
 		return array(1, 2, 3);
 	}
 }

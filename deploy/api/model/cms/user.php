@@ -1,9 +1,10 @@
 <?php
 namespace model\cms;
-class user
+class user extends Model
 {
-	public function test(){
-		return 123;
+	function test()
+	{
+		var_dump($this->controller->login());
 	}
 }
 ?>

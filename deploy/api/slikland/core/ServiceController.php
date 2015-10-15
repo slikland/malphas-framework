@@ -1,21 +1,34 @@
 <?php
 namespace slikland\core;
+
+include_once('DB.php');
+include_once('Model.php');
+include_once('Controller.php');
+
 class ServiceController
 {
 	private static $prependAnnotation = array('authenticate'=>'controller\cms\User::checkPermission', 'validate');
 	private static $appendAnnotation = array('');
 
-	public static function execute($service = NULL, $data = NULL, $output = TRUE)
+	public static function execute($servicePath = NULL, $data = NULL, $output = TRUE)
 	{
 		$a = new controller\cms\User();
-		if(!$service)
+		if(!$servicePath)
 		{
-			$service = substr(preg_replace('/\?.*?$/', '', $_SERVER['REQUEST_URI']), strlen(dirname($_SERVER['SCRIPT_NAME'])));
+			$servicePath = preg_replace('/\/*$/', '', substr(preg_replace('/\?.*?$/', '', $_SERVER['REQUEST_URI']), strlen(dirname($_SERVER['SCRIPT_NAME']))));
 		}
-		$service = self::findService($service);
+		$service = self::findService($servicePath);
 		if(!$service)
 		{
 			throw new ServiceError('Service not found');
+		}
+		if(file_exists(API_PATH . 'view' . ($servicePath) . '.tpl')){
+			var_dump(API_PATH . 'view' . $servicePath . '.tpl');
+			$service['view'] = slikland\template\TemplateLoader::load(API_PATH . 'view' . $servicePath . '.tpl');
+		}else if(file_exists(API_PATH . 'view' . ($servicePath) . '/index.tpl'))
+		{
+			var_dump(API_PATH . 'view' . $servicePath . '/index.tpl');
+			$service['view'] = slikland\template\TemplateLoader::load(API_PATH . 'view' . $servicePath . '/index.tpl');
 		}
 		$response = null;
 		try{
@@ -23,7 +36,7 @@ class ServiceController
 			{
 				if(array_key_exists('class', $service))
 				{
-					if(isset($service['cms']) && $service['cms'])
+					if($service['cms'])
 					{
 						if(isset($service['path']))
 						{
@@ -52,16 +65,19 @@ class ServiceController
 						}
 						$params = array_merge($data, array('__path'=>$service['path']), $service['params']);
 						$response = $class->$method($params);
-					}else
+					}else if(!isset($service['view']))
 					{
 						$response['header'] = 'HTTP/1.0 404 Not Found';
+					}
+					if(isset($service['view'])){
+						$response['view'] = $service['view'];
 					}
 				}
 			}
 		}catch(ServiceError $e)
 		{
 			$response = $e->toObject();
-		}catch(Exception $e)
+		}catch(\Exception $e)
 		{
 			$e = new ServiceError($e->getMessage());
 			$response = $e->toObject();
@@ -74,39 +90,6 @@ class ServiceController
 			return $response;
 		}
 	}
-
-	// private static function checkPermission($path)
-	// {
-	// 	global $db;
-	// 	global $user;
-	// 	$path = preg_replace('/^(?:\/|cms)*/', '', $path);
-
-	// 	$roles = $db->fetch_all("SELECT crc.fk_cms_role FROM cms_role_content crc LEFT JOIN cms_content cc ON cc.pk_cms_content = crc.fk_cms_content WHERE cc.path = '{$path}';", TRUE);
-	// 	if(count($roles) == 0)
-	// 	{
-	// 		return TRUE;
-	// 	}
-	// 	$roles = array_map('current', $roles);
-	// 	@include_once('model/cms/CMSUser.php');
-	// 	$retries = 3;
-	// 	$user = NULL;
-	// 	while($retries-- > 0)
-	// 	{
-	// 		if($user = CMSUser::getInstance()->checkSession())
-	// 		{
-	// 			$user->getSession();
-	// 			if($user->logged)
-	// 			{
-	// 				if(in_array($user->role, $roles))
-	// 				{
-	// 					return TRUE;
-	// 				}
-	// 			}
-	// 		}
-	// 		usleep(10);
-	// 	}
-	// 	throw new Exception('No permission');
-	// }
 
 	private static function output($data)
 	{
@@ -166,8 +149,8 @@ class ServiceController
 						$response['method'] = '_run';
 					}
 					$response['params'] = $methodArr;
-					$response['cms'] = (bool)preg_match('/^\/?cms/', $fileName);
 				}
+				$response['cms'] = (bool)preg_match('/^\/?cms/', $fileName);
 				return $response;
 			}
 			array_unshift($methodArr, array_pop($serviceArr));

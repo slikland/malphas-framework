@@ -1,10 +1,15 @@
 <?php
 namespace controller\cms;
-class User
+class User extends Controller
 {
 	public static function checkPermission()
 	{
-		
+
+	}
+
+	public function login()
+	{
+		return $this->db;
 	}
 }
 ?>

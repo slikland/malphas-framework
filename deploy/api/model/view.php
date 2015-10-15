@@ -1,6 +1,6 @@
 <?php
 namespace model;
-class view
+class view extends Model
 {
 	function __construct(){
 

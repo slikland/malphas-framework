@@ -1,6 +1,6 @@
 <?php
 namespace slikland\core;
-class ServiceError extends Exception
+class ServiceError extends \Exception
 {
 
 	public function __construct($message, $code = 0, $data = NULL) {
