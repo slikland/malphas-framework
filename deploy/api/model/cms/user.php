@@ -2,9 +2,19 @@
 namespace model\cms;
 class user extends Model
 {
-	function test()
+	function login()
 	{
-		var_dump($this->controller->login());
+
+	}
+
+	function logout()
+	{
+
+	}
+
+	function getSession()
+	{
+
 	}
 }
 ?>

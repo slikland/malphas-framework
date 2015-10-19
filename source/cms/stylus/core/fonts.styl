@@ -1,0 +1,29 @@
+// USAGE
+// add-font(Regular, helveticaneue);
+// add-font(Bold, helveticaneuecondensedbold);
+// add-font(Italic, helveticaneuelightitalic);
+
+add-font(p_family, p_file-name, p_style = normal, p_weight = normal)
+	@font-face
+		font-family: p_family;
+		src:url('../fonts/'+p_file-name+'.eot'),
+			url('../fonts/'+p_file-name+'.eot?#iefix') format('embedded-opentype'),
+			url('../fonts/'+p_file-name+'.woff') format('woff'),
+			url('../fonts/'+p_file-name+'.ttf') format('truetype'),
+			url('../fonts/'+p_file-name+'.svg#0e367a30b984427caad4ff30c417ba64') format('svg');
+		font-weight: p_weight;
+		font-style: p_style;
+
+font-alias-fix(p_weight)
+	text-shadow: 0 -1px 1px rgba(255, 255, 255, 0.01);
+	text-rendering: optimizeLegibility;    
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	font-weight: p_weight !important;
+
+set-font-size(p_size)
+	font-size: p_size;
+	-webkit-text-size-adjust: p_size;
+	-ms-text-size-adjust: p_size;
+
+// Adding fonts

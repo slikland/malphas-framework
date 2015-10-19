@@ -35,7 +35,6 @@ class TemplateNode extends EventDispatcher
 		# console.log(nodeData)
 
 	render:(context, data, originalData = null)->
-
 		if !originalData && data
 			originalData = data
 		foundData = data
@@ -81,6 +80,8 @@ class TemplateNode extends EventDispatcher
 		return JSON.parse(obj)
 
 	_findObjectData:(obj, path)->
+		if !obj
+			return null
 		if path && o = /([\*\@])?(.*?)$/.exec(path)
 			switch o[1]
 				when '*'

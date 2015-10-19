@@ -2386,6 +2386,9 @@ TemplateNode = (function(_super) {
 
   TemplateNode.prototype._findObjectData = function(obj, path) {
     var o;
+    if (!obj) {
+      return null;
+    }
     if (path && (o = /([\*\@])?(.*?)$/.exec(path))) {
       switch (o[1]) {
         case '*':
@@ -2498,9 +2501,9 @@ TemplateParser = (function(_super) {
       dataPath = null;
     }
     if (!/\.tpl$/.test(name)) {
-      name = name.replace(/\./, '/') + '.tpl';
+      name = name.replace(/\./, '/') + Template.EXTENSION;
     }
-    if (name.indexOf('/') === !0) {
+    if (name.indexOf('/') !== 0) {
       rootPath = Template.ROOT_PATH;
     } else {
       rootPath = '';
@@ -2530,6 +2533,7 @@ TemplateParser = (function(_super) {
   };
 
   TemplateParser.prototype._templateLoadComplete = function(e, data) {
+    console.log(arguments);
     this._externalTemplates = [];
     this._nodes = this._parseBlocks(data);
     return this._loadExternalTemplates();
@@ -2562,6 +2566,7 @@ TemplateParser = (function(_super) {
         template = new TemplateParser(this._externalTemplates[i]);
         template.on(TemplateParser.LOAD_ERROR, this._externalTemplateLoadError);
         template.on(TemplateParser.LOAD_COMPLETE, this._externalTemplateLoaded);
+        Template.addTemplate(this._externalTemplates[i], template);
         this._externalTemplates.splice(i, 1);
         return;
       }
@@ -2612,6 +2617,7 @@ TemplateParser = (function(_super) {
   };
 
   TemplateParser.prototype._externalTemplateLoadError = function(e, data) {
+    Template.addTemplate(e.target.id, '');
     return this._loadExternalTemplates();
   };
 
@@ -2860,8 +2866,20 @@ Template = (function() {
 
   Template.ROOT_PATH = '';
 
-  Template.setRootPath = function(ROOT_PATH) {
-    this.ROOT_PATH = ROOT_PATH != null ? ROOT_PATH : '';
+  Template.EXTENSION = '.tpl';
+
+  Template.setRootPath = function(rootPath) {
+    if (rootPath == null) {
+      rootPath = '';
+    }
+    return this.ROOT_PATH = rootPath;
+  };
+
+  Template.setExtension = function(extension) {
+    if (extension == null) {
+      extension = '.tpl';
+    }
+    return this.EXTENSION = extension;
   };
 
   Template.addTemplate = function(id, template) {
@@ -2903,9 +2921,7 @@ Template = (function() {
     return tParser.render(context, data, onComplete, onError);
   };
 
-  Template._loadComplete = function() {
-    return console.log("LOADEDEDED!");
-  };
+  Template._loadComplete = function() {};
 
   Template.find = function(id) {
     return this.CACHE[id];
@@ -3061,23 +3077,11 @@ var Main,
 Main = (function() {
   function Main() {
     this._loadComplete = __bind(this._loadComplete, this);
-    var obj;
-    Template.setRootPath('template/');
-    obj = {
-      list: [
-        {
-          link: 'http://www.google.com.br',
-          label: 'GOOGLE'
-        }, {
-          link: 'http://www.yahoo.com.br',
-          label: 'YAHOO!'
-        }, {
-          link: 'http://www.bing.com.br',
-          label: 'Bing'
-        }
-      ]
-    };
-    Template.render('template', document.body, obj);
+    var _ref;
+    app.basePath = ((_ref = document.querySelector('base')) != null ? _ref.href : void 0) || '';
+    Template.setRootPath(app.basePath + '../api/view/cms/');
+    Template.setExtension('');
+    Template.render('index', document.body);
   }
 
   Main.prototype._loadComplete = function() {};

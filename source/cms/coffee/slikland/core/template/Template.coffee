@@ -38,9 +38,12 @@ class Template
 
 	@CACHE = {}
 	@ROOT_PATH = ''
+	@EXTENSION = '.tpl'
 
-	@setRootPath:(@ROOT_PATH = '')->
-
+	@setRootPath:(rootPath = '')->
+		@ROOT_PATH = rootPath
+	@setExtension:(extension = '.tpl')->
+		@EXTENSION = extension
 	@addTemplate:(id, template)->
 		if !@CACHE[id]
 			if template not instanceof TemplateParser
@@ -61,7 +64,7 @@ class Template
 		tParser.render(context, data, onComplete, onError)
 
 	@_loadComplete:()=>
-		console.log("LOADEDEDED!")
+		
 
 
 	@find:(id)->

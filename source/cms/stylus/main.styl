@@ -1,0 +1,19 @@
+@import 'nib'
+global-reset()
+@import 'core/fonts'
+
+add-font('helveticaneue', 'helveticaneue', normal, normal)
+add-font('helveticaneue', 'helveticaneuecondensedbold', normal, bold)
+add-font('helveticaneue', 'helveticaneuelightitalic', italic, normal)
+
+body
+	font-family: helveticaneue
+
+headerHeight = 48px
+menuWidth = 240px
+
+@import 'core/mixins'
+@import 'ui/header'
+@import 'ui/menu'
+@import 'ui/main'
+

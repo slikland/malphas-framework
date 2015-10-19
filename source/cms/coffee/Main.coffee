@@ -14,17 +14,11 @@
 class Main
 
 	constructor:()->
-		Template.setRootPath('template/')
+		app.basePath = document.querySelector('base')?.href || ''
+		Template.setRootPath(app.basePath + '../api/view/cms/')
+		Template.setExtension('')
 
-		obj = {
-			list: [
-				{link: 'http://www.google.com.br', label: 'GOOGLE'},
-				{link: 'http://www.yahoo.com.br', label: 'YAHOO!'},
-				{link: 'http://www.bing.com.br', label: 'Bing'}
-			]
-		}
-
-		Template.render('template', document.body, obj)
+		Template.render('index', document.body)
 	_loadComplete:()=>
 		# @_template = AssetLoader.getInstance().getResult('template.yaml')
 

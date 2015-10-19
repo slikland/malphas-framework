@@ -14,19 +14,19 @@
 
 class Main extends NavigationContainer
 	create:(evt=null)=>
-		for k, v of app.config.views
-			color = Math.floor(Math.random()*16777215).toString(16)
-			@test = new BaseDOM('div')
-			@appendChild(@test)
-			@test.text = v.id
-			@test.css({
-				'width':'50px',
-				'height':'25px',
-				'display':'inline-block',
-				'cursor':'pointer',
-				'background-color': '#'+color
-			})
-			@test.element.on 'click', @go
+		# for k, v of app.config.views
+		# 	color = Math.floor(Math.random()*16777215).toString(16)
+		# 	@test = new BaseDOM('div')
+		# 	@appendChild(@test)
+		# 	@test.text = v.id
+		# 	@test.css({
+		# 		'width':'50px',
+		# 		'height':'25px',
+		# 		'display':'inline-block',
+		# 		'cursor':'pointer',
+		# 		'background-color': '#'+color
+		# 	})
+		# 	@test.element.on 'click', @go
 		# setTimeout(@start, 1000) 
 		super
 

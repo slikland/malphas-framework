@@ -1,4 +1,3 @@
-html
-	div
-		asdasd.sadas#id: asdasdad
-		asdasd: #{asdasd}
+<core.header
+	<core.menu
+	main: "a"

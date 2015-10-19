@@ -18,18 +18,15 @@ class ServiceController
 			$servicePath = preg_replace('/\/*$/', '', substr(preg_replace('/\?.*?$/', '', $_SERVER['REQUEST_URI']), strlen(dirname($_SERVER['SCRIPT_NAME']))));
 		}
 		$service = self::findService($servicePath);
+		if($view = slikland\template\TemplateLoader::load($servicePath))
+		{
+			$service['view'] = $view;
+		}
 		if(!$service)
 		{
 			throw new ServiceError('Service not found');
 		}
-		if(file_exists(API_PATH . 'view' . ($servicePath) . '.tpl')){
-			var_dump(API_PATH . 'view' . $servicePath . '.tpl');
-			$service['view'] = slikland\template\TemplateLoader::load(API_PATH . 'view' . $servicePath . '.tpl');
-		}else if(file_exists(API_PATH . 'view' . ($servicePath) . '/index.tpl'))
-		{
-			var_dump(API_PATH . 'view' . $servicePath . '/index.tpl');
-			$service['view'] = slikland\template\TemplateLoader::load(API_PATH . 'view' . $servicePath . '/index.tpl');
-		}
+		
 		$response = null;
 		try{
 			if($service)
@@ -69,9 +66,9 @@ class ServiceController
 					{
 						$response['header'] = 'HTTP/1.0 404 Not Found';
 					}
-					if(isset($service['view'])){
-						$response['view'] = $service['view'];
-					}
+				}
+				if(isset($service['view'])){
+					$response['__view'] = $service['view'];
 				}
 			}
 		}catch(ServiceError $e)
@@ -132,6 +129,7 @@ class ServiceController
 				include_once(API_PATH . $path . ($fileName) . '.php');
 				$service = preg_replace('/\//', '\\', $path) . implode('\\', $serviceArr);
 				$response = array('class'=>$service);
+				$response['path'] = $fileName;
 				if(count($methodArr) > 0)
 				{
 					$method = $methodArr[0];

@@ -23,7 +23,6 @@ class TemplateParser extends EventDispatcher
 		if !TemplateParser.rules
 			TemplateParser._parseTemplateRules()
 
-
 		@_renderQueue = []
 		@_loaded = false
 		@id = template
@@ -37,12 +36,10 @@ class TemplateParser extends EventDispatcher
 	parse:(template)->
 		@_templateLoadComplete(null, template)
 
-
-
 	loadTemplate:(name, dataPath = null)->
 		if !/\.tpl$/.test(name)
-			name = name.replace(/\./, '/') + '.tpl'
-		if name.indexOf('/') is not 0
+			name = name.replace(/\./, '/') + Template.EXTENSION
+		if name.indexOf('/') != 0
 			rootPath = Template.ROOT_PATH
 		else
 			rootPath = ''
@@ -65,6 +62,7 @@ class TemplateParser extends EventDispatcher
 
 
 	_templateLoadComplete:(e, data)=>
+		console.log(arguments)
 		@_externalTemplates = []
 
 		@_nodes = @_parseBlocks(data)
@@ -95,6 +93,7 @@ class TemplateParser extends EventDispatcher
 				template = new TemplateParser(@_externalTemplates[i])
 				template.on(TemplateParser.LOAD_ERROR, @_externalTemplateLoadError)
 				template.on(TemplateParser.LOAD_COMPLETE, @_externalTemplateLoaded)
+				Template.addTemplate(@_externalTemplates[i], template)
 				@_externalTemplates.splice(i, 1)
 				return
 
@@ -127,6 +126,7 @@ class TemplateParser extends EventDispatcher
 		@_loadExternalTemplates()
 
 	_externalTemplateLoadError:(e, data)=>
+		Template.addTemplate(e.target.id, '')
 		@_loadExternalTemplates()
 
 	_loadComplete:()=>
