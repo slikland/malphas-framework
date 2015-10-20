@@ -1,14 +1,15 @@
 <?php
 namespace model\cms;
 /**
-*	@addToMenu("Usuário", 999, [1, 2, 3])
+*	@addToMenu("Usuários", 999, [1, 2, 3])
 */
 class user extends Model
 {
 
 	/**
-	*	@validate('user', 'min', 5)
-	*	@validate('pass', 'min', 5)
+	*	@validate("user", "min", 5)
+	*	@validate("pass", "min", 5)
+	*	@authenticate([1, 2, 3])
 	*/
 	function login($data)
 	{

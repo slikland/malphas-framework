@@ -3824,6 +3824,8 @@ components.Form = (function(_super) {
     this.element.on('submit', this._submit);
   }
 
+  Form.prototype.destroy = function() {};
+
   Form.prototype.addComponent = function(component) {};
 
   Form.prototype.removeComponent = function() {};

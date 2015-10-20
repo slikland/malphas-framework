@@ -3,6 +3,8 @@ class components.Form extends BaseDOM
 	constructor:()->
 		super
 		@element.on('submit', @_submit)
+	destroy:()->
+		
 	addComponent:(component)->
 
 	removeComponent:()->
