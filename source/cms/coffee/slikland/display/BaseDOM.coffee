@@ -22,6 +22,9 @@ Node::removeChild = (node) ->
 		node.parent = @
 	Node::__removeChild__.call(@, el)
 	
+Node::getInstance = () ->
+	return @__instance__
+	
 # 
 # TODO: FIX IE8+
 # Node.get({instance: ()-> return @__instance__})
@@ -57,6 +60,7 @@ class BaseDOM extends EventDispatcher
 		if className
 			@addClass(className)
 		@_element.__instance__ = @
+		
 
 	##------------------------------------------------------------------------------
 	##

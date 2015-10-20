@@ -62,7 +62,6 @@ class TemplateParser extends EventDispatcher
 
 
 	_templateLoadComplete:(e, data)=>
-		console.log(arguments)
 		@_externalTemplates = []
 
 		@_nodes = @_parseBlocks(data)
@@ -196,9 +195,12 @@ class TemplateParser extends EventDispatcher
 				data['condition'] = cond[1]
 			else
 				attrsRE = /([\.\#])?([\w\-]+)/g
+				if !instructionData
+					instructionData = ''
+				tagData = instructionData.replace(/\{.*?\}/g, '')
 				ids = []
 				cssClasses = []
-				while instAttr = attrsRE.exec(instructionData)
+				while instAttr = attrsRE.exec(tagData)
 					switch instAttr[1]
 						when '.'
 							cssClasses.push(instAttr[2])
@@ -231,14 +233,19 @@ class TemplateParser extends EventDispatcher
 		return data
 	_parseObjectRecursive:(data)=>
 		@_objData = []
+		obj = /(\{.*?\})/.exec(data)
+		if obj
+			try
+				obj = JSON.parse(obj[0])
+		if !obj
+			obj = {}
 		while /\{([^\{\}]*)\}/.test(data)
 			[data, @_objData] = @_escapeCharacters(data, @_objData, '£££')
 			[data, @_objData] = @_escapeString(data, /(([\'\"])([^\2]*)\2)/, @_objData, '£££', 3)
 			data = data.replace(/\{([^\{\}]*)\}/g, @_replaceObject)
-		if @_objData.length == 0
-			return [data, {}]
-		obj = @_objData[@_objData.length - 1]
-		@_objData.length = 0
+		# if @_objData.length == 0
+		# 	return [data, {}]
+		# @_objData.length = 0
 		data = data.replace(/\${3}\d+\£{3}/g, '')
 		return [data, obj]
 	_replaceObject:(context, match)=>

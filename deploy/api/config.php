@@ -52,10 +52,10 @@ define('TIME_DIFF', 0);
 
 if(preg_match('/^local(\.|host)/', $_SERVER['SERVER_NAME']))
 {
-	$db_host = 'mysql.homolog.slik.land';
-	$db_name = 's253dev';
-	$db_user = 's253dev';
-	$db_pass = 'dF28e0ZAdf';
+	$db_host = 'localhost';
+	$db_name = 'slikland-cms';
+	$db_user = 'root';
+	$db_pass = '';
 }
 else if(preg_match('/^(b_.*?\.)?dev\./', $_SERVER['SERVER_NAME']))
 {

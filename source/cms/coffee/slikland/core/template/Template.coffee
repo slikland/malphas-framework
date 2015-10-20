@@ -45,13 +45,17 @@ class Template
 	@setExtension:(extension = '.tpl')->
 		@EXTENSION = extension
 	@addTemplate:(id, template)->
-		if !@CACHE[id]
-			if template not instanceof TemplateParser
-				tParser = new TemplateParser()
-				tParser.parse(template)
-			else
-				tParser = template
-			@CACHE[id] = tParser
+		if template not instanceof TemplateParser
+			tParser = new TemplateParser()
+			tParser.parse(template)
+		else
+			tParser = template
+		@CACHE[id] = tParser
+		return tParser
+
+	@renderTemplate:(id, template, context = null, data = null, onComplete = null, onError = null)->
+		tParser = @addTemplate(id, template)
+		tParser.render(context, data, onComplete, onError)
 
 	@render:(template, context = null, data = null, onComplete = null, onError = null)->
 		if !template

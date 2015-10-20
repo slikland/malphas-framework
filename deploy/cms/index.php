@@ -8,6 +8,7 @@ include_once('../api/config.php');
 
 	<title>CMS</title>
 	<script src="js/Main.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/font-awesome.min.css">
 	<link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
 <body>

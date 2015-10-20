@@ -48,7 +48,7 @@ class DB{
 	{
 		if(!isset($this->mysqli))
 		{
-			$this->mysqli = new mysqli($this->host, $this->user, $this->pass, $this->name);
+			$this->mysqli = new \mysqli($this->host, $this->user, $this->pass, $this->name);
 			$this->mysqli->query("SET NAMES 'utf8'");
 		}
 	}
@@ -57,6 +57,27 @@ class DB{
 	{
 		$this->initMySQLi();
 		return $this->mysqli->real_escape_string($string);
+	}
+
+	public function multi_query($sql)
+	{
+		$this->initMySQLi();
+		$results = array();
+		if ($this->mysqli->multi_query($sql)) {
+			do {
+				if ($result = $this->mysqli->store_result()) {
+					while ($row = $result->fetch_row()) {
+						$results[] = $row[0];
+					}
+					$result->free();
+				}
+				if ($this->mysqli->more_results()) {
+				}else{
+					break;
+				}
+			} while ($this->mysqli->next_result());
+		}
+		return $results;
 	}
 
 	public function query($sql, $params = NULL)

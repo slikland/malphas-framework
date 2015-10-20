@@ -1,6 +1,17 @@
 <?php
 namespace slikland\core;
 class Controller{
+	private static $instance = NULL;
+	public static function getInstance()
+	{
+		if(!self::$instance)
+		{
+			// var_dump(__CLASS__);
+			self::$instance = new static();
+		}
+		return self::$instance;
+	}
+
 	function __construct()
 	{
 

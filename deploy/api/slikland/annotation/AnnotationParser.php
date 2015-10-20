@@ -3,9 +3,14 @@ namespace slikland\annotation;
 
 class AnnotationParser
 {
-	public static function getAnnotations($class, $method, $filters = NULL)
+	public static function getAnnotations($class, $method = NULL, $filters = NULL)
 	{
-		$refl = new \ReflectionMethod($class, $method);
+		if($method)
+		{
+			$refl = new \ReflectionMethod($class, $method);
+		}else{
+			$refl = new \ReflectionClass($class);
+		}
 		$doc = $refl->getDocComment();
 		preg_match_all('/\*\s*@(\w+)(?:\((.*?)\))?$/m', $doc, $annotations, PREG_SET_ORDER);
 		if(!$annotations || count($annotations) == 0)

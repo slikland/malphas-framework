@@ -1,3 +1,5 @@
-nav: 
-	ul: #{menu}
-		li: #{item}
+nav: #{menu}
+	a{"href":"#{url}"}: #{name}
+	ul: #{items}
+		li: 
+			a{"href":"#{url}"}: #{name}
