@@ -53,8 +53,10 @@ class Template
 		@CACHE[id] = tParser
 		return tParser
 
-	@renderTemplate:(id, template, context = null, data = null, onComplete = null, onError = null)->
-		tParser = @addTemplate(id, template)
+	@renderTemplate:(id, context = null, data = null, onComplete = null, onError = null)->
+		tParser = @find(id)
+		if !tParser
+			return
 		tParser.render(context, data, onComplete, onError)
 
 	@render:(template, context = null, data = null, onComplete = null, onError = null)->

@@ -2,7 +2,6 @@ class components.Form extends BaseDOM
 	@SELECTOR: 'form'
 	constructor:()->
 		super
-		console.log(@)
 		@element.on('submit', @_submit)
 	addComponent:(component)->
 
@@ -12,4 +11,7 @@ class components.Form extends BaseDOM
 		e.stopPropagation()
 		e.preventDefault()
 		formData = new FormData(@element)
-		API.call({url: @attr('action'), data: formData})
+		app.serviceController.call({url: @attr('action'), data: formData, onComplete: @_submitComplete, onError: @_submitError})
+	_submitComplete:()=>
+		@element.reset?()
+	_submitError:()=>

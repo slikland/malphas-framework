@@ -3,16 +3,33 @@ class ViewController
 		@_instance ?= new @(arguments...)
 	
 	constructor:()->
+		@_body = new BaseDOM({element: document.body})
 
-	getInterface:()->
-		API.call({url: 'index/view', onComplete: @_interfaceLoadComplete})
-	_interfaceLoadComplete:(e, data)=>
-		if data.__view
-			@renderView(data.__view, data.data)
+	getInterface:(logged = false)->
+		app.serviceController.call({url: 'index/view'})
 
-	renderView:(template, data, target = document.body)->
-		console.log(data)
-		Template.renderTemplate('index', template, target, data)
+	addView:(id, template)->
+		Template.addTemplate(id, template)
+
+	renderInterface:(id, template, data)->
+		@addView('__interface', template)
+		@renderView('__interface', data, @_body)
+		main = document.querySelector('main')
+
+		if main
+			@_container = main.getInstance() || new BaseDOM({element: main})
+		else
+			@_container = null
+
+	renderView:(id, data, target = null)->
+		if !target
+			target = @_container
+		if !target
+			return
+		if target instanceof BaseDOM
+			target.removeAll()
+			target = target.element
+		Template.renderTemplate(id, target, data)
 		app.componentController.parse()
 
 	goto:(path)->

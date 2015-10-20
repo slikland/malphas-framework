@@ -12,8 +12,10 @@
 #import slikland.core.template.Template
 #import slikland.loader.API
 
+#import cms.core.ServiceController
 #import cms.core.ComponentController
 #import cms.core.ViewController
+#import cms.core.User
 
 #import cms.components.*
 
@@ -26,6 +28,9 @@ class Main
 
 		API.ROOT_PATH = app.basePath + '../api/cms/'
 
+		app.serviceController = ServiceController.getInstance()
+		app.user = new User()
+
 		app.router = new NavigationRouter()
 		app.router.init(app.basePath)
 
@@ -36,9 +41,11 @@ class Main
 
 		app.componentController.parse()
 
-		# API.call({url: 'index/index', onComplete: @_indexComplete})
+		# API.call({url: 'user/getSession', onComplete: @_indexComplete, onError: @_error})
 	_indexComplete:()=>
 		console.log(arguments)
+	_error:()=>
+		console.log("ERR")
 	_loadComplete:()=>
 		# @_template = AssetLoader.getInstance().getResult('template.yaml')
 

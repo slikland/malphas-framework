@@ -24,7 +24,7 @@ class ServiceController
 		}
 		if(!$service)
 		{
-			throw new ServiceError('Service not found');
+			throw new \slikland\error\ServiceError('Service not found');
 		}
 		
 		$response = null;
@@ -71,12 +71,12 @@ class ServiceController
 					$response['__view'] = $service['view'];
 				}
 			}
-		}catch(ServiceError $e)
+		}catch(\slikland\error\Error $e)
 		{
 			$response = $e->toObject();
 		}catch(\Exception $e)
 		{
-			$e = new ServiceError($e->getMessage());
+			$e = new \slikland\error\ServiceError($e->getMessage());
 			$response = $e->toObject();
 		}
 		if($output)

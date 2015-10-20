@@ -21,6 +21,7 @@ function sl_autoloader($class, $prevClassName = NULL)
 		$paths[] = $localPath;
 		$paths[] = 'controller/' . $localPath;
 		$paths[] = 'model/' . $localPath;
+		$paths[] = 'slikland/error/' . $localPath;
 	}
 
 	$found = false;

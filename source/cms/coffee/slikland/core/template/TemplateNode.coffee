@@ -85,8 +85,10 @@ class TemplateNode extends EventDispatcher
 		if path && o = /([\*\@])?(.*?)$/.exec(path)
 			switch o[1]
 				when '*'
+					1
 					# console.log("GLOBAL")
 				when '@'
+					2
 					# console.log("ROOT")
 				else
 					obj = ObjectUtils.findChild(obj, o[2])

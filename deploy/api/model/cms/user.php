@@ -5,20 +5,40 @@ namespace model\cms;
 */
 class user extends Model
 {
-	function login()
+
+	/**
+	*	@validate('user', 'min', 5)
+	*	@validate('pass', 'min', 5)
+	*/
+	function login($data)
 	{
-		// $this->controller->login();
-		return 1;
+		$user = $this->controller->login($data['user'], $data['pass']);
+		if(!$user)
+		{
+			throw new AuthenticationError('not logged');
+		}
+		return array('__user'=>$user);
 	}
 
 	function logout()
 	{
+		$this->controller->logout();
+		throw new AuthenticationError('not logged');
+	}
 
+	function ping()
+	{
+		return $this->getSession();
 	}
 
 	function getSession()
 	{
-
+		$session = $this->controller->getSession(False);
+		if(!$session)
+		{
+			throw new AuthenticationError('not logged');
+		}
+		return TRUE;
 	}
 
 	/**

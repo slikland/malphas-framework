@@ -2744,10 +2744,10 @@ TemplateNode = (function(_super) {
     if (path && (o = /([\*\@])?(.*?)$/.exec(path))) {
       switch (o[1]) {
         case '*':
-          console.log("GLOBAL");
+          1;
           break;
         case '@':
-          console.log("ROOT");
+          2;
           break;
         default:
           obj = ObjectUtils.findChild(obj, o[2]);
@@ -3253,7 +3253,7 @@ Template = (function() {
     return tParser;
   };
 
-  Template.renderTemplate = function(id, template, context, data, onComplete, onError) {
+  Template.renderTemplate = function(id, context, data, onComplete, onError) {
     var tParser;
     if (context == null) {
       context = null;
@@ -3267,7 +3267,10 @@ Template = (function() {
     if (onError == null) {
       onError = null;
     }
-    tParser = this.addTemplate(id, template);
+    tParser = this.find(id);
+    if (!tParser) {
+      return;
+    }
     return tParser.render(context, data, onComplete, onError);
   };
 
@@ -3428,7 +3431,11 @@ API = (function(_super) {
               data = e.currentTarget.responseText;
             }
           }
-          this.trigger(API.COMPLETE, data);
+          if (data != null ? data.error : void 0) {
+            this.trigger(API.ERROR, data);
+          } else {
+            this.trigger(API.COMPLETE, data);
+          }
         } catch (_error) {
           err = _error;
           console.log(err);
@@ -3444,6 +3451,64 @@ API = (function(_super) {
   };
 
   return API;
+
+})(EventDispatcher);
+
+var ServiceController,
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+ServiceController = (function(_super) {
+  __extends(ServiceController, _super);
+
+  ServiceController.getInstance = function() {
+    return ServiceController._instance != null ? ServiceController._instance : ServiceController._instance = (function(func, args, ctor) {
+      ctor.prototype = func.prototype;
+      var child = new ctor, result = func.apply(child, args);
+      return Object(result) === result ? result : child;
+    })(ServiceController, arguments, function(){});
+  };
+
+  function ServiceController() {
+    this._callError = __bind(this._callError, this);
+    this._callComplete = __bind(this._callComplete, this);
+  }
+
+  ServiceController.prototype.call = function(params) {
+    var apiCall;
+    apiCall = API.call(params);
+    apiCall.on(API.COMPLETE, this._callComplete);
+    return apiCall.on(API.ERROR, this._callError);
+  };
+
+  ServiceController.prototype.cancel = function(apiCall) {
+    return apiCall.cancel();
+  };
+
+  ServiceController.prototype._callComplete = function(e, data) {
+    console.log(data);
+    if (!data) {
+      return;
+    }
+    if (data['__user'] != null) {
+      app.user.setUser(data['__user']);
+    }
+    if (data['__interface']) {
+      return app.viewController.renderInterface('index', data.__interface, data.data);
+    } else if (data['__view']) {
+      return 1;
+    }
+  };
+
+  ServiceController.prototype._callError = function(data) {
+    switch (data.code) {
+      case 1:
+        return app.viewController.getInterface();
+    }
+  };
+
+  return ServiceController;
 
 })(EventDispatcher);
 
@@ -3577,8 +3642,7 @@ ComponentController = (function() {
 
 })();
 
-var ViewController,
-  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+var ViewController;
 
 ViewController = (function() {
   ViewController.getInstance = function() {
@@ -3590,28 +3654,53 @@ ViewController = (function() {
   };
 
   function ViewController() {
-    this._interfaceLoadComplete = __bind(this._interfaceLoadComplete, this);
+    this._body = new BaseDOM({
+      element: document.body
+    });
   }
 
-  ViewController.prototype.getInterface = function() {
-    return API.call({
-      url: 'index/view',
-      onComplete: this._interfaceLoadComplete
+  ViewController.prototype.getInterface = function(logged) {
+    if (logged == null) {
+      logged = false;
+    }
+    return app.serviceController.call({
+      url: 'index/view'
     });
   };
 
-  ViewController.prototype._interfaceLoadComplete = function(e, data) {
-    if (data.__view) {
-      return this.renderView(data.__view, data.data);
+  ViewController.prototype.addView = function(id, template) {
+    return Template.addTemplate(id, template);
+  };
+
+  ViewController.prototype.renderInterface = function(id, template, data) {
+    var main;
+    this.addView('__interface', template);
+    this.renderView('__interface', data, this._body);
+    main = document.querySelector('main');
+    if (main) {
+      return this._container = main.getInstance() || new BaseDOM({
+        element: main
+      });
+    } else {
+      return this._container = null;
     }
   };
 
-  ViewController.prototype.renderView = function(template, data, target) {
+  ViewController.prototype.renderView = function(id, data, target) {
     if (target == null) {
-      target = document.body;
+      target = null;
     }
-    console.log(data);
-    Template.renderTemplate('index', template, target, data);
+    if (!target) {
+      target = this._container;
+    }
+    if (!target) {
+      return;
+    }
+    if (target instanceof BaseDOM) {
+      target.removeAll();
+      target = target.element;
+    }
+    Template.renderTemplate(id, target, data);
     return app.componentController.parse();
   };
 
@@ -3623,6 +3712,101 @@ ViewController = (function() {
 
 })();
 
+var User,
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+User = (function(_super) {
+  __extends(User, _super);
+
+  User.PING_TIMEOUT = 10;
+
+  function User() {
+    this._pingComplete = __bind(this._pingComplete, this);
+    this._ping = __bind(this._ping, this);
+    this._firstTime = true;
+  }
+
+  User.get({
+    name: function() {
+      return this._name;
+    }
+  });
+
+  User.get({
+    id: function() {
+      return this._id;
+    }
+  });
+
+  User.get({
+    role: function() {
+      return this._role;
+    }
+  });
+
+  User.get({
+    roleName: function() {
+      return this._roleName;
+    }
+  });
+
+  User.prototype.setUser = function(data) {
+    if (data == null) {
+      data = null;
+    }
+    if (!data) {
+      this._stopPing();
+      this._name = null;
+      this._id = null;
+      this._role = null;
+    } else if (this._id !== data['id']) {
+      this._startPing();
+      this._name = data['name'];
+      this._id = data['id'];
+      this._role = data['role'];
+      this._roleName = data['roleName'];
+      if (!this._firstTime) {
+        app.viewController.getInterface();
+      }
+    }
+    return this._firstTime = false;
+  };
+
+  User.prototype.logout = function() {
+    return 1;
+  };
+
+  User.prototype._startPing = function() {
+    return this._pingTimeout = setTimeout(this._ping, User.PING_TIMEOUT * 1000);
+  };
+
+  User.prototype._stopPing = function() {
+    clearTimeout(this._pingTimeout);
+    return this._pingTimeout = null;
+  };
+
+  User.prototype._ping = function() {
+    if (!this._pingTimeout) {
+      return;
+    }
+    return app.serviceController.call({
+      url: 'user/ping',
+      onComplete: this._pingComplete
+    });
+  };
+
+  User.prototype._pingComplete = function() {
+    if (this._pingTimeout) {
+      return this._startPing();
+    }
+  };
+
+  return User;
+
+})(EventDispatcher);
+
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -3633,9 +3817,10 @@ components.Form = (function(_super) {
   Form.SELECTOR = 'form';
 
   function Form() {
+    this._submitError = __bind(this._submitError, this);
+    this._submitComplete = __bind(this._submitComplete, this);
     this._submit = __bind(this._submit, this);
     Form.__super__.constructor.apply(this, arguments);
-    console.log(this);
     this.element.on('submit', this._submit);
   }
 
@@ -3648,11 +3833,20 @@ components.Form = (function(_super) {
     e.stopPropagation();
     e.preventDefault();
     formData = new FormData(this.element);
-    return API.call({
+    return app.serviceController.call({
       url: this.attr('action'),
-      data: formData
+      data: formData,
+      onComplete: this._submitComplete,
+      onError: this._submitError
     });
   };
+
+  Form.prototype._submitComplete = function() {
+    var _base;
+    return typeof (_base = this.element).reset === "function" ? _base.reset() : void 0;
+  };
+
+  Form.prototype._submitError = function() {};
 
   return Form;
 
@@ -3694,12 +3888,15 @@ var Main,
 Main = (function() {
   function Main() {
     this._loadComplete = __bind(this._loadComplete, this);
+    this._error = __bind(this._error, this);
     this._indexComplete = __bind(this._indexComplete, this);
     var _ref;
     app.basePath = ((_ref = document.querySelector('base')) != null ? _ref.href : void 0) || '';
     Template.setRootPath(app.basePath + '../api/view/cms/');
     Template.setExtension('');
     API.ROOT_PATH = app.basePath + '../api/cms/';
+    app.serviceController = ServiceController.getInstance();
+    app.user = new User();
     app.router = new NavigationRouter();
     app.router.init(app.basePath);
     app.componentController = ComponentController.getInstance();
@@ -3710,6 +3907,10 @@ Main = (function() {
 
   Main.prototype._indexComplete = function() {
     return console.log(arguments);
+  };
+
+  Main.prototype._error = function() {
+    return console.log("ERR");
   };
 
   Main.prototype._loadComplete = function() {};

@@ -4,7 +4,7 @@ class user extends Model
 {
 
 	/**
-	* @authenticate("admin", "editor")
+	* @authenticate(1, 2, 3)
 	* @validate("email", "email")
 	* @validate("name", "maxchar", 10)
 	* @cache()
@@ -12,8 +12,6 @@ class user extends Model
 
 	function test($data = NULL)
 	{
-		var_dump($this->db);
-		var_dump($this->controller);
 		return array(1, 2, 3);
 	}
 }

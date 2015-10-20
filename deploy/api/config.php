@@ -15,7 +15,6 @@ define('API_PATH', dirname(realpath(__FILE__)) . '/');
 define('ROOT_PATH', dirname(API_PATH) . '/');
 define('DYNAMIC_PATH', ROOT_PATH . 'dynamic/');
 
-
 $http = "http";
 if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') $http = 'https';
 if(isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') $http = 'https';
@@ -61,44 +60,20 @@ else if(preg_match('/^(b_.*?\.)?dev\./', $_SERVER['SERVER_NAME']))
 {
 	// dev
 	$db_host = 'mysql.homolog.slik.land';
-	$db_name = 's253dev';
-	$db_user = 's253dev';
-	$db_pass = 'dF28e0ZAdf';
+	$db_name = '';
+	$db_user = '';
+	$db_pass = '';
 }
 else if(preg_match('/^(b_.*?\.)?client\./', $_SERVER['SERVER_NAME']))
 {
 	// client
 	$db_host = 'mysql.homolog.slik.land';
-	$db_name = 's253dev';
-	$db_user = 's253dev';
-	$db_pass = 'dF28e0ZAdf';
+	$db_name = '';
+	$db_user = '';
+	$db_pass = '';
 }else{
 	switch($_SERVER['SERVER_NAME'])
 	{
-		case 's253.local.slikland.com':
-			$db_host = '127.0.0.1';
-			$db_name = 's253local';
-			$db_user = 'root';
-			$db_pass = '';
-			break;
-		case 's253.dev.slikland.com':
-			// $db_host = '127.0.0.1';
-			// $db_name = 's102';
-			// $db_user = 'root';
-			$db_pass = '';
-			$local = true;
-			$db_host = 'mysql.homolog.slik.land';
-		    $db_name = 's253dev';
-		    $db_user = 's253dev';
-		    $db_pass = 'dF28e0ZAdf';
-			break;
-		case 's253.client.slikland.com':
-			$local = false;
-			$db_host = 'mysql.homolog.slik.land';
-			$db_name = 's253client';
-			$db_user = 's253client';
-			$db_pass = 'pidDs813nf';
-			break;
 		default:
 			$local = false;
 			$db_host = '';

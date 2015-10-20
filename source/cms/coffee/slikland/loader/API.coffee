@@ -83,7 +83,10 @@ class API extends EventDispatcher
 							data = eval('(' + e.currentTarget.responseText + ')')
 						catch
 							data = e.currentTarget.responseText
-					@trigger(API.COMPLETE, data)
+					if data?.error
+						@trigger(API.ERROR, data)
+					else
+						@trigger(API.COMPLETE, data)
 				catch err
 					console.log(err)
 					@trigger(API.ERROR)
