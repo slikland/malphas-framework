@@ -59,10 +59,10 @@ if(preg_match('/^local(\.|host)/', $_SERVER['SERVER_NAME']))
 else if(preg_match('/^(b_.*?\.)?dev\./', $_SERVER['SERVER_NAME']))
 {
 	// dev
-	$db_host = 'mysql.homolog.slik.land';
-	$db_name = '';
-	$db_user = '';
-	$db_pass = '';
+	$db_host = 'mysql.dev.slikland.net';
+	$db_name = 'sliklandcmsdev';
+	$db_user = 'sliklandcmsdev';
+	$db_pass = 'FX9a83lb';
 }
 else if(preg_match('/^(b_.*?\.)?client\./', $_SERVER['SERVER_NAME']))
 {
