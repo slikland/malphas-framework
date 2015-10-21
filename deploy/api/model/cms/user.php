@@ -1,7 +1,7 @@
 <?php
 namespace model\cms;
 /**
-*	@addToMenu("Usuários", 999, [1, 2, 3])
+*	@addToMenu("Usuários", 9999, [1, 2, 3])
 */
 class user extends Model
 {
@@ -48,7 +48,7 @@ class user extends Model
 	*/
 	function listUsers()
 	{
-		
+
 	}
 
 	/**

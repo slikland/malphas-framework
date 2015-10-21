@@ -28,6 +28,15 @@ class User extends Controller
 		return $this->getUser($id);
 	}
 
+	public function getCurrentUser()
+	{
+		if(!$this->user)
+		{
+			$this->user = $this->getSession(TRUE);
+		}
+		return $this->user;
+	}
+
 	private function getUser($id)
 	{
 		return $this->db->fetch_one('SELECT cu.pk_cms_user id, cu.fk_cms_role role, cr.name roleName, cu.name name FROM cms_user cu LEFT JOIN cms_role cr ON cu.fk_cms_role = cr.pk_cms_role WHERE pk_cms_user = ' . $id);
@@ -55,7 +64,8 @@ class User extends Controller
 			$this->updateSession($uid);
 			if($userData)
 			{
-				return $this->getUser($id);
+				$this->user = $this->getUser($id);
+				return $this->user;
 			}else{
 				return TRUE;
 			}
