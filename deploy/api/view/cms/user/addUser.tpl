@@ -7,8 +7,8 @@ form{"action":"user/add"}:
 		label{"for":"email"}: "E-mail"
 		input{"email":"email","id":"email"}
 	field:
-		label{"for":"pass"}: "Password"
-		input{"pass":"pass","id":"pass"}
+		label{"for":"pass"}: "Senha"
+		input{"pass":"pass","id":"pass", "type":"password"}
 	field:
 		label{"for":"role"}: "Tipo"
 		select{"role":"role","id":"role"}:#{roles}

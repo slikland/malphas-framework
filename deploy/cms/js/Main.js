@@ -3504,6 +3504,7 @@ ServiceController = (function(_super) {
   };
 
   ServiceController.prototype._callComplete = function(e, data) {
+    var url;
     if (e.target.hasBlocker) {
       app.blocker.hide();
     }
@@ -3516,8 +3517,12 @@ ServiceController = (function(_super) {
     if (data['__interface']) {
       app.viewController.renderInterface('index', data.__interface, data);
       if (app.user.logged) {
+        url = app.router.getCurrentPath();
+        if (!url) {
+          url = '/';
+        }
         return this.call({
-          url: app.router.getCurrentPath()
+          url: url
         });
       }
     } else if (data['__view']) {
@@ -3949,7 +3954,13 @@ components.Anchor = (function(_super) {
 
   function Anchor() {
     this._click = __bind(this._click, this);
+    var href;
     Anchor.__super__.constructor.apply(this, arguments);
+    href = this.attr('href');
+    if (!href || href.length === 0) {
+      this.element.removeAttribute('href');
+      return;
+    }
     this.element.on('click', this._click);
   }
 

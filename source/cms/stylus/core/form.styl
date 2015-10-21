@@ -22,13 +22,22 @@ button
 	outline: 0
 	font-size: 1em
 	cursor: pointer
+
+select
+	padding: 4px 8px
+	min-width: 215px
+	height: 29px
+	-webkit-appearance: menulist-button
+	
 field
 	display: block
 	margin-top: 0.5em
 	label
 		display: block
 
+
 for i in (1...length(bg-colors) + 1)
 	button.p{i}
 		generateColor(i - 1)
 		border-width: 1px
+	

@@ -26,7 +26,11 @@ class index extends Model{
 
 	function index()
 	{
-		return 1;
+		$response = array();
+
+		$response['title'] = Settings::get('cms_title');
+
+		return $response;
 	}
 
 }

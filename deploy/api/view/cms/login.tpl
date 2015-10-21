@@ -10,4 +10,4 @@ section.login
 				i.fa.fa-key
 			input{"name":"pass" ,"type": "password", "placeholder": "Password"}
 		field.buttons
-			button: Sign in
+			button.p5: Sign in

@@ -47,7 +47,10 @@ class Core
 			return NULL;
 		}
 		$menuItem = call_user_func_array(array($this, 'setInterfaceData'), $annotations[0]['values']);
-		$menuItem['url'] = $urlPath;
+		if($reflection->hasmethod('index'))
+		{
+			$menuItem['url'] = $urlPath;
+		}
 		$methods = $reflection->getMethods(\ReflectionMethod::IS_PUBLIC);
 		$items = array();
 		foreach($methods as $method)

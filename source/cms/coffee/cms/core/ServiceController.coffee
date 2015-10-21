@@ -25,7 +25,10 @@ class ServiceController extends EventDispatcher
 		if data['__interface']
 			app.viewController.renderInterface('index', data.__interface, data)
 			if app.user.logged
-				@call({url: app.router.getCurrentPath()})
+				url = app.router.getCurrentPath()
+				if !url
+					url = '/'
+				@call({url: url})
 		else if data['__view']
 			app.viewController.addView(e.target.path, data.__view)
 			app.viewController.renderView(e.target.path, data)

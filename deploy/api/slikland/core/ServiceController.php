@@ -20,7 +20,16 @@ class ServiceController
 		{
 			$servicePath = preg_replace('/\/*$/', '', substr(preg_replace('/\?.*?$/', '', $_SERVER['REQUEST_URI']), strlen(dirname($_SERVER['SCRIPT_NAME']))));
 		}
+		if($servicePath == '/cms')
+		{
+			$servicePath = '/cms/index';
+		}
 		$service = self::findService($servicePath);
+		if(!isset($service['method']))
+		{
+			$service['method'] = 'index';
+			$service['params'] = array();
+		}
 		if($view = slikland\template\TemplateLoader::load($servicePath))
 		{
 			$service['view'] = $view;
