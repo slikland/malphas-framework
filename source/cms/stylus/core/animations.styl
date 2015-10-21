@@ -1,0 +1,68 @@
+showAnimation(type, direction, distance = 30%, initialOpacity = 0)
+	x = 0
+	y = 0
+	if direction == 'up'
+		y = distance
+	else if direction == 'down'
+		y = distance * -1
+	else if direction == 'left'
+		x = distance
+	else if direction == 'right'
+		x = distance * -1
+	name = type + '-' + direction
+	@keyframes name
+		from
+			transform: translate(x, y)
+			opacity: initialOpacity
+		to
+			transform: translate(0, 0)
+			opacity: 1
+showAnimation('show', 'up')
+showAnimation('show', 'down')
+showAnimation('show', 'left')
+showAnimation('show', 'right')
+showAnimation('slide', 'up', 100%, 1)
+showAnimation('slide', 'down', 100%, 1)
+showAnimation('slide', 'right', 100%, 1)
+showAnimation('slide', 'left', 100%, 1)
+
+show-up(duration = 0.3s, delay = 0s)
+	animation-fill-mode: backwards
+	animation-name: show-up
+	animation-duration: duration
+	animation-delay: delay
+show-down(duration = 0.3s, delay = 0s)
+	animation-fill-mode: backwards
+	animation-name: show-down
+	animation-duration: duration
+	animation-delay: delay
+show-left(duration = 0.3s, delay = 0s)
+	animation-fill-mode: backwards
+	animation-name: show-left
+	animation-duration: duration
+	animation-delay: delay
+show-right(duration = 0.3s, delay = 0s)
+	animation-fill-mode: backwards
+	animation-name: show-right
+	animation-duration: duration
+	animation-delay: delay
+slide-up(duration = 0.3s, delay = 0s)
+	animation-fill-mode: backwards
+	animation-name: slide-up
+	animation-duration: duration
+	animation-delay: delay
+slide-down(duration = 0.3s, delay = 0s)
+	animation-fill-mode: backwards
+	animation-name: slide-down
+	animation-duration: duration
+	animation-delay: delay
+slide-left(duration = 0.3s, delay = 0s)
+	animation-fill-mode: backwards
+	animation-name: slide-left
+	animation-duration: duration
+	animation-delay: delay
+slide-right(duration = 0.3s, delay = 0s)
+	animation-fill-mode: backwards
+	animation-name: slide-right
+	animation-duration: duration
+	animation-delay: delay

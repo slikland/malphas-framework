@@ -82,6 +82,11 @@ class User extends Controller
 		return FALSE;
 	}
 
+	public function getRoles()
+	{
+		return $this->db->fetch_all('SELECT pk_cms_role value, name name FROM cms_role ORDER BY pk_cms_role', FALSE);
+	}
+
 	private function getUserIP()
 	{
 		$ipaddress = '';

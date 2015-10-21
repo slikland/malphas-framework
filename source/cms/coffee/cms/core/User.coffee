@@ -11,6 +11,8 @@ class User extends EventDispatcher
 		return @_role
 	@get roleName:()->
 		return @_roleName
+	@get logged:()->
+		return ~~@_id
 	setUser:(data = null)->
 		if !data
 			@_stopPing()
@@ -38,7 +40,7 @@ class User extends EventDispatcher
 	_ping:()=>
 		if !@_pingTimeout
 			return
-		app.serviceController.call({url: 'user/ping', onComplete: @_pingComplete})
+		app.serviceController.call({url: 'user/ping', onComplete: @_pingComplete}, false)
 	_pingComplete:()=>
 		if @_pingTimeout
 			@_startPing()

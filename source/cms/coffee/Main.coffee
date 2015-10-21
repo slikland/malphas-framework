@@ -17,6 +17,7 @@
 #import cms.core.ViewController
 #import cms.core.User
 
+#import cms.ui.*
 #import cms.components.*
 
 class Main
@@ -25,6 +26,8 @@ class Main
 		app.basePath = document.querySelector('base')?.href || ''
 		Template.setRootPath(app.basePath + '../api/view/cms/')
 		Template.setExtension('')
+
+		app.blocker = new Blocker()
 
 		API.ROOT_PATH = app.basePath + '../api/cms/'
 
@@ -41,6 +44,7 @@ class Main
 		app.viewController.getInterface()
 
 		app.componentController.parse()
+
 
 		# API.call({url: 'user/getSession', onComplete: @_indexComplete, onError: @_error})
 	_routeChange:()=>

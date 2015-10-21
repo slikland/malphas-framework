@@ -2878,7 +2878,6 @@ TemplateParser = (function(_super) {
       i = -1;
       _results = [];
       while (++i < l) {
-        console.log(this._nodes[i]);
         _results.push(this._nodes[i].render(context, data));
       }
       return _results;
@@ -2886,6 +2885,7 @@ TemplateParser = (function(_super) {
   };
 
   TemplateParser.prototype._templateLoadComplete = function(e, data) {
+    data = data + '\n';
     this._externalTemplates = [];
     this._nodes = this._parseBlocks(data);
     return this._loadExternalTemplates();
@@ -3250,7 +3250,6 @@ Template = (function() {
     } else {
       tParser = template;
     }
-    console.log(id, tParser);
     this.CACHE[id] = tParser;
     return tParser;
   };
@@ -3481,10 +3480,17 @@ ServiceController = (function(_super) {
     this._callComplete = __bind(this._callComplete, this);
   }
 
-  ServiceController.prototype.call = function(params) {
+  ServiceController.prototype.call = function(params, showBlocker) {
     var apiCall;
+    if (showBlocker == null) {
+      showBlocker = true;
+    }
+    if (showBlocker) {
+      app.blocker.show();
+    }
     apiCall = API.call(params);
     apiCall.path = params['url'];
+    apiCall.hasBlocker = showBlocker;
     apiCall.on(API.COMPLETE, this._callComplete);
     return apiCall.on(API.ERROR, this._callError);
   };
@@ -3494,6 +3500,9 @@ ServiceController = (function(_super) {
   };
 
   ServiceController.prototype._callComplete = function(e, data) {
+    if (e.target.hasBlocker) {
+      app.blocker.hide();
+    }
     if (!data) {
       return;
     }
@@ -3501,15 +3510,22 @@ ServiceController = (function(_super) {
       app.user.setUser(data['__user']);
     }
     if (data['__interface']) {
-      return app.viewController.renderInterface('index', data.__interface, data.data);
+      app.viewController.renderInterface('index', data.__interface, data);
+      if (app.user.logged) {
+        return this.call({
+          url: app.router.getCurrentPath()
+        });
+      }
     } else if (data['__view']) {
-      console.log(e.target.path, data.__view);
       app.viewController.addView(e.target.path, data.__view);
-      return app.viewController.renderView(e.target.path, data.data);
+      return app.viewController.renderView(e.target.path, data);
     }
   };
 
   ServiceController.prototype._callError = function(data) {
+    if (data.target.hasBlocker) {
+      app.blocker.hide();
+    }
     switch (data.code) {
       case 1:
         return app.viewController.getInterface();
@@ -3663,7 +3679,7 @@ ViewController = (function() {
 
   function ViewController() {
     this._body = new BaseDOM({
-      element: document.body
+      element: document.querySelector('#wrapper')
     });
   }
 
@@ -3677,7 +3693,7 @@ ViewController = (function() {
   };
 
   ViewController.prototype.addView = function(id, template) {
-    return console.log(Template.addTemplate(id, template));
+    return Template.addTemplate(id, template);
   };
 
   ViewController.prototype.renderInterface = function(id, template, data) {
@@ -3771,6 +3787,12 @@ User = (function(_super) {
     }
   });
 
+  User.get({
+    logged: function() {
+      return ~~this._id;
+    }
+  });
+
   User.prototype.setUser = function(data) {
     if (data == null) {
       data = null;
@@ -3813,7 +3835,7 @@ User = (function(_super) {
     return app.serviceController.call({
       url: 'user/ping',
       onComplete: this._pingComplete
-    });
+    }, false);
   };
 
   User.prototype._pingComplete = function() {
@@ -3825,6 +3847,45 @@ User = (function(_super) {
   return User;
 
 })(EventDispatcher);
+
+var Blocker,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+Blocker = (function(_super) {
+  __extends(Blocker, _super);
+
+  function Blocker() {
+    Blocker.__super__.constructor.call(this, {
+      element: 'div',
+      className: 'blocker'
+    });
+    this.css({
+      display: 'none'
+    });
+  }
+
+  Blocker.prototype.show = function(showLoader) {
+    if (showLoader == null) {
+      showLoader = true;
+    }
+    if (!this.element.parentNode) {
+      document.body.appendChild(this.element);
+    }
+    return this.css({
+      display: 'block'
+    });
+  };
+
+  Blocker.prototype.hide = function() {
+    return this.css({
+      display: 'none'
+    });
+  };
+
+  return Blocker;
+
+})(BaseDOM);
 
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
@@ -3915,7 +3976,6 @@ components.ActionButton = (function(_super) {
   function ActionButton() {
     this._click = __bind(this._click, this);
     ActionButton.__super__.constructor.apply(this, arguments);
-    console.log(this.element);
     this.element.on('click', this._click);
   }
 
@@ -3942,6 +4002,7 @@ Main = (function() {
     app.basePath = ((_ref = document.querySelector('base')) != null ? _ref.href : void 0) || '';
     Template.setRootPath(app.basePath + '../api/view/cms/');
     Template.setExtension('');
+    app.blocker = new Blocker();
     API.ROOT_PATH = app.basePath + '../api/cms/';
     app.serviceController = ServiceController.getInstance();
     app.user = new User();

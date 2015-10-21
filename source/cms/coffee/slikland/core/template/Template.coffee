@@ -50,7 +50,6 @@ class Template
 			tParser.parse(template)
 		else
 			tParser = template
-		console.log(id, tParser)
 		@CACHE[id] = tParser
 		return tParser
 	@hasTemplate:(id)=>

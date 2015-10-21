@@ -22,13 +22,13 @@ class ServiceController
 		{
 			$service['view'] = $view;
 		}
-		if(!$service)
-		{
-			throw new \slikland\error\ServiceError('Service not found');
-		}
-		
 		$response = null;
 		try{
+			if(!$service)
+			{
+				throw new \slikland\error\ServiceError('Service not found');
+			}
+		
 			if($service)
 			{
 				if(array_key_exists('class', $service))

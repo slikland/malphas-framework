@@ -3,13 +3,13 @@ class ViewController
 		@_instance ?= new @(arguments...)
 	
 	constructor:()->
-		@_body = new BaseDOM({element: document.body})
+		@_body = new BaseDOM({element: document.querySelector('#wrapper')})
 
 	getInterface:(logged = false)->
 		app.serviceController.call({url: 'index/view'})
 
 	addView:(id, template)->
-		console.log(Template.addTemplate(id, template))
+		Template.addTemplate(id, template)
 
 	renderInterface:(id, template, data)->
 		@addView('__interface', template)

@@ -58,11 +58,11 @@ class TemplateParser extends EventDispatcher
 			l = @_nodes.length
 			i = -1
 			while ++i < l
-				console.log(@_nodes[i])
 				@_nodes[i].render(context, data)
 
 
 	_templateLoadComplete:(e, data)=>
+		data = data + '\n'
 		@_externalTemplates = []
 
 		@_nodes = @_parseBlocks(data)

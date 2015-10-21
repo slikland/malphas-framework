@@ -16,7 +16,8 @@ class user extends Model
 		$user = $this->controller->login($data['user'], $data['pass']);
 		if(!$user)
 		{
-			throw new AuthenticationError('not logged');
+			throw new ServiceError('User not found');
+			// throw new AuthenticationError('not logged');
 		}
 		return array('__user'=>$user);
 	}
@@ -55,7 +56,14 @@ class user extends Model
 	*/
 	function addUser()
 	{
+		$response = array();
+		$response['roles'] = $this->controller->getRoles();
+		return $response;
+	}
 
+	function add($data)
+	{
+		return $data;
 	}
 }
 ?>

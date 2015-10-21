@@ -12,6 +12,7 @@ include_once('../api/config.php');
 	<link rel="stylesheet" type="text/css" href="css/main.css">
 </head>
 <body>
-
+<div id="wrapper">
+</div>
 </body>
 </html>

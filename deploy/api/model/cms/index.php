@@ -4,6 +4,7 @@ class index extends Model{
 	function view()
 	{
 		$userController = controller\cms\User::getInstance();
+		$response = array();
 		if($user = $userController->getSession())
 		{
 			$interface = new \controller\cms\Core();
@@ -12,11 +13,14 @@ class index extends Model{
 			$interfaceData = array();
 			$interfaceData['menu'] = $menuData;
 			$interfaceData['user'] = $user;
-
-			return array('__user'=>$user, '__interface' => slikland\template\TemplateLoader::load('cms/index'), 'data'=>$interfaceData);
+			$response = array_merge($response, $interfaceData);
+			$response['__user'] = $user;
+			$response['__interface'] = slikland\template\TemplateLoader::load('cms/interface');
 		}else{
-			return array('__user'=>false, '__interface' => slikland\template\TemplateLoader::load('cms/login'));
+			$response['__user'] = FALSE;
+			$response['__interface'] = slikland\template\TemplateLoader::load('cms/login');
 		}
+		return $response;
 	}
 
 	function index()

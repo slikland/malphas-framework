@@ -8,11 +8,13 @@ input
 	font-size: 1em
 	padding: 0.2em
 	outline: 0
+	width: 300px
 	&:focus
 		border-color: #666666
 
 button
 	font-family: helveticaneue
+	font-weight: bold
 	border-width: 1px
 	border-style: solid
 	border-color: #CCCCCC
@@ -20,6 +22,11 @@ button
 	outline: 0
 	font-size: 1em
 	cursor: pointer
+field
+	display: block
+	margin-top: 0.5em
+	label
+		display: block
 
 for i in (1...length(bg-colors) + 1)
 	button.p{i}
