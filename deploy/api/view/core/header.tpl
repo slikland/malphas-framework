@@ -2,5 +2,10 @@ header
 	div.left#asdasd:
 		a{"href":"/"}
 			img.logo{"src": "media/images/logo.png"}
-			:CMS | 
-	div.right: USER
+			span.cms:CMS | 
+	div.right:
+		span.user: #{user.name}
+		span.separator: " | " 
+		button.sign-out.p1{"action":"user/logout"}
+			span.fa.fa-sign-out
+			span: Logout

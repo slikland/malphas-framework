@@ -6,6 +6,7 @@ header
 	background-color: rgba(0, 0, 0, 0.7)
 	line-height: headerHeight
 	color: #FFFFFF
+	font-weight: bold
 	div
 		inline-block()
 	>div
@@ -16,6 +17,16 @@ header
 		padding-left: 8px
 		padding-right: 8px
 	
-	.logo
-		max-height: headerHeight - 16px
-		vertical-align: middle
+	.left
+		.logo
+			max-height: headerHeight - 16px
+			vertical-align: middle
+		span.cms
+			vertical-align: middle
+			
+		
+	.right
+		span.separator
+			padding: 0 0.3em
+		span.sign-out
+			color: #FF3333

@@ -1,7 +1,7 @@
 form
 	position: relative
 input
-	font-family: helveticaneue
+	font-family: Tahoma
 	border-width: 1px
 	border-style: solid
 	border-color: #CCCCCC
@@ -19,3 +19,9 @@ button
 	background-color: #FFFFFF
 	outline: 0
 	font-size: 1em
+	cursor: pointer
+
+for i in (1...length(bg-colors) + 1)
+	button.p{i}
+		generateColor(i - 1)
+		border-width: 1px

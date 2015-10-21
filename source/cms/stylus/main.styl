@@ -3,16 +3,23 @@ global-reset()
 @import 'core/fonts'
 
 add-font('FontAwesome', 'font-awesome-webfont', normal, normal)
-add-font('helveticaneue', 'helveticaneue', normal, normal)
+add-font('helveticaneue', 'helveticaneuecondensed', normal, normal)
 add-font('helveticaneue', 'helveticaneuecondensedbold', normal, bold)
+add-font('helveticaneuebold', 'helveticaneuecondensedbold', normal, normal)
 add-font('helveticaneue', 'helveticaneuelightitalic', italic, normal)
 
 body
-	font-family: helveticaneue
+	font-family: helveticaneuebold
 	font-alias-fix(normal)
+	font-weight: bold
+	color: #000000
 
 headerHeight = 48px
 menuWidth = 240px
+
+a
+	color: inherit
+	text-decoration: none
 
 @import 'core/mixins'
 @import 'core/form'

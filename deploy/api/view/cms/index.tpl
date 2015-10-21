@@ -1,3 +1,3 @@
 <core.header
-	<core.menu
-	main: "a"
+<core.menu
+main: "a"
