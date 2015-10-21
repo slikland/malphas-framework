@@ -48,7 +48,7 @@ class user extends Model
 	*/
 	function listUsers()
 	{
-
+		
 	}
 
 	/**
