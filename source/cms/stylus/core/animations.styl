@@ -17,6 +17,7 @@ showAnimation(type, direction, distance = 30%, initialOpacity = 0)
 		to
 			transform: translate(0, 0)
 			opacity: 1
+showAnimation('show', '--', 0, 0)
 showAnimation('show', 'up')
 showAnimation('show', 'down')
 showAnimation('show', 'left')
@@ -25,6 +26,12 @@ showAnimation('slide', 'up', 100%, 1)
 showAnimation('slide', 'down', 100%, 1)
 showAnimation('slide', 'right', 100%, 1)
 showAnimation('slide', 'left', 100%, 1)
+
+show(duration = 0.3s, delay = 0.3s)
+	animation-fill-mode: backwards
+	animation-name: show---
+	animation-duration: duration
+	animation-delay: delay
 
 show-up(duration = 0.3s, delay = 0s)
 	animation-fill-mode: backwards
