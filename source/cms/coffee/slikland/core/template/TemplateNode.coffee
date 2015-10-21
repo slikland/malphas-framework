@@ -56,7 +56,7 @@ class TemplateNode extends EventDispatcher
 			childContext = document.createElement(@_element)
 			context.appendChild(childContext)
 		if @_content
-			childContext.innerHTML = @_content
+			childContext.innerHTML = @_replaceData(@_content, data)
 
 		if @_attributes
 			attrs = @_replaceData(@_attributes, data)
@@ -76,7 +76,10 @@ class TemplateNode extends EventDispatcher
 	_replaceData:(obj, data)->
 		obj = JSON.stringify(obj)
 		while o = /\#\{(.*?)\}/.exec(obj)
-			obj = obj.replace(new RegExp('#\\{' + o[1] + '\\}', 'g'), ObjectUtils.findChild(data, o[1]))
+			value = ObjectUtils.findChild(data, o[1])
+			if !value
+				value = ''
+			obj = obj.replace(new RegExp('#\\{' + o[1] + '\\}', 'g'), value)
 		return JSON.parse(obj)
 
 	_findObjectData:(obj, path)->

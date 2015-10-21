@@ -13,6 +13,7 @@ class index extends Model{
 			$interfaceData = array();
 			$interfaceData['menu'] = $menuData;
 			$interfaceData['user'] = $user;
+			$interfaceData['title'] = Settings::get('cms_title');
 			$response = array_merge($response, $interfaceData);
 			$response['__user'] = $user;
 			$response['__interface'] = slikland\template\TemplateLoader::load('cms/interface');

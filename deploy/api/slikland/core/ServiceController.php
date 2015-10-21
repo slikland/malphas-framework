@@ -4,6 +4,9 @@ namespace slikland\core;
 include_once('DB.php');
 include_once('Model.php');
 include_once('Controller.php');
+include_once('Settings.php');
+
+class_alias('slikland\core\Settings', 'Settings');
 
 class ServiceController
 {

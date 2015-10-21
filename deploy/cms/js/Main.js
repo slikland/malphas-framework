@@ -2703,7 +2703,7 @@ TemplateNode = (function(_super) {
       context.appendChild(childContext);
     }
     if (this._content) {
-      childContext.innerHTML = this._content;
+      childContext.innerHTML = this._replaceData(this._content, data);
     }
     if (this._attributes) {
       attrs = this._replaceData(this._attributes, data);
@@ -2728,10 +2728,14 @@ TemplateNode = (function(_super) {
   };
 
   TemplateNode.prototype._replaceData = function(obj, data) {
-    var o;
+    var o, value;
     obj = JSON.stringify(obj);
     while (o = /\#\{(.*?)\}/.exec(obj)) {
-      obj = obj.replace(new RegExp('#\\{' + o[1] + '\\}', 'g'), ObjectUtils.findChild(data, o[1]));
+      value = ObjectUtils.findChild(data, o[1]);
+      if (!value) {
+        value = '';
+      }
+      obj = obj.replace(new RegExp('#\\{' + o[1] + '\\}', 'g'), value);
     }
     return JSON.parse(obj);
   };
