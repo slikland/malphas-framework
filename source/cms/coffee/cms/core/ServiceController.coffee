@@ -6,13 +6,13 @@ class ServiceController extends EventDispatcher
 
 	call:(params)->
 		apiCall = API.call(params)
+		apiCall.path = params['url']
 		apiCall.on(API.COMPLETE, @_callComplete)
 		apiCall.on(API.ERROR, @_callError)
 	cancel:(apiCall)->
 		apiCall.cancel()
 
 	_callComplete:(e, data)=>
-		console.log(data)
 		if !data
 			return
 		if data['__user']?
@@ -20,10 +20,9 @@ class ServiceController extends EventDispatcher
 		if data['__interface']
 			app.viewController.renderInterface('index', data.__interface, data.data)
 		else if data['__view']
-			1
-			# app.viewController.addView('index', data.__interface)
-			# app.viewController.renderView('index', data.data, document.body)
-
+			console.log(e.target.path, data.__view)
+			app.viewController.addView(e.target.path, data.__view)
+			app.viewController.renderView(e.target.path, data.data)
 
 	_callError:(data)=>
 		switch data.code

@@ -9,7 +9,7 @@ class ViewController
 		app.serviceController.call({url: 'index/view'})
 
 	addView:(id, template)->
-		Template.addTemplate(id, template)
+		console.log(Template.addTemplate(id, template))
 
 	renderInterface:(id, template, data)->
 		@addView('__interface', template)
@@ -33,4 +33,8 @@ class ViewController
 		app.componentController.parse()
 
 	goto:(path)->
+		if !Template.hasTemplate(path)
+			app.serviceController.call({url: path, __v: true})
+		else
+			app.serviceController.call({url: path, __v: false})
 		app.router.goto(path)

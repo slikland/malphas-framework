@@ -2878,6 +2878,7 @@ TemplateParser = (function(_super) {
       i = -1;
       _results = [];
       while (++i < l) {
+        console.log(this._nodes[i]);
         _results.push(this._nodes[i].render(context, data));
       }
       return _results;
@@ -3249,8 +3250,13 @@ Template = (function() {
     } else {
       tParser = template;
     }
+    console.log(id, tParser);
     this.CACHE[id] = tParser;
     return tParser;
+  };
+
+  Template.hasTemplate = function(id) {
+    return Boolean(Template.CACHE[id]);
   };
 
   Template.renderTemplate = function(id, context, data, onComplete, onError) {
@@ -3259,7 +3265,7 @@ Template = (function() {
       context = null;
     }
     if (data == null) {
-      data = null;
+      data = {};
     }
     if (onComplete == null) {
       onComplete = null;
@@ -3280,7 +3286,7 @@ Template = (function() {
       context = null;
     }
     if (data == null) {
-      data = null;
+      data = {};
     }
     if (onComplete == null) {
       onComplete = null;
@@ -3478,6 +3484,7 @@ ServiceController = (function(_super) {
   ServiceController.prototype.call = function(params) {
     var apiCall;
     apiCall = API.call(params);
+    apiCall.path = params['url'];
     apiCall.on(API.COMPLETE, this._callComplete);
     return apiCall.on(API.ERROR, this._callError);
   };
@@ -3487,7 +3494,6 @@ ServiceController = (function(_super) {
   };
 
   ServiceController.prototype._callComplete = function(e, data) {
-    console.log(data);
     if (!data) {
       return;
     }
@@ -3497,7 +3503,9 @@ ServiceController = (function(_super) {
     if (data['__interface']) {
       return app.viewController.renderInterface('index', data.__interface, data.data);
     } else if (data['__view']) {
-      return 1;
+      console.log(e.target.path, data.__view);
+      app.viewController.addView(e.target.path, data.__view);
+      return app.viewController.renderView(e.target.path, data.data);
     }
   };
 
@@ -3669,7 +3677,7 @@ ViewController = (function() {
   };
 
   ViewController.prototype.addView = function(id, template) {
-    return Template.addTemplate(id, template);
+    return console.log(Template.addTemplate(id, template));
   };
 
   ViewController.prototype.renderInterface = function(id, template, data) {
@@ -3705,6 +3713,17 @@ ViewController = (function() {
   };
 
   ViewController.prototype.goto = function(path) {
+    if (!Template.hasTemplate(path)) {
+      app.serviceController.call({
+        url: path,
+        __v: true
+      });
+    } else {
+      app.serviceController.call({
+        url: path,
+        __v: false
+      });
+    }
     return app.router.goto(path);
   };
 
@@ -3918,6 +3937,7 @@ Main = (function() {
     this._loadComplete = __bind(this._loadComplete, this);
     this._error = __bind(this._error, this);
     this._indexComplete = __bind(this._indexComplete, this);
+    this._routeChange = __bind(this._routeChange, this);
     var _ref;
     app.basePath = ((_ref = document.querySelector('base')) != null ? _ref.href : void 0) || '';
     Template.setRootPath(app.basePath + '../api/view/cms/');
@@ -3927,11 +3947,16 @@ Main = (function() {
     app.user = new User();
     app.router = new NavigationRouter();
     app.router.init(app.basePath);
+    app.router.on(NavigationRouter.CHANGE, this._routeChange);
     app.componentController = ComponentController.getInstance();
     app.viewController = ViewController.getInstance();
     app.viewController.getInterface();
     app.componentController.parse();
   }
+
+  Main.prototype._routeChange = function() {
+    return console.log(arguments);
+  };
 
   Main.prototype._indexComplete = function() {
     return console.log(arguments);

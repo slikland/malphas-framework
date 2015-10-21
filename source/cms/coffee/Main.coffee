@@ -33,6 +33,7 @@ class Main
 
 		app.router = new NavigationRouter()
 		app.router.init(app.basePath)
+		app.router.on(NavigationRouter.CHANGE, @_routeChange)
 
 		app.componentController = ComponentController.getInstance()
 
@@ -42,6 +43,8 @@ class Main
 		app.componentController.parse()
 
 		# API.call({url: 'user/getSession', onComplete: @_indexComplete, onError: @_error})
+	_routeChange:()=>
+		console.log(arguments)
 	_indexComplete:()=>
 		console.log(arguments)
 	_error:()=>

@@ -50,16 +50,19 @@ class Template
 			tParser.parse(template)
 		else
 			tParser = template
+		console.log(id, tParser)
 		@CACHE[id] = tParser
 		return tParser
+	@hasTemplate:(id)=>
+		return Boolean(@CACHE[id])
 
-	@renderTemplate:(id, context = null, data = null, onComplete = null, onError = null)->
+	@renderTemplate:(id, context = null, data = {}, onComplete = null, onError = null)->
 		tParser = @find(id)
 		if !tParser
 			return
 		tParser.render(context, data, onComplete, onError)
 
-	@render:(template, context = null, data = null, onComplete = null, onError = null)->
+	@render:(template, context = null, data = {}, onComplete = null, onError = null)->
 		if !template
 			return
 		if !@CACHE[template]
