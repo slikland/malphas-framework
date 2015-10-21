@@ -50,7 +50,12 @@ class Core
 		{
 			return NULL;
 		}
-		$menuItem = call_user_func_array(array($this, 'setInterfaceData'), $annotations[0]['values']);
+		$values = $annotations[0]['values'];
+		if(isset($values[2]) && !in_array($user['role'], $values[2]))
+		{
+			return NULL;
+		}
+		$menuItem = call_user_func_array(array($this, 'setInterfaceData'), $values);
 		if($reflection->hasmethod('index'))
 		{
 			$menuItem['url'] = $urlPath;
@@ -64,7 +69,10 @@ class Core
 			if($annotations)
 			{
 				$values = $annotations[0]['values'];
-				// if()
+				if(isset($values[2]) && !in_array($user['role'], $values[2]))
+				{
+					continue;
+				}
 				if(!isset($values[1]))
 				{
 					$values[1] = 0;

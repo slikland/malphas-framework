@@ -2,7 +2,7 @@
 namespace model\cms;
 
 /**
-*	@addToMenu("CMS", 9998)
+*	@addToMenu("CMS", 9998, [1])
 */
 class cms extends Model{
 	/**

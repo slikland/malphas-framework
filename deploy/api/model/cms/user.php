@@ -1,7 +1,7 @@
 <?php
 namespace model\cms;
 /**
-*	@addToMenu("Usuários", 9999, [1, 2, 3])
+*	@addToMenu("Usuários", 9999, [1, 2])
 */
 class user extends Model
 {
@@ -9,7 +9,6 @@ class user extends Model
 	/**
 	*	@validate("user", "min", 5)
 	*	@validate("pass", "min", 5)
-	*	@authenticate([1, 2, 3])
 	*/
 	function login($data)
 	{
@@ -28,6 +27,9 @@ class user extends Model
 		throw new AuthenticationError('not logged');
 	}
 
+	/**
+	*	@permission()
+	*/
 	function ping()
 	{
 		return $this->getSession();
@@ -45,6 +47,7 @@ class user extends Model
 
 	/**
 	*	@addToMenu("Lista de usuários", 0, [1, 2])
+	*	@permission([1, 2])
 	*/
 	function listUsers()
 	{

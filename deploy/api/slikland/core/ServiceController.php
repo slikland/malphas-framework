@@ -10,7 +10,7 @@ class_alias('slikland\core\Settings', 'Settings');
 
 class ServiceController
 {
-	private static $prependAnnotation = array('authenticate'=>'controller\cms\User::checkPermission', 'validate');
+	private static $prependAnnotation = array('permission'=>'controller\cms\User::checkPermission', 'validate');
 	private static $appendAnnotation = array('');
 
 	public static function execute($servicePath = NULL, $data = NULL, $output = TRUE)
@@ -45,16 +45,6 @@ class ServiceController
 			{
 				if(array_key_exists('class', $service))
 				{
-					if($service['cms'])
-					{
-						if(isset($service['path']))
-						{
-							\controller\cms\User::checkPermission($service['path']);
-						}else
-						{
-							return;
-						}
-					}
 					$class = new $service['class']();
 
 					if(array_key_exists('method', $service))
@@ -69,7 +59,7 @@ class ServiceController
 						{
 							foreach($annotations as $annotation)
 							{
-								call_user_func($annotation['func'], $data);
+								call_user_func($annotation['func'], $annotation['values'], $service['path'], $data);
 							}
 						}
 						$params = array_merge($data, array('__path'=>$service['path']), $service['params']);

@@ -2,14 +2,26 @@
 namespace controller\cms;
 class User extends Controller
 {
-	public static function checkPermission()
+	public static function checkPermission($values, $path, $data)
 	{
-
+		$user = self::getInstance()->getCurrentUser();
+		if(!$user)
+		{
+			throw new AuthenticationError('not logged');
+		}
+		if(isset($values[0]) && !in_array($user['role'], $values[0]))
+		{
+			throw new AuthenticationError('no permission');
+		}
 	}
 
 	public function isLogged()
 	{
-		return 1;
+		if($this->getCurrentUser())
+		{
+			return TRUE;
+		}
+		return FALSE;
 	}
 
 	public function login($user, $pass)
