@@ -1,6 +1,7 @@
 form
 	position: relative
-input
+	max-width: 600px
+input, textarea
 	font-family: Tahoma
 	border-width: 1px
 	border-style: solid
@@ -8,7 +9,7 @@ input
 	font-size: 1em
 	padding: 0.3em
 	outline: 0
-	width: 300px
+	width: 100%
 	&:focus
 		border-color: #666666
 
@@ -28,12 +29,15 @@ select
 	min-width: 215px
 	height: 29px
 	-webkit-appearance: menulist-button
+	width: 100%
+	
 	
 field
 	display: block
-	margin-top: 0.5em
+	margin-top: 0.7em
 	label
 		display: block
+		margin-bottom: 0.1em
 
 
 for i in (1...length(bg-colors) + 1)

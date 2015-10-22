@@ -66,7 +66,13 @@ class user extends Model
 
 	function add($data)
 	{
-		return $data;
+		$response = array();
+		// $response['goto'] = 'user/listUsers';
+		$notifications = array();
+		$notifications[] = array("type"=>1, 'message'=>'bla', 'timeout'=>0);
+		$notifications[] = array("type"=>2, 'message'=>'bla 2');
+		$response['notification'] = $notifications;
+		return $response;
 	}
 }
 ?>

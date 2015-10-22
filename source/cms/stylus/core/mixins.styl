@@ -7,6 +7,10 @@ inline-block()
 	float: left
 .right
 	float: right
+	
+.hidden
+	visibility: hidden
+	display: none
 
 bg-colors = (#d9534f #f0ad4e #5bc0de #337ab7 #5cb85c)
 
@@ -15,6 +19,7 @@ generateColor(index, lightenAmount = 0)
 	if lightenAmount != 0
 		color = lighten(color, lightenAmount)
 	background-color: color
+	border-style: solid
 	border-color: darken(color, 5%)
 	if lightness(color) > 75%
 		color: #666666

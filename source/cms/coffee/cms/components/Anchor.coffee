@@ -7,6 +7,10 @@ class components.Anchor extends BaseDOM
 			@element.removeAttribute('href')
 			return
 		@element.on('click', @_click)
+	destroy:()->
+		@removeAll()
+		@off()
+		@element.off('click', @_click)
 	_click:(e)=>
 		href = @attr('href')
 		if !href || /^http/i.test(href) || /blank/i.test(@attr('target')?.toLowerCase() || '')

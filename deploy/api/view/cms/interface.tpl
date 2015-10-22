@@ -1,3 +1,5 @@
 <core.header
 <core.menu
-main: 
+div.main
+	notification
+	main: 

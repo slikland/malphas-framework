@@ -22,6 +22,10 @@ class ServiceController extends EventDispatcher
 			return
 		if data['__user']?
 			app.user.setUser(data['__user'])
+		if data['goto']
+			app.viewController.goto(data['goto'])
+		if data['notification']
+			app.notification.showNotifications(data['notification']);
 		if data['__interface']
 			app.viewController.renderInterface('index', data.__interface, data)
 			if app.user.logged

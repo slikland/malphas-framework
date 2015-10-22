@@ -4,6 +4,9 @@ class components.Form extends BaseDOM
 		super
 		@element.on('submit', @_submit)
 	destroy:()->
+		@element.on('submit', @_submit)
+		@removeAll()
+		@off()
 		
 	addComponent:(component)->
 

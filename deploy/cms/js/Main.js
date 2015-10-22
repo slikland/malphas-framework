@@ -3514,6 +3514,12 @@ ServiceController = (function(_super) {
     if (data['__user'] != null) {
       app.user.setUser(data['__user']);
     }
+    if (data['goto']) {
+      app.viewController.goto(data['goto']);
+    }
+    if (data['notification']) {
+      app.notification.showNotifications(data['notification']);
+    }
     if (data['__interface']) {
       app.viewController.renderInterface('index', data.__interface, data);
       if (app.user.logged) {
@@ -3857,6 +3863,122 @@ User = (function(_super) {
 
 })(EventDispatcher);
 
+var Notification,
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+Notification = (function(_super) {
+  var NotificationItem;
+
+  __extends(Notification, _super);
+
+  Notification.DEFAULT_TIMEOUT = 10;
+
+  function Notification() {
+    this._hideNotification = __bind(this._hideNotification, this);
+    this._showNotification = __bind(this._showNotification, this);
+    Notification.__super__.constructor.apply(this, arguments);
+  }
+
+  Notification.prototype.destroy = function() {};
+
+  Notification.prototype.showNotifications = function(items) {
+    var i, _results;
+    items = [].concat(items);
+    i = items.length;
+    _results = [];
+    while (i-- > 0) {
+      _results.push(this.showNotification(items[i]));
+    }
+    return _results;
+  };
+
+  Notification.prototype.showNotification = function(item) {
+    var target;
+    target = document.querySelector('notification');
+    if (!target) {
+      target = document.body;
+    }
+    if (!target.getInstance()) {
+      target = new BaseDOM({
+        element: target
+      });
+    } else {
+      target = target.getInstance();
+    }
+    console.log(target);
+    item = new NotificationItem(item);
+    return target.appendChildAt(item, 0);
+  };
+
+  Notification.prototype._showNotification = function(e, data) {
+    var item, _i, _len, _results;
+    data = [].concat(data);
+    _results = [];
+    for (_i = 0, _len = data.length; _i < _len; _i++) {
+      item = data[_i];
+      _results.push(console.log(item));
+    }
+    return _results;
+  };
+
+  Notification.prototype._hideNotification = function(e, data) {};
+
+  NotificationItem = (function(_super1) {
+    __extends(NotificationItem, _super1);
+
+    function NotificationItem(data) {
+      this._closeClick = __bind(this._closeClick, this);
+      this._hideNotification = __bind(this._hideNotification, this);
+      NotificationItem.__super__.constructor.call(this, {
+        element: 'div',
+        className: 'notification-item'
+      });
+      if (data['message']) {
+        this.text = data['message'];
+      }
+      if (data['type']) {
+        this.addClass('p' + data['type']);
+      }
+      this.timeout = Notification.DEFAULT_TIMEOUT;
+      if (data['timeout']) {
+        this.timeout = Number(data['timeout']);
+      }
+      if (this.timeout > 0) {
+        this._closeTimeout = setTimeout(this._hideNotification, this.timeout * 1000);
+      }
+      this.closeBtn = new BaseDOM({
+        element: 'i',
+        className: 'closeBtn fa fa-close'
+      });
+      this.closeBtn.element.on('click', this._closeClick);
+      this.appendChild(this.closeBtn);
+    }
+
+    NotificationItem.prototype._hideNotification = function() {
+      return this._hide();
+    };
+
+    NotificationItem.prototype._hide = function() {
+      clearTimeout(this._closeTimeout);
+      this.element.parentNode.removeChild(this.element);
+      return typeof this.destroy === "function" ? this.destroy() : void 0;
+    };
+
+    NotificationItem.prototype._closeClick = function(e) {
+      console.log("CLICK");
+      return this._hide();
+    };
+
+    return NotificationItem;
+
+  })(BaseDOM);
+
+  return Notification;
+
+})(EventDispatcher);
+
 var Blocker,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
@@ -3900,6 +4022,83 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
+components.Input = (function(_super) {
+  var CharCounter;
+
+  __extends(Input, _super);
+
+  Input.SELECTOR = 'input,select,textarea';
+
+  function Input() {
+    this._blur = __bind(this._blur, this);
+    this._focus = __bind(this._focus, this);
+    Input.__super__.constructor.apply(this, arguments);
+    this._checkAttributes();
+    this.element.on('focus', this._focus);
+    this.element.on('blur', this._blur);
+  }
+
+  Input.prototype.destroy = function() {};
+
+  Input.prototype._checkAttributes = function() {
+    if (this.attr('maxlength')) {
+      this._maxLength = Number(this.attr('maxlength'));
+      this._charCounter = new CharCounter(this._maxLength);
+      return this.element.parentNode.appendChild(this._charCounter);
+    }
+  };
+
+  Input.prototype._focus = function() {
+    if (this._charCounter) {
+      this._charCounter.show();
+      return this._charCounter.update(10);
+    }
+  };
+
+  Input.prototype._blur = function() {};
+
+  CharCounter = (function(_super1) {
+    __extends(CharCounter, _super1);
+
+    function CharCounter(_maxLength) {
+      this._maxLength = _maxLength;
+      CharCounter.__super__.constructor.call(this, {
+        element: 'span',
+        className: 'hidden'
+      });
+      this.css({
+        position: 'absolute',
+        right: '0px',
+        top: '0px'
+      });
+    }
+
+    CharCounter.prototype.update = function(_currentLength) {
+      this._currentLength = _currentLength;
+      return this.text = this._currentLength;
+    };
+
+    CharCounter.prototype.show = function() {
+      this.removeClass('hidden');
+      return this.addClass('show-up');
+    };
+
+    CharCounter.prototype.hide = function() {
+      return this.addClass('hidden');
+    };
+
+    return CharCounter;
+
+  })(BaseDOM);
+
+  return Input;
+
+})(BaseDOM);
+
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
 components.Form = (function(_super) {
   __extends(Form, _super);
 
@@ -3913,7 +4112,11 @@ components.Form = (function(_super) {
     this.element.on('submit', this._submit);
   }
 
-  Form.prototype.destroy = function() {};
+  Form.prototype.destroy = function() {
+    this.element.on('submit', this._submit);
+    this.removeAll();
+    return this.off();
+  };
 
   Form.prototype.addComponent = function(component) {};
 
@@ -3964,6 +4167,12 @@ components.Anchor = (function(_super) {
     this.element.on('click', this._click);
   }
 
+  Anchor.prototype.destroy = function() {
+    this.removeAll();
+    this.off();
+    return this.element.off('click', this._click);
+  };
+
   Anchor.prototype._click = function(e) {
     var href, _ref;
     href = this.attr('href');
@@ -3993,6 +4202,12 @@ components.ActionButton = (function(_super) {
     ActionButton.__super__.constructor.apply(this, arguments);
     this.element.on('click', this._click);
   }
+
+  ActionButton.prototype.destroy = function() {
+    this.removeAll();
+    this.off();
+    return this.element.off('click', this._click);
+  };
 
   ActionButton.prototype._click = function() {
     return app.serviceController.call({
@@ -4027,6 +4242,7 @@ Main = (function() {
     app.componentController = ComponentController.getInstance();
     app.viewController = ViewController.getInstance();
     app.viewController.getInterface();
+    app.notification = new Notification();
     app.componentController.parse();
   }
 

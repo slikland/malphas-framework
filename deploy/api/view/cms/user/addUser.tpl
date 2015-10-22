@@ -2,7 +2,7 @@ h1: "Adicionar novo usuário"
 form{"action":"user/add"}:
 	field:
 		label{"for":"name"}: "Nome"
-		input{"name":"name","id":"name"}
+		input{"name":"name","id":"name", "maxlength": 10}
 	field:
 		label{"for":"email"}: "E-mail"
 		input{"email":"email","id":"email"}
