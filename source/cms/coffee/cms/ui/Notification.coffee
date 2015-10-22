@@ -10,8 +10,8 @@ class Notification extends EventDispatcher
 	showNotifications:(items)->
 		items = [].concat(items)
 		i = items.length
-		while i-- > 0
-			@showNotification(items[i])
+		for item in items
+			@showNotification(item)
 	showNotification:(item)->
 		target = document.querySelector('notification')
 		if !target
@@ -22,7 +22,7 @@ class Notification extends EventDispatcher
 			target = target.getInstance()
 		console.log(target)
 		item = new NotificationItem(item)
-		target.appendChildAt(item, 0)
+		target.appendChildAt(item)
 
 
 	_showNotification:(e, data)=>
@@ -35,7 +35,7 @@ class Notification extends EventDispatcher
 
 	class NotificationItem extends BaseDOM
 		constructor:(data)->
-			super({element: 'div', className: 'notification-item'})
+			super({element: 'div', className: 'notification-item show-down'})
 			if data['message']
 				@text = data['message']
 			if data['type']

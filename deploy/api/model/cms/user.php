@@ -9,6 +9,7 @@ class user extends Model
 	/**
 	*	@validate("user", "min", 5)
 	*	@validate("pass", "min", 5)
+	*	@log(null, null, "")
 	*/
 	function login($data)
 	{
@@ -29,6 +30,7 @@ class user extends Model
 
 	/**
 	*	@permission()
+	*	@log(0)
 	*/
 	function ping()
 	{

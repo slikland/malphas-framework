@@ -24,6 +24,8 @@ class ServiceController extends EventDispatcher
 			app.user.setUser(data['__user'])
 		if data['goto']
 			app.viewController.goto(data['goto'])
+		if data['refresh']
+			app.viewController.goto(app.router.getCurrentPath())
 		if data['notification']
 			app.notification.showNotifications(data['notification']);
 		if data['__interface']

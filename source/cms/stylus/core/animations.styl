@@ -17,11 +17,35 @@ showAnimation(type, direction, distance = 30%, initialOpacity = 0)
 		to
 			transform: translate(0, 0)
 			opacity: 1
+hideAnimation(type, direction, distance = 30%, initialOpacity = 0)
+	x = 0
+	y = 0
+	if direction == 'up'
+		y = distance * -1
+	else if direction == 'down'
+		y = distance
+	else if direction == 'left'
+		x = distance * -1
+	else if direction == 'right'
+		x = distance
+	name = type + '-' + direction
+	@keyframes name
+		from
+			transform: translate(0, 0)
+			opacity: 1
+		to
+			transform: translate(x, y)
+			opacity: initialOpacity
 showAnimation('show', '--', 0, 0)
 showAnimation('show', 'up')
 showAnimation('show', 'down')
 showAnimation('show', 'left')
 showAnimation('show', 'right')
+hideAnimation('hide', '--', 0, 0)
+hideAnimation('hide', 'up')
+hideAnimation('hide', 'down')
+hideAnimation('hide', 'left')
+hideAnimation('hide', 'right')
 showAnimation('slide', 'up', 100%, 1)
 showAnimation('slide', 'down', 100%, 1)
 showAnimation('slide', 'right', 100%, 1)
@@ -53,6 +77,32 @@ show-right(duration = 0.3s, delay = 0s)
 	animation-name: show-right
 	animation-duration: duration
 	animation-delay: delay
+hide(duration = 0.3s, delay = 0.3s)
+	animation-fill-mode: forwards
+	animation-name: hide---
+	animation-duration: duration
+	animation-delay: delay
+
+hide-up(duration = 0.3s, delay = 0s)
+	animation-fill-mode: forwards
+	animation-name: hide-up
+	animation-duration: duration
+	animation-delay: delay
+hide-down(duration = 0.3s, delay = 0s)
+	animation-fill-mode: forwards
+	animation-name: hide-down
+	animation-duration: duration
+	animation-delay: delay
+hide-left(duration = 0.3s, delay = 0s)
+	animation-fill-mode: forwards
+	animation-name: hide-left
+	animation-duration: duration
+	animation-delay: delay
+hide-right(duration = 0.3s, delay = 0s)
+	animation-fill-mode: forwards
+	animation-name: hide-right
+	animation-duration: duration
+	animation-delay: delay
 slide-up(duration = 0.3s, delay = 0s)
 	animation-fill-mode: backwards
 	animation-name: slide-up
@@ -73,4 +123,29 @@ slide-right(duration = 0.3s, delay = 0s)
 	animation-name: slide-right
 	animation-duration: duration
 	animation-delay: delay
+
+.show-up
+	show-up()
+.show-down
+	show-down()
+.show-left
+	show-left()
+.show-right
+	show-right()
+.hide-up
+	hide-up()
+.hide-down
+	hide-down()
+.hide-left
+	hide-left()
+.hide-right
+	hide-right()
+.slide-up
+	slide-up()
+.slide-down
+	slide-down()
+.slide-left
+	slide-left()
+.slide-right
+	slide-right()
 

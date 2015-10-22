@@ -66,7 +66,9 @@ class User extends Controller
 		if(isset($_COOKIE['sl_cms_session']))
 		{
 			$uid = $_COOKIE['sl_cms_session'];
-			$id = $this->db->fetch_value("SELECT fk_cms_user FROM cms_session cs WHERE cs.uid = '{$uid}' AND cs.active = 1 AND cs.updated > CURRENT_TIMESTAMP - " . CMS_SESSION_TIMEOUT);
+			$session = $this->db->fetch_one("SELECT fk_cms_user id, pk_cms_session session FROM cms_session cs WHERE cs.uid = '{$uid}' AND cs.active = 1 AND cs.updated > CURRENT_TIMESTAMP - " . CMS_SESSION_TIMEOUT);
+			$id = $session['id'];
+			$sessionId = $session['session'];
 		}
 		if(!$id)
 		{
@@ -77,6 +79,7 @@ class User extends Controller
 			if($userData)
 			{
 				$this->user = $this->getUser($id);
+				$this->user['session'] = $sessionId;
 				return $this->user;
 			}else{
 				return TRUE;
@@ -98,6 +101,7 @@ class User extends Controller
 		if($id = $this->db->fetch_value("SELECT pk_cms_session FROM cms_session WHERE uid = '{$uid}' AND active = 1 AND updated > CURRENT_TIMESTAMP - " . CMS_SESSION_TIMEOUT))
 		{
 			$this->db->query('UPDATE cms_session SET updated = CURRENT_TIMESTAMP WHERE pk_cms_session = ?', array($id));
+			$_COOKIE['sl_cms_session'] = $uid;
 			setcookie('sl_cms_session', $uid, time() + CMS_SESSION_TIMEOUT, '/', $_SERVER['HTTP_HOST']);
 			return TRUE;
 		}

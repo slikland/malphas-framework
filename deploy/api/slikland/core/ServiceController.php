@@ -5,16 +5,19 @@ include_once('DB.php');
 include_once('Model.php');
 include_once('Controller.php');
 include_once('Settings.php');
+include_once('Logger.php');
 
 class_alias('slikland\core\Settings', 'Settings');
 
 class ServiceController
 {
 	private static $prependAnnotation = array('permission'=>'controller\cms\User::checkPermission', 'validate');
-	private static $appendAnnotation = array('');
+	private static $appendAnnotation = array('log'=>'slikland\core\ServiceController::log');
 
 	public static function execute($servicePath = NULL, $data = NULL, $output = TRUE)
 	{
+		global $logged;
+		$logged = false;
 		$a = new controller\cms\User();
 		if(!$servicePath)
 		{
@@ -64,6 +67,15 @@ class ServiceController
 						}
 						$params = array_merge($data, array('__path'=>$service['path']), $service['params']);
 						$response = $class->$method($params);
+
+						$annotations = \slikland\annotation\AnnotationParser::getAnnotations($class, $method, ServiceController::$appendAnnotation);
+						if($annotations)
+						{
+							foreach($annotations as $annotation)
+							{
+								call_user_func($annotation['func'], $annotation['values'], $service['path'], $data);
+							}
+						}
 					}else if(!isset($service['view']))
 					{
 						$response['header'] = 'HTTP/1.0 404 Not Found';
@@ -72,6 +84,10 @@ class ServiceController
 				if(isset($service['view'])){
 					$response['__view'] = $service['view'];
 				}
+			}
+			if(!$logged)
+			{
+				\slikland\core\Logger::log($servicePath, '', json_encode($data));
 			}
 		}catch(\slikland\error\Error $e)
 		{
@@ -88,6 +104,31 @@ class ServiceController
 		{
 			return $response;
 		}
+	}
+
+	private static function log($values, $path, $data)
+	{
+		global $logged;
+		if(!$values)
+		{
+			$values = array();
+		}
+
+		if(!isset($values[0]) || $values[0] !== 0)
+		{
+			if(!isset($values[0]) || is_null($values[0])){
+				$values[0] = $path;
+			}
+			if(!isset($values[1]) || is_null($values[1])){
+				$values[1] = '';
+			}
+			if(!isset($values[2]) || is_null($values[2])){
+				$values[2] = json_encode($data);
+			}
+			\slikland\core\Logger::log($values[0], $values[1], $values[2]);
+		}
+
+		$logged = true;
 	}
 
 	private static function output($data)

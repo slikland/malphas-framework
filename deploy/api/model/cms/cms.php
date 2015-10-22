@@ -16,7 +16,7 @@ class cms extends Model{
 	function updateSettings($data)
 	{
 		$this->controller->setSettings($data);
-		return True;
+		return array('refresh'=>True);
 	}
 }
 ?>

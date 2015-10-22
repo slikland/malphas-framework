@@ -3517,6 +3517,9 @@ ServiceController = (function(_super) {
     if (data['goto']) {
       app.viewController.goto(data['goto']);
     }
+    if (data['refresh']) {
+      app.viewController.goto(app.router.getCurrentPath());
+    }
     if (data['notification']) {
       app.notification.showNotifications(data['notification']);
     }
@@ -3884,12 +3887,13 @@ Notification = (function(_super) {
   Notification.prototype.destroy = function() {};
 
   Notification.prototype.showNotifications = function(items) {
-    var i, _results;
+    var i, item, _i, _len, _results;
     items = [].concat(items);
     i = items.length;
     _results = [];
-    while (i-- > 0) {
-      _results.push(this.showNotification(items[i]));
+    for (_i = 0, _len = items.length; _i < _len; _i++) {
+      item = items[_i];
+      _results.push(this.showNotification(item));
     }
     return _results;
   };
@@ -3909,7 +3913,7 @@ Notification = (function(_super) {
     }
     console.log(target);
     item = new NotificationItem(item);
-    return target.appendChildAt(item, 0);
+    return target.appendChildAt(item);
   };
 
   Notification.prototype._showNotification = function(e, data) {
@@ -3933,7 +3937,7 @@ Notification = (function(_super) {
       this._hideNotification = __bind(this._hideNotification, this);
       NotificationItem.__super__.constructor.call(this, {
         element: 'div',
-        className: 'notification-item'
+        className: 'notification-item show-down'
       });
       if (data['message']) {
         this.text = data['message'];
@@ -4031,11 +4035,15 @@ components.Input = (function(_super) {
 
   function Input() {
     this._blur = __bind(this._blur, this);
+    this._update = __bind(this._update, this);
     this._focus = __bind(this._focus, this);
     Input.__super__.constructor.apply(this, arguments);
     this._checkAttributes();
     this.element.on('focus', this._focus);
     this.element.on('blur', this._blur);
+    this.element.on('change', this._update);
+    this.element.on('keydown', this._update);
+    this.element.on('keyup', this._update);
   }
 
   Input.prototype.destroy = function() {};
@@ -4051,11 +4059,20 @@ components.Input = (function(_super) {
   Input.prototype._focus = function() {
     if (this._charCounter) {
       this._charCounter.show();
-      return this._charCounter.update(10);
     }
+    return this._update();
   };
 
-  Input.prototype._blur = function() {};
+  Input.prototype._update = function() {
+    var value, _ref;
+    value = this.element.value;
+    return (_ref = this._charCounter) != null ? _ref.update(value.length) : void 0;
+  };
+
+  Input.prototype._blur = function() {
+    var _ref;
+    return (_ref = this._charCounter) != null ? _ref.hide() : void 0;
+  };
 
   CharCounter = (function(_super1) {
     __extends(CharCounter, _super1);
@@ -4064,7 +4081,7 @@ components.Input = (function(_super) {
       this._maxLength = _maxLength;
       CharCounter.__super__.constructor.call(this, {
         element: 'span',
-        className: 'hidden'
+        className: 'charCounter hidden'
       });
       this.css({
         position: 'absolute',
@@ -4075,16 +4092,18 @@ components.Input = (function(_super) {
 
     CharCounter.prototype.update = function(_currentLength) {
       this._currentLength = _currentLength;
-      return this.text = this._currentLength;
+      return this.text = this._maxLength - this._currentLength;
     };
 
     CharCounter.prototype.show = function() {
       this.removeClass('hidden');
-      return this.addClass('show-up');
+      this.addClass('show-up');
+      return this.removeClass('hide-up');
     };
 
     CharCounter.prototype.hide = function() {
-      return this.addClass('hidden');
+      this.addClass('hide-up');
+      return this.removeClass('show-up');
     };
 
     return CharCounter;
