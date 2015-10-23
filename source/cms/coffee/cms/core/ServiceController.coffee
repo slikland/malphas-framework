@@ -45,3 +45,5 @@ class ServiceController extends EventDispatcher
 		switch data.code
 			when 1
 				app.viewController.getInterface()
+			when 2
+				app.notification.showNotifications({message: data['message'], type: 1})

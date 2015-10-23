@@ -61,6 +61,8 @@ class TemplateNode extends EventDispatcher
 		if @_attributes
 			attrs = @_replaceData(@_attributes, data)
 			for k, v of attrs
+				if !v || v.length == 0
+					continue
 				childContext.setAttribute(k, v)
 
 		if !context

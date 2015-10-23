@@ -2709,6 +2709,9 @@ TemplateNode = (function(_super) {
       attrs = this._replaceData(this._attributes, data);
       for (k in attrs) {
         v = attrs[k];
+        if (!v || v.length === 0) {
+          continue;
+        }
         childContext.setAttribute(k, v);
       }
     }
@@ -3547,6 +3550,11 @@ ServiceController = (function(_super) {
     switch (data.code) {
       case 1:
         return app.viewController.getInterface();
+      case 2:
+        return app.notification.showNotifications({
+          message: data['message'],
+          type: 1
+        });
     }
   };
 
@@ -4146,6 +4154,8 @@ components.Form = (function(_super) {
     e.stopPropagation();
     e.preventDefault();
     formData = new FormData(this.element);
+    console.log(formData);
+    console.log(this.element);
     return app.serviceController.call({
       url: this.attr('action'),
       data: formData,
@@ -4172,7 +4182,7 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 components.Anchor = (function(_super) {
   __extends(Anchor, _super);
 
-  Anchor.SELECTOR = 'a[href]';
+  Anchor.SELECTOR = 'a[href],button[href]';
 
   function Anchor() {
     this._click = __bind(this._click, this);
@@ -4196,6 +4206,9 @@ components.Anchor = (function(_super) {
     var href, _ref;
     href = this.attr('href');
     if (!href || /^http/i.test(href) || /blank/i.test(((_ref = this.attr('target')) != null ? _ref.toLowerCase() : void 0) || '')) {
+      if (this.element.tagName.toLowerCase() === 'button') {
+        window.open(href, this.attr('target'));
+      }
       return;
     }
     e.stopPropagation();

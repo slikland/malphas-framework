@@ -11,7 +11,7 @@ class_alias('slikland\core\Settings', 'Settings');
 
 class ServiceController
 {
-	private static $prependAnnotation = array('permission'=>'controller\cms\User::checkPermission', 'validate');
+	private static $prependAnnotation = array('permission'=>'controller\cms\User::checkPermission');
 	private static $appendAnnotation = array('log'=>'slikland\core\ServiceController::log');
 
 	public static function execute($servicePath = NULL, $data = NULL, $output = TRUE)
@@ -32,6 +32,10 @@ class ServiceController
 		{
 			$service['method'] = 'index';
 			$service['params'] = array();
+		}
+		if(isset($service['path']))
+		{
+			$servicePath = $service['path'];
 		}
 		if($view = slikland\template\TemplateLoader::load($servicePath))
 		{
@@ -130,6 +134,31 @@ class ServiceController
 
 		$logged = true;
 	}
+
+	// private static function addToMenuPermission($values, $path, $data)
+	// {
+	// 	global $logged;
+	// 	if(!$values)
+	// 	{
+	// 		$values = array();
+	// 	}
+
+	// 	if(!isset($values[0]) || $values[0] !== 0)
+	// 	{
+	// 		if(!isset($values[0]) || is_null($values[0])){
+	// 			$values[0] = $path;
+	// 		}
+	// 		if(!isset($values[1]) || is_null($values[1])){
+	// 			$values[1] = '';
+	// 		}
+	// 		if(!isset($values[2]) || is_null($values[2])){
+	// 			$values[2] = json_encode($data);
+	// 		}
+	// 		\slikland\core\Logger::log($values[0], $values[1], $values[2]);
+	// 	}
+
+	// 	$logged = true;
+	// }
 
 	private static function output($data)
 	{

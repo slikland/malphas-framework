@@ -49,9 +49,9 @@ class User extends Controller
 		return $this->user;
 	}
 
-	private function getUser($id)
+	public function getUser($id)
 	{
-		return $this->db->fetch_one('SELECT cu.pk_cms_user id, cu.fk_cms_role role, cr.name roleName, cu.name name FROM cms_user cu LEFT JOIN cms_role cr ON cu.fk_cms_role = cr.pk_cms_role WHERE pk_cms_user = ' . $id);
+		return $this->db->fetch_one('SELECT cu.pk_cms_user id, cu.fk_cms_role role, cr.name roleName, cu.name name, cu.email email FROM cms_user cu LEFT JOIN cms_role cr ON cu.fk_cms_role = cr.pk_cms_role WHERE pk_cms_user = ' . $id);
 	}
 
 	public function logout()
@@ -140,6 +140,12 @@ class User extends Controller
 			include_once(API_PATH . 'setup/cms.php');
 			create_cms_db();
 		}
+	}
+
+	public function getUserList()
+	{
+		$user = $this->getCurrentUser();
+		return $this->db->fetch_all('SELECT cu.pk_cms_user id, cu.name name, cu.email email, cr.name role  FROM cms_user cu LEFT JOIN cms_role cr ON cu.fk_cms_role = cr.pk_cms_role WHERE cu.fk_cms_role >= '. $user['role'] .';');
 	}
 }
 ?>

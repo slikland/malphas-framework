@@ -1,5 +1,5 @@
 class components.Anchor extends BaseDOM
-	@SELECTOR: 'a[href]'
+	@SELECTOR: 'a[href],button[href]'
 	constructor:()->
 		super
 		href = @attr('href')
@@ -14,6 +14,8 @@ class components.Anchor extends BaseDOM
 	_click:(e)=>
 		href = @attr('href')
 		if !href || /^http/i.test(href) || /blank/i.test(@attr('target')?.toLowerCase() || '')
+			if @element.tagName.toLowerCase() == 'button'
+				window.open(href, @attr('target'))
 			return
 		e.stopPropagation()
 		e.preventDefault()

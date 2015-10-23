@@ -19,9 +19,13 @@ class TemplateLoader{
 
 	private static function parseTemplate($template)
 	{
-		preg_match_all('/^((\s*)\<(.*?))$/m',$template, $matches, PREG_SET_ORDER);
+		preg_match_all('/^((\s*)\<([^\s\:]+)(.*?))$/m',$template, $matches, PREG_SET_ORDER);
 		foreach($matches as $match){
+			if(strstr($template, '!' . $match[3]) !== FALSE){
+				continue;
+			}
 			$temp = TemplateLoader::load($match[3]);
+			$temp = preg_replace('/^(.*?)(\\n|$)/', '$1' . $match[4] . "\n", $temp);
 
 			if(!is_null($temp))
 			{
