@@ -33,21 +33,39 @@ class TemplateNode extends EventDispatcher
 
 	_parseNode:(nodeData)->
 		# console.log(nodeData)
+	find:(element)->
+		childNode = null
+		for child in @_children
+			if child.element == element
+				childNode = child
+				break
+		if !childNode
+			for child in @_children
+				childNode = child.find(element)
+				if childNode
+					break
+		return childNode
+	clear:()->
+		children = @_childContext.childNodes
+		while @_childContext.childNodes.length
+			@_childContext.removeChild(@_childContext.childNodes[0])
 
-	render:(context, data, originalData = null)->
+	render:(context, data, originalData = null, ignoreUse = false)->
 		if !originalData && data
 			originalData = data
+		@originalData = originalData
+		@data = data
 		foundData = data
-		if @_use && o = /([\*\@])?(.*?)$/.exec(@_use)
-			foundData = @_findObjectData(foundData, @_use)
-			if !foundData
-				return
-			if !Array.isArray(foundData) && typeof(foundData) != 'object'
-				@_content = foundData
-			else
-				data = foundData
-				@_content = ''
-
+		if !ignoreUse
+			if @_use && o = /([\*\@])?(.*?)$/.exec(@_use)
+				foundData = @_findObjectData(foundData, @_use)
+				if !foundData
+					return
+				if !Array.isArray(foundData) && typeof(foundData) != 'object'
+					@_content = foundData
+				else
+					data = foundData
+					@_content = ''
 		if @_contextSelector
 			context = (context || document.body).querySelector(@_contextSelector)
 
@@ -55,6 +73,7 @@ class TemplateNode extends EventDispatcher
 		if @_element
 			childContext = document.createElement(@_element)
 			context.appendChild(childContext)
+			childContext.templateNode = @
 		if @_content
 			childContext.innerHTML = @_replaceData(@_content, data)
 
@@ -67,13 +86,21 @@ class TemplateNode extends EventDispatcher
 
 		if !context
 			throw new Error('Context was not found.')
-
-		if @_use && data && (typeof(data) == 'object' || Array.isArray(data))
+		if (!ignoreUse && @_use) && data && (typeof(data) == 'object' || Array.isArray(data))
 			
 			for v in data
 				@_renderChildren(childContext, v, originalData)
 		else
 			@_renderChildren(childContext, data, originalData)
+		@_childContext = childContext
+
+	update:(data, originalData)->
+		@clear()
+		if data && (typeof(data) == 'object' || Array.isArray(data))
+			for v in data
+				@_renderChildren(@_childContext, v, data, true)
+		else
+			@_renderChildren(@_childContext, data, data, true)
 
 	_replaceData:(obj, data)->
 		obj = JSON.stringify(obj)
@@ -99,9 +126,9 @@ class TemplateNode extends EventDispatcher
 					obj = ObjectUtils.findChild(obj, o[2])
 		return obj
 
-	_renderChildren:(childContext, data, originalData)->
+	_renderChildren:(childContext, data, originalData, ignoreUse = false)->
 		l = @_children.length
 		i = -1
 		while ++i < l
-			@_children[i].render(childContext, data, originalData)
+			@_children[i].render(childContext, data, originalData, ignoreUse)
 

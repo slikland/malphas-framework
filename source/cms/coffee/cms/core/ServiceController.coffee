@@ -12,6 +12,7 @@ class ServiceController extends EventDispatcher
 		apiCall.hasBlocker = showBlocker
 		apiCall.on(API.COMPLETE, @_callComplete)
 		apiCall.on(API.ERROR, @_callError)
+		return apiCall
 	cancel:(apiCall)->
 		apiCall.cancel()
 

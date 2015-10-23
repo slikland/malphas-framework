@@ -271,5 +271,45 @@ class DB{
 		}
 		return $response;
 	}
+
+	public function getList($query, $params)
+	{
+		$query = array($query);
+
+		// if(isset($params['search']))
+		// {
+		// 	$where = array();
+		// 	$search = $params['search'];
+		// 	if(!is_array($seach)){
+		// 		$search = array($search);
+		// 	}
+		// 	foreach($search as $item)
+		// 	{
+		// 		foreach($item['fields'] as $field)
+		// 		{
+		// 			$where
+		// 		}
+
+		// 	}
+		// 	if(is_array($params['search']
+		// }
+
+		$resource = $this->query($sql);
+		$response = array();
+		if($array)
+		{
+			while($row = $resource->fetch_array(MYSQLI_NUM))
+			{
+				$response[] = $row;
+			}
+		}else
+		{
+			while($row = $resource->fetch_assoc())
+			{
+				$response[] = $row;
+			}
+		}
+		return $response;
+	}
 }
 ?>

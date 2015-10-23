@@ -1,5 +1,6 @@
 h1:"Lista de log"
-table{"update":"user/logList"}
+input{"class":"search", "placeholder": "Busca", "for": "list"}
+table{"update":"user/logList", "id":"list"}
 	thead
 		tr
 			th{"sort":"user"}: Usuário

@@ -2,7 +2,10 @@ class components.Table extends BaseDOM
 	@SELECTOR: 'table'
 	constructor:()->
 		super
+		@_values = {}
 		@_parseHeader()
+		@_update = @attr('update')
+		console.log(@element.templateNode)
 	destroy:()->
 		@removeAll()
 		@off()
@@ -17,8 +20,25 @@ class components.Table extends BaseDOM
 				continue
 			head = new TableHeader(head)
 			head.on('click', @_headerClick)
-	_headerClick:()=>
+	_headerClick:(e, value)=>
+		@update({'sort': value})
 
+	update:(values)->
+		if !@_update
+			return
+		@_service?.cancel()
+		for k, v of values
+			switch k
+				when 'search'
+					delete @_values['page']
+				when 'sort'
+					if @_values['sort'] && @_values['sort'] == v
+						v = '-' + v
+			@_values[k] = v
+		@_service = app.serviceController.call({url: @_update, onComplete: @_dataLoaded, data: @_values})
+		console.log(@_service)
+	_dataLoaded:(e, data)=>
+		@element.templateNode.find('tbody')?.update(data, data)
 
 	class TableHeader extends BaseDOM
 		constructor:(el)->
@@ -27,3 +47,7 @@ class components.Table extends BaseDOM
 			@css({cursor: 'pointer'})
 			@_icon = new BaseDOM({element: 'i', className: 'sort-icon'})
 			@appendChild(@_icon)
+			@element.on('click', @_click)
+			@_value = @attr('sort')
+		_click:()=>
+			@trigger('click', @_value)

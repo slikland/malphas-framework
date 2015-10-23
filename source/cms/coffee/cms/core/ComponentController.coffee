@@ -5,24 +5,49 @@ class ComponentController
 	constructor:(target = document.body)->
 		@_target = target
 
+		@_listComponents()
+
 		if MutationObserver
 			@_mutationObserver = new MutationObserver(@_mutationChanged)
 			@_mutationObserver.observe(target, {childList: true, subtree: true})
 		else
 			target.addEventListener('DOMSubtreeModified', @_domInserted)
+	_listComponents:()=>
+		@_components = []
+		for k, component of components
+			@_components.push(component)
+		@_components = @_components.sort(@_sortComponents)
+	_sortComponents:(a, b)=>
+		sortOrder = 0
+		if a.ORDER?
+			if b.ORDER?
+				if a.ORDER > b.ORDER
+					sortOrder = -1
+				else if a.ORDER < b.ORDER
+					sortOrder = 1
+				else
+					sortOrder = 0
+			else
+				sortOrder = -1
+		else
+			if b.ORDER?
+				sortOrder = 1
+			else
+				sortOrder = 0
+		return sortOrder
+
 	parse:(target = null)->
 		return
 		if !target
 			target = @_target
 
-		for k, component of components
+		for component in @_components
 			items = target.querySelectorAll(component.SELECTOR)
 			for item in items
 				if !item.getInstance()
 					new component({element: item})
-					# @_mutationObserver.observe(item.parentNode, {childList: true})
 	_mutationChanged:(mutation)=>
-		for k, component of components
+		for k, component of @_components
 			items = @_target.querySelectorAll(component.SELECTOR)
 			for item in items
 				if !item.getInstance()
@@ -32,7 +57,7 @@ class ComponentController
 				item.getInstance()?.destroy()
 	_domChanged:()=>
 		@_items ?= []
-		for k, component of components
+		for k, component of @_components
 			items = target.querySelectorAll(component.SELECTOR)
 			for item in items
 				if !item.getInstance()

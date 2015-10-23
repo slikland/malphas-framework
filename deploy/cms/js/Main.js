@@ -2673,25 +2673,66 @@ TemplateNode = (function(_super) {
 
   TemplateNode.prototype._parseNode = function(nodeData) {};
 
-  TemplateNode.prototype.render = function(context, data, originalData) {
-    var attrs, childContext, foundData, k, o, v, _i, _len, _results;
+  TemplateNode.prototype.find = function(element) {
+    var child, childNode, _i, _j, _len, _len1, _ref, _ref1;
+    childNode = null;
+    _ref = this._children;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      child = _ref[_i];
+      if (child.element === element) {
+        childNode = child;
+        break;
+      }
+    }
+    if (!childNode) {
+      _ref1 = this._children;
+      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+        child = _ref1[_j];
+        childNode = child.find(element);
+        if (childNode) {
+          break;
+        }
+      }
+    }
+    return childNode;
+  };
+
+  TemplateNode.prototype.clear = function() {
+    var children, _results;
+    children = this._childContext.childNodes;
+    _results = [];
+    while (this._childContext.childNodes.length) {
+      _results.push(this._childContext.removeChild(this._childContext.childNodes[0]));
+    }
+    return _results;
+  };
+
+  TemplateNode.prototype.render = function(context, data, originalData, ignoreUse) {
+    var attrs, childContext, foundData, k, o, v, _i, _len;
     if (originalData == null) {
       originalData = null;
+    }
+    if (ignoreUse == null) {
+      ignoreUse = false;
     }
     if (!originalData && data) {
       originalData = data;
     }
+    this.originalData = originalData;
+    this.data = data;
     foundData = data;
-    if (this._use && (o = /([\*\@])?(.*?)$/.exec(this._use))) {
-      foundData = this._findObjectData(foundData, this._use);
-      if (!foundData) {
-        return;
-      }
-      if (!Array.isArray(foundData) && typeof foundData !== 'object') {
-        this._content = foundData;
-      } else {
-        data = foundData;
-        this._content = '';
+    if (!ignoreUse) {
+      if (this._use && (o = /([\*\@])?(.*?)$/.exec(this._use))) {
+        foundData = this._findObjectData(foundData, this._use);
+        if (!foundData) {
+          return;
+        }
+        if (!Array.isArray(foundData) && typeof foundData !== 'object') {
+          this._content = foundData;
+        } else {
+          data = foundData;
+          this._content = '';
+        }
       }
     }
     if (this._contextSelector) {
@@ -2701,6 +2742,7 @@ TemplateNode = (function(_super) {
     if (this._element) {
       childContext = document.createElement(this._element);
       context.appendChild(childContext);
+      childContext.templateNode = this;
     }
     if (this._content) {
       childContext.innerHTML = this._replaceData(this._content, data);
@@ -2718,15 +2760,29 @@ TemplateNode = (function(_super) {
     if (!context) {
       throw new Error('Context was not found.');
     }
-    if (this._use && data && (typeof data === 'object' || Array.isArray(data))) {
+    if ((!ignoreUse && this._use) && data && (typeof data === 'object' || Array.isArray(data))) {
+      for (_i = 0, _len = data.length; _i < _len; _i++) {
+        v = data[_i];
+        this._renderChildren(childContext, v, originalData);
+      }
+    } else {
+      this._renderChildren(childContext, data, originalData);
+    }
+    return this._childContext = childContext;
+  };
+
+  TemplateNode.prototype.update = function(data, originalData) {
+    var v, _i, _len, _results;
+    this.clear();
+    if (data && (typeof data === 'object' || Array.isArray(data))) {
       _results = [];
       for (_i = 0, _len = data.length; _i < _len; _i++) {
         v = data[_i];
-        _results.push(this._renderChildren(childContext, v, originalData));
+        _results.push(this._renderChildren(this._childContext, v, data, true));
       }
       return _results;
     } else {
-      return this._renderChildren(childContext, data, originalData);
+      return this._renderChildren(this._childContext, data, data, true);
     }
   };
 
@@ -2763,13 +2819,16 @@ TemplateNode = (function(_super) {
     return obj;
   };
 
-  TemplateNode.prototype._renderChildren = function(childContext, data, originalData) {
+  TemplateNode.prototype._renderChildren = function(childContext, data, originalData, ignoreUse) {
     var i, l, _results;
+    if (ignoreUse == null) {
+      ignoreUse = false;
+    }
     l = this._children.length;
     i = -1;
     _results = [];
     while (++i < l) {
-      _results.push(this._children[i].render(childContext, data, originalData));
+      _results.push(this._children[i].render(childContext, data, originalData, ignoreUse));
     }
     return _results;
   };
@@ -3506,7 +3565,8 @@ ServiceController = (function(_super) {
     apiCall.path = params['url'];
     apiCall.hasBlocker = showBlocker;
     apiCall.on(API.COMPLETE, this._callComplete);
-    return apiCall.on(API.ERROR, this._callError);
+    apiCall.on(API.ERROR, this._callError);
+    return apiCall;
   };
 
   ServiceController.prototype.cancel = function(apiCall) {
@@ -3589,7 +3649,10 @@ ComponentController = (function() {
     }
     this._domChanged = __bind(this._domChanged, this);
     this._mutationChanged = __bind(this._mutationChanged, this);
+    this._sortComponents = __bind(this._sortComponents, this);
+    this._listComponents = __bind(this._listComponents, this);
     this._target = target;
+    this._listComponents();
     if (MutationObserver) {
       this._mutationObserver = new MutationObserver(this._mutationChanged);
       this._mutationObserver.observe(target, {
@@ -3601,8 +3664,43 @@ ComponentController = (function() {
     }
   }
 
+  ComponentController.prototype._listComponents = function() {
+    var component, k;
+    this._components = [];
+    for (k in components) {
+      component = components[k];
+      this._components.push(component);
+    }
+    return this._components = this._components.sort(this._sortComponents);
+  };
+
+  ComponentController.prototype._sortComponents = function(a, b) {
+    var sortOrder;
+    sortOrder = 0;
+    if (a.ORDER != null) {
+      if (b.ORDER != null) {
+        if (a.ORDER > b.ORDER) {
+          sortOrder = -1;
+        } else if (a.ORDER < b.ORDER) {
+          sortOrder = 1;
+        } else {
+          sortOrder = 0;
+        }
+      } else {
+        sortOrder = -1;
+      }
+    } else {
+      if (b.ORDER != null) {
+        sortOrder = 1;
+      } else {
+        sortOrder = 0;
+      }
+    }
+    return sortOrder;
+  };
+
   ComponentController.prototype.parse = function(target) {
-    var component, item, items, k, _results;
+    var component, item, items, _i, _len, _ref, _results;
     if (target == null) {
       target = null;
     }
@@ -3610,15 +3708,16 @@ ComponentController = (function() {
     if (!target) {
       target = this._target;
     }
+    _ref = this._components;
     _results = [];
-    for (k in components) {
-      component = components[k];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      component = _ref[_i];
       items = target.querySelectorAll(component.SELECTOR);
       _results.push((function() {
-        var _i, _len, _results1;
+        var _j, _len1, _results1;
         _results1 = [];
-        for (_i = 0, _len = items.length; _i < _len; _i++) {
-          item = items[_i];
+        for (_j = 0, _len1 = items.length; _j < _len1; _j++) {
+          item = items[_j];
           if (!item.getInstance()) {
             _results1.push(new component({
               element: item
@@ -3634,9 +3733,10 @@ ComponentController = (function() {
   };
 
   ComponentController.prototype._mutationChanged = function(mutation) {
-    var component, item, items, k, mut, _i, _j, _len, _len1, _results;
-    for (k in components) {
-      component = components[k];
+    var component, item, items, k, mut, _i, _j, _len, _len1, _ref, _results;
+    _ref = this._components;
+    for (k in _ref) {
+      component = _ref[k];
       items = this._target.querySelectorAll(component.SELECTOR);
       for (_i = 0, _len = items.length; _i < _len; _i++) {
         item = items[_i];
@@ -3651,12 +3751,12 @@ ComponentController = (function() {
     for (_j = 0, _len1 = mutation.length; _j < _len1; _j++) {
       mut = mutation[_j];
       _results.push((function() {
-        var _k, _len2, _ref, _ref1, _results1;
-        _ref = mut.removedNodes;
+        var _k, _len2, _ref1, _ref2, _results1;
+        _ref1 = mut.removedNodes;
         _results1 = [];
-        for (_k = 0, _len2 = _ref.length; _k < _len2; _k++) {
-          item = _ref[_k];
-          _results1.push((_ref1 = item.getInstance()) != null ? _ref1.destroy() : void 0);
+        for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+          item = _ref1[_k];
+          _results1.push((_ref2 = item.getInstance()) != null ? _ref2.destroy() : void 0);
         }
         return _results1;
       })());
@@ -3665,12 +3765,13 @@ ComponentController = (function() {
   };
 
   ComponentController.prototype._domChanged = function() {
-    var component, i, item, items, k, _i, _len, _results;
+    var component, i, item, items, k, _i, _len, _ref, _results;
     if (this._items == null) {
       this._items = [];
     }
-    for (k in components) {
-      component = components[k];
+    _ref = this._components;
+    for (k in _ref) {
+      component = _ref[k];
       items = target.querySelectorAll(component.SELECTOR);
       for (_i = 0, _len = items.length; _i < _len; _i++) {
         item = items[_i];
@@ -4049,10 +4150,14 @@ components.Table = (function(_super) {
   Table.SELECTOR = 'table';
 
   function Table() {
+    this._dataLoaded = __bind(this._dataLoaded, this);
     this._headerClick = __bind(this._headerClick, this);
     this._parseHeader = __bind(this._parseHeader, this);
     Table.__super__.constructor.apply(this, arguments);
+    this._values = {};
     this._parseHeader();
+    this._update = this.attr('update');
+    console.log(this.element.templateNode);
   }
 
   Table.prototype.destroy = function() {
@@ -4077,12 +4182,51 @@ components.Table = (function(_super) {
     return _results;
   };
 
-  Table.prototype._headerClick = function() {};
+  Table.prototype._headerClick = function(e, value) {
+    return this.update({
+      'sort': value
+    });
+  };
+
+  Table.prototype.update = function(values) {
+    var k, v, _ref;
+    if (!this._update) {
+      return;
+    }
+    if ((_ref = this._service) != null) {
+      _ref.cancel();
+    }
+    for (k in values) {
+      v = values[k];
+      switch (k) {
+        case 'search':
+          delete this._values['page'];
+          break;
+        case 'sort':
+          if (this._values['sort'] && this._values['sort'] === v) {
+            v = '-' + v;
+          }
+      }
+      this._values[k] = v;
+    }
+    this._service = app.serviceController.call({
+      url: this._update,
+      onComplete: this._dataLoaded,
+      data: this._values
+    });
+    return console.log(this._service);
+  };
+
+  Table.prototype._dataLoaded = function(e, data) {
+    var _ref;
+    return (_ref = this.element.templateNode.find('tbody')) != null ? _ref.update(data, data) : void 0;
+  };
 
   TableHeader = (function(_super1) {
     __extends(TableHeader, _super1);
 
     function TableHeader(el) {
+      this._click = __bind(this._click, this);
       TableHeader.__super__.constructor.call(this, {
         element: el
       });
@@ -4094,7 +4238,13 @@ components.Table = (function(_super) {
         className: 'sort-icon'
       });
       this.appendChild(this._icon);
+      this.element.on('click', this._click);
+      this._value = this.attr('sort');
     }
+
+    TableHeader.prototype._click = function() {
+      return this.trigger('click', this._value);
+    };
 
     return TableHeader;
 
@@ -4323,6 +4473,64 @@ components.ActionButton = (function(_super) {
   };
 
   return ActionButton;
+
+})(BaseDOM);
+
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+components.SearchInput = (function(_super) {
+  __extends(SearchInput, _super);
+
+  SearchInput.SELECTOR = 'input.search';
+
+  SearchInput.ORDER = 0;
+
+  function SearchInput() {
+    this._updateTarget = __bind(this._updateTarget, this);
+    this._update = __bind(this._update, this);
+    SearchInput.__super__.constructor.apply(this, arguments);
+    this._checkAttributes();
+    this.element.on('change', this._update);
+    this.element.on('keydown', this._update);
+    this.element.on('keyup', this._update);
+  }
+
+  SearchInput.prototype.destroy = function() {};
+
+  SearchInput.prototype._checkAttributes = function() {
+    if (this.attr('maxlength')) {
+      this._maxLength = Number(this.attr('maxlength'));
+      this._charCounter = new CharCounter(this._maxLength);
+      return this.element.parentNode.appendChild(this._charCounter);
+    }
+  };
+
+  SearchInput.prototype._update = function() {
+    var value;
+    value = this.element.value.trim().toLowerCase();
+    if (value !== this._value) {
+      clearTimeout(this._updateTimeout);
+      this._value = value;
+      return this._updateTimeout = setTimeout(this._updateTarget, 300);
+    }
+  };
+
+  SearchInput.prototype._updateTarget = function() {
+    var _ref;
+    if (!this._target) {
+      this._target = (_ref = document.getElementById(this.attr('for'))) != null ? _ref.getInstance() : void 0;
+    }
+    if (!this._target) {
+      return;
+    }
+    return this._target.update({
+      'search': this._value
+    });
+  };
+
+  return SearchInput;
 
 })(BaseDOM);
 

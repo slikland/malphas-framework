@@ -1,3 +1,5 @@
+input.search
+	margin-bottom: 1em
 
 table
 	width: 100%
@@ -5,19 +7,30 @@ table
 	thead
 		font-weight: 'bold'
 		tr
-			border-bottom: 1px solid #999999
+			border-bottom: 1px solid darken(#CACACA, 10%)
 			background-color: #CACACA
 			th
 				padding: 8px
 				
 				i.sort-icon
 					float: right
+					opacity: 0.3
+					transition: opacity 0.1s
 					@extend .fa-sort
 					@extend .fa
 					&.up
-						@extend .fa-sort-asc
-					&.down
 						@extend .fa-sort-desc
+						opacity: 0.8
+					&.down
+						@extend .fa-sort-asc
+						opacity: 0.8
+				&:hover
+					i.sort-icon
+						opacity: 1
+						
+						@extend .fa-sort-desc
+						&.up
+							@extend .fa-sort-asc
 
 	tbody
 		font-family: Tahoma
