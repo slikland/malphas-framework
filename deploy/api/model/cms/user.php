@@ -53,7 +53,8 @@ class user extends Model
 	*/
 	function listUsers()
 	{
-		return array('users'=>$this->controller->getUserList());
+		$users = $this->controller->getUserList();
+		return array('users'=>$users);
 	}
 
 	/**

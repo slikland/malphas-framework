@@ -1,10 +1,10 @@
 h1:"Lista de usuários"
-table
+table{"update":"user/userList"}
 	thead
 		tr
-			th: Nome
-			th: Email
-			th: Nível
+			th{"sort":"name"}: Nome
+			th{"sort":"email"}: Email
+			th{"sort":"role"}: Nível
 			th: 
 	tbody
 		<tableItem:#{users}
