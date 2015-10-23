@@ -138,6 +138,12 @@ class user extends Model
 	function listLog()
 	{
 
+		return array('items'=>$this->logList());
+	}
+
+	function logList($data = array())
+	{
+		return $this->controller->getLog($data);
 	}
 }
 ?>

@@ -2,6 +2,7 @@ class components.Form extends BaseDOM
 	@SELECTOR: 'form'
 	constructor:()->
 		super
+		console.log(@element)
 		@element.on('submit', @_submit)
 	destroy:()->
 		@element.on('submit', @_submit)

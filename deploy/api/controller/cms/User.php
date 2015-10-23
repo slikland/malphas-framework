@@ -147,5 +147,10 @@ class User extends Controller
 		$user = $this->getCurrentUser();
 		return $this->db->fetch_all('SELECT cu.pk_cms_user id, cu.name name, cu.email email, cr.name role  FROM cms_user cu LEFT JOIN cms_role cr ON cu.fk_cms_role = cr.pk_cms_role WHERE cu.fk_cms_role >= '. $user['role'] .';');
 	}
+
+	public function getLog($data)
+	{
+		return $this->db->fetch_all('SELECT cl.action, IF(ISNULL(cl.description) OR ISEMPTY(cl.description), \' \', cl.description) description, IF(ISNULL(cl.data) OR ISEMPTY(cl.data), \' \', cl.data) data, cl.created created, cu.name `user` FROM cms_log cl LEFT JOIN cms_session cs ON cl.fk_cms_session = cs.pk_cms_session LEFT JOIN cms_user cu ON cs.fk_cms_user = cu.pk_cms_user ORDER BY cl.created DESC');
+	}
 }
 ?>

@@ -179,7 +179,7 @@ class TemplateParser extends EventDispatcher
 					data['external'] = o[2]
 					if o[4] && o[4].length > 0
 						c = /^\s*\#\{(.*?)\}\s*$/.exec(@_unescapeCharacters(o[4], charMap))
-						data[content = o[4]
+						data['content'] = o[4]
 						if c
 							data['use'] = c[1]
 				when '!'

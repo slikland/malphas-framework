@@ -9,6 +9,16 @@ table
 			background-color: #CACACA
 			th
 				padding: 8px
+				
+				i.sort-icon
+					float: right
+					@extend .fa-sort
+					@extend .fa
+					&.up
+						@extend .fa-sort-asc
+					&.down
+						@extend .fa-sort-desc
+
 	tbody
 		font-family: Tahoma
 		tr

@@ -2605,7 +2605,6 @@ TemplateNode = (function(_super) {
 
   function TemplateNode(nodeData) {
     this.nodeData = nodeData;
-    console.log(this.nodeData);
     this._id = this.nodeData['id'];
     this._external = this.nodeData['external'];
     this._use = this.nodeData['use'];
@@ -3030,9 +3029,9 @@ TemplateParser = (function(_super) {
         case '<':
           this._externalTemplates.push(o[2]);
           data['external'] = o[2];
-          if (o[3] && o[3].length > 0) {
+          if (o[4] && o[4].length > 0) {
             c = /^\s*\#\{(.*?)\}\s*$/.exec(this._unescapeCharacters(o[4], charMap));
-            data[content = o[3]];
+            data['content'] = o[4];
             if (c) {
               data['use'] = c[1];
             }
@@ -4042,6 +4041,73 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
+components.Table = (function(_super) {
+  var TableHeader;
+
+  __extends(Table, _super);
+
+  Table.SELECTOR = 'table';
+
+  function Table() {
+    this._headerClick = __bind(this._headerClick, this);
+    this._parseHeader = __bind(this._parseHeader, this);
+    Table.__super__.constructor.apply(this, arguments);
+    this._parseHeader();
+  }
+
+  Table.prototype.destroy = function() {
+    this.removeAll();
+    return this.off();
+  };
+
+  Table.prototype._parseHeader = function() {
+    var head, heads, i, sort, _results;
+    heads = this.findAll('thead th');
+    i = heads.length;
+    _results = [];
+    while (i-- > 0) {
+      head = heads[i];
+      sort = head.getAttribute('sort');
+      if (!sort || sort.length === 0) {
+        continue;
+      }
+      head = new TableHeader(head);
+      _results.push(head.on('click', this._headerClick));
+    }
+    return _results;
+  };
+
+  Table.prototype._headerClick = function() {};
+
+  TableHeader = (function(_super1) {
+    __extends(TableHeader, _super1);
+
+    function TableHeader(el) {
+      TableHeader.__super__.constructor.call(this, {
+        element: el
+      });
+      this.css({
+        cursor: 'pointer'
+      });
+      this._icon = new BaseDOM({
+        element: 'i',
+        className: 'sort-icon'
+      });
+      this.appendChild(this._icon);
+    }
+
+    return TableHeader;
+
+  })(BaseDOM);
+
+  return Table;
+
+})(BaseDOM);
+
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
 components.Input = (function(_super) {
   var CharCounter;
 
@@ -4144,6 +4210,7 @@ components.Form = (function(_super) {
     this._submitComplete = __bind(this._submitComplete, this);
     this._submit = __bind(this._submit, this);
     Form.__super__.constructor.apply(this, arguments);
+    console.log(this.element);
     this.element.on('submit', this._submit);
   }
 
