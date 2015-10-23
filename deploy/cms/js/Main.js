@@ -2605,6 +2605,7 @@ TemplateNode = (function(_super) {
 
   function TemplateNode(nodeData) {
     this.nodeData = nodeData;
+    console.log(this.nodeData);
     this._id = this.nodeData['id'];
     this._external = this.nodeData['external'];
     this._use = this.nodeData['use'];
@@ -3029,6 +3030,13 @@ TemplateParser = (function(_super) {
         case '<':
           this._externalTemplates.push(o[2]);
           data['external'] = o[2];
+          if (o[3] && o[3].length > 0) {
+            c = /^\s*\#\{(.*?)\}\s*$/.exec(this._unescapeCharacters(o[4], charMap));
+            data[content = o[3]];
+            if (c) {
+              data['use'] = c[1];
+            }
+          }
           break;
         case '!':
           data['id'] = o[2];

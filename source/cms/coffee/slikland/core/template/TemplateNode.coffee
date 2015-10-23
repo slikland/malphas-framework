@@ -1,5 +1,6 @@
 class TemplateNode extends EventDispatcher
 	constructor:(@nodeData)->
+		console.log(@nodeData)
 		@_id = @nodeData['id']
 		@_external = @nodeData['external']
 		@_use = @nodeData['use']

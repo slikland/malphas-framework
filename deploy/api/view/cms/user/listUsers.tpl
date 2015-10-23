@@ -7,10 +7,10 @@ table
 			th: Nível
 			th: 
 	tbody
-		<tableItem:
+		<tableItem:#{users}
 			
 !tableItem
-	tr: #{users}
+	tr: 
 		td: #{name}
 		td: #{email}
 		td: #{role}
