@@ -143,6 +143,7 @@ class user extends Model
 
 	function logList($data = array())
 	{
+		// $data['search'] = array('fields'=>'action', 'value'=>'login');
 		return $this->controller->getLog($data);
 	}
 }

@@ -272,29 +272,101 @@ class DB{
 		return $response;
 	}
 
-	public function getList($query, $params)
+	public function getList($query, $params, $array = false)
 	{
 		$query = array($query);
+		$where = array();
 
-		// if(isset($params['search']))
-		// {
-		// 	$where = array();
-		// 	$search = $params['search'];
-		// 	if(!is_array($seach)){
-		// 		$search = array($search);
-		// 	}
-		// 	foreach($search as $item)
-		// 	{
-		// 		foreach($item['fields'] as $field)
-		// 		{
-		// 			$where
-		// 		}
+		if(isset($params['search']))
+		{
+			$fields = $params['search']['fields'];
+			if(!is_array($fields))
+			{
+				$fields = array($fields);
+			}
+			$fields = implode(' OR ', $fields);
+			$value = $params['search']['value'];
+			$searches = array();
 
-		// 	}
-		// 	if(is_array($params['search']
-		// }
+			preg_match_all('/([\'"])(.+)\1/', $value, $matches);
+			foreach($matches[2] as $match)
+			{
+				$searches[] = $fields . ' LIKE ' . '"%' . $match . '%"';
+			}
+			$value = preg_replace('/([\'"])(.+)\1/', '', $value);
+			preg_match_all('/([^\s]+)/', $value, $matches);
+			foreach($matches[1] as $match)
+			{
+				$searches[] = $fields . ' LIKE ' . '"%' . $match . '%"';
+			}
+			$where[] = implode(' OR ', $searches);
+		}
 
-		$resource = $this->query($sql);
+		if(isset($params['filter']))
+		{
+			$filters = array();
+			foreach($params['filter'] as $filter)
+			{
+				$fields = $filter['fields'];
+				if(!is_array($fields))
+				{
+					$fields = array($fields);
+				}
+				$fields = implode(' AND ', $fields);
+				$value = $filter['value'];
+				if(is_array($value)){
+					$filters[] = $fields . ' IN("' . implode('", "', $value) . '")';
+				}else{
+					$filters[] = $fields . ' = "' . $value . '"';
+				}
+			}
+			$where[] = implode(' AND ', $fields);
+		}
+
+		$orders = array();
+		if(isset($params['sort']))
+		{
+			$sorts = $params['sort'];
+			if(!is_array($sorts))
+			{
+				$sorts = array($sorts);
+			}
+
+			foreach($sorts as $sort)
+			{
+				$dir = 'ASC';
+				if(is_string($sort))
+				{
+					preg_match('/^(\-?)(.*?)$/', $sort, $match);
+					$value = $match[2];
+					if(isset($match[1]) && !empty($match[1]))
+					{
+						$dir = 'DESC';
+					}
+				}else{
+					$value = $sort['field'];
+					if(isset($sort['dir']) && $sort['dir'] < 0)
+					{
+						$dir = 'DESC';
+					}else if(isset($sort['desc'])){
+						$dir = 'DESC';
+					}
+				}
+				$orders[] = '`'.$value.'` ' . $dir;
+			}
+		}
+
+		if(count($where) > 0)
+		{
+			$query[] = 'WHERE ' . implode(' AND ', $where);
+		}
+
+		if(count($orders) > 0)
+		{
+			$query[] = 'ORDER BY ' . implode(', ', $orders);
+		}
+
+		$resource = $this->query(implode(' ', $query));
 		$response = array();
 		if($array)
 		{
