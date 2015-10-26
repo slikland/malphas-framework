@@ -144,10 +144,11 @@ class user extends Model
 	/**
 	*	@log(0)
 	*/
-
 	function logList($data = array())
 	{
-		// $data['search'] = array('fields'=>'action', 'value'=>'login');
+		if(!isset($data['sort'])){
+			$data['sort'] = '-created';
+		}
 		return $this->controller->getLog($data);
 	}
 }

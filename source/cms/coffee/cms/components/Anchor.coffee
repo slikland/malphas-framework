@@ -1,5 +1,6 @@
 class components.Anchor extends BaseDOM
 	@SELECTOR: 'a[href],button[href]'
+	@ORDER: 0
 	constructor:()->
 		super
 		href = @attr('href')
