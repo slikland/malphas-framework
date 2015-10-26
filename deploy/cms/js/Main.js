@@ -2673,22 +2673,44 @@ TemplateNode = (function(_super) {
 
   TemplateNode.prototype._parseNode = function(nodeData) {};
 
-  TemplateNode.prototype.find = function(element) {
-    var child, childNode, _i, _j, _len, _len1, _ref, _ref1;
+  TemplateNode.prototype.find = function(element, attrs) {
+    var child, childNode, found, k, v, _i, _j, _len, _len1, _ref, _ref1, _ref2;
+    if (element == null) {
+      element = null;
+    }
+    if (attrs == null) {
+      attrs = null;
+    }
     childNode = null;
     _ref = this._children;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       child = _ref[_i];
-      if (child.element === element) {
-        childNode = child;
-        break;
+      if (element) {
+        if (child.element !== element) {
+          continue;
+        }
       }
+      if (attrs) {
+        found = true;
+        for (k in attrs) {
+          v = attrs[k];
+          if (!child.attributes[k] || ((_ref1 = child.attributes[k]) != null ? _ref1.indexOf(v) : void 0) < 0) {
+            found = false;
+            continue;
+          }
+        }
+        if (!found) {
+          continue;
+        }
+      }
+      childNode = child;
+      break;
     }
     if (!childNode) {
-      _ref1 = this._children;
-      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-        child = _ref1[_j];
-        childNode = child.find(element);
+      _ref2 = this._children;
+      for (_j = 0, _len1 = _ref2.length; _j < _len1; _j++) {
+        child = _ref2[_j];
+        childNode = child.find(element, attrs);
         if (childNode) {
           break;
         }
@@ -4235,7 +4257,7 @@ components.Table = (function(_super) {
       v = values[k];
       switch (k) {
         case 'search':
-          delete this._values['page'];
+          delete this._values['_index'];
           break;
         case 'sort':
           if (this._values['sort'] && this._values['sort'] === v) {
@@ -4369,25 +4391,46 @@ components.Pagination = (function(_super) {
 
   function Pagination() {
     this._updateTarget = __bind(this._updateTarget, this);
+    this._lastClick = __bind(this._lastClick, this);
+    this._firstClick = __bind(this._firstClick, this);
     this._nextClick = __bind(this._nextClick, this);
     this._prevClick = __bind(this._prevClick, this);
+    this._pageClick = __bind(this._pageClick, this);
     this._create = __bind(this._create, this);
     Pagination.__super__.constructor.apply(this, arguments);
-    this.templateNode = this.element.templateNode;
+    this._templateNode = this.element.templateNode;
+    this._pageTemplate = this._templateNode.find('button', {
+      'class': 'page'
+    });
     this._currentPage = 0;
     setTimeout(this._create, 0);
   }
 
   Pagination.prototype._create = function() {
+    var _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
     this._prevBtn = this.find('.prev', true);
     this._nextBtn = this.find('.next', true);
-    this._prevBtn.element.on('click', this._prevClick);
-    this._nextBtn.element.on('click', this._nextClick);
+    this._firstBtn = this.find('.first', true);
+    this._lastBtn = this.find('.last', true);
+    if ((_ref = this._prevBtn) != null) {
+      _ref.element.on('click', this._prevClick);
+    }
+    if ((_ref1 = this._nextBtn) != null) {
+      _ref1.element.on('click', this._nextClick);
+    }
+    if ((_ref2 = this._firstBtn) != null) {
+      _ref2.element.on('click', this._firstClick);
+    }
+    if ((_ref3 = this._lastBtn) != null) {
+      _ref3.element.on('click', this._lastClick);
+    }
     this._pagesContainer = new BaseDOM({
       element: 'span'
     });
-    this._nextBtn.element.parentNode.insertBefore(this._pagesContainer.element, this._nextBtn.element);
-    return this.update(this.templateNode.data);
+    if ((_ref4 = this._nextBtn) != null) {
+      _ref4.element.parentNode.insertBefore(this._pagesContainer.element, (_ref5 = this._nextBtn) != null ? _ref5.element : void 0);
+    }
+    return this.update(this._templateNode.data);
   };
 
   Pagination.prototype.destroy = function() {
@@ -4399,37 +4442,86 @@ components.Pagination = (function(_super) {
     this._total = data.total;
     this._numItems = data.numItems;
     this._currentPage = data.index / this._numItems;
-    this._buildPages();
+    this._totalPages = Math.ceil(this._total / this._numItems);
     return this.goto(this._currentPage);
   };
 
   Pagination.prototype.goto = function(page) {
-    var totalPages;
-    totalPages = Math.ceil(this._total / this._numItems);
+    var _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7;
     if (page <= 0) {
       page = 0;
-      this._prevBtn.enable(false);
-      this._prevBtn.removeClass('p3');
+      if ((_ref = this._prevBtn) != null) {
+        _ref.enable(false);
+      }
+      if ((_ref1 = this._firstBtn) != null) {
+        _ref1.enable(false);
+      }
     } else {
-      this._prevBtn.enable(true);
-      this._prevBtn.addClass('p3');
+      if ((_ref2 = this._prevBtn) != null) {
+        _ref2.enable(true);
+      }
+      if ((_ref3 = this._firstBtn) != null) {
+        _ref3.enable(true);
+      }
     }
-    if (page >= totalPages) {
-      page = totalPages - 1;
-      this._nextBtn.enable(false);
-      this._nextBtn.removeClass('p3');
+    if (page >= this._totalPages - 1) {
+      page = this._totalPages - 1;
+      if ((_ref4 = this._nextBtn) != null) {
+        _ref4.enable(false);
+      }
+      if ((_ref5 = this._lastBtn) != null) {
+        _ref5.enable(false);
+      }
     } else {
-      this._nextBtn.enable(true);
-      this._nextBtn.addClass('p3');
+      if ((_ref6 = this._nextBtn) != null) {
+        _ref6.enable(true);
+      }
+      if ((_ref7 = this._lastBtn) != null) {
+        _ref7.enable(true);
+      }
     }
     if (this._currentPage !== page) {
       this._currentPage = page;
-      return this._updateTarget();
+      this._updateTarget();
     }
+    return this._buildPages();
   };
 
   Pagination.prototype._buildPages = function() {
-    return this._clear();
+    var halfPages, init, item, page, _i, _ref, _results;
+    this._clear();
+    halfPages = Pagination.NUM_VISIBLE_PAGES >> 1;
+    init = this._currentPage - halfPages;
+    if (init + Pagination.NUM_VISIBLE_PAGES >= this._totalPages) {
+      init = this._totalPages - Pagination.NUM_VISIBLE_PAGES;
+    }
+    if (init < 0) {
+      init = 0;
+    }
+    _results = [];
+    for (page = _i = init, _ref = init + Pagination.NUM_VISIBLE_PAGES; init <= _ref ? _i < _ref : _i > _ref; page = init <= _ref ? ++_i : --_i) {
+      item = this._pageTemplate.render(this._pagesContainer.element, {
+        page: (page + 1).toString()
+      }, null, true);
+      if (item) {
+        item = item.getInstance() || new BaseDOM({
+          element: item
+        });
+        item.value = page;
+        if (page === this._currentPage) {
+          _results.push(item.addClass('selected p3'));
+        } else {
+          _results.push(item.element.on('click', this._pageClick));
+        }
+      } else {
+        _results.push(void 0);
+      }
+    }
+    return _results;
+  };
+
+  Pagination.prototype._pageClick = function(e) {
+    return this.goto(e.currentTarget.getInstance().value);
   };
 
   Pagination.prototype._clear = function() {
@@ -4461,6 +4553,14 @@ components.Pagination = (function(_super) {
 
   Pagination.prototype._nextClick = function() {
     return this._next();
+  };
+
+  Pagination.prototype._firstClick = function() {
+    return this.goto(0);
+  };
+
+  Pagination.prototype._lastClick = function() {
+    return this.goto(this._totalPages - 1);
   };
 
   Pagination.prototype._updateTarget = function() {

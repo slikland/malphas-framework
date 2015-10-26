@@ -29,7 +29,7 @@ class components.Table extends BaseDOM
 		for k, v of values
 			switch k
 				when 'search'
-					delete @_values['page']
+					delete @_values['_index']
 				when 'sort'
 					if @_values['sort'] && @_values['sort'] == v
 						v = '-' + v

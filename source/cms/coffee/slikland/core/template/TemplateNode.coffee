@@ -33,15 +33,25 @@ class TemplateNode extends EventDispatcher
 
 	_parseNode:(nodeData)->
 		# console.log(nodeData)
-	find:(element)->
+	find:(element = null, attrs = null)->
 		childNode = null
 		for child in @_children
-			if child.element == element
-				childNode = child
-				break
+			if element
+				if child.element != element
+					continue
+			if attrs
+				found = true
+				for k, v of attrs 
+					if !child.attributes[k] || child.attributes[k]?.indexOf(v) < 0
+						found = false
+						continue
+				if !found
+					continue
+			childNode = child
+			break
 		if !childNode
 			for child in @_children
-				childNode = child.find(element)
+				childNode = child.find(element, attrs)
 				if childNode
 					break
 		return childNode

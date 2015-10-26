@@ -3,7 +3,8 @@ class components.Pagination extends BaseDOM
 	@NUM_VISIBLE_PAGES: 15
 	constructor:()->
 		super
-		@templateNode = @element.templateNode
+		@_templateNode = @element.templateNode
+		@_pageTemplate = @_templateNode.find('button', {'class': 'page'})
 
 		@_currentPage = 0
 
@@ -11,12 +12,16 @@ class components.Pagination extends BaseDOM
 	_create:()=>
 		@_prevBtn = @find('.prev', true)
 		@_nextBtn = @find('.next', true)
-		@_prevBtn.element.on('click', @_prevClick)
-		@_nextBtn.element.on('click', @_nextClick)
+		@_firstBtn = @find('.first', true)
+		@_lastBtn = @find('.last', true)
+		@_prevBtn?.element.on('click', @_prevClick)
+		@_nextBtn?.element.on('click', @_nextClick)
+		@_firstBtn?.element.on('click', @_firstClick)
+		@_lastBtn?.element.on('click', @_lastClick)
 
 		@_pagesContainer = new BaseDOM({element: 'span'})
-		@_nextBtn.element.parentNode.insertBefore(@_pagesContainer.element, @_nextBtn.element)
-		@update(@templateNode.data)
+		@_nextBtn?.element.parentNode.insertBefore(@_pagesContainer.element, @_nextBtn?.element)
+		@update(@_templateNode.data)
 
 	destroy:()->
 		@removeAll()
@@ -26,36 +31,52 @@ class components.Pagination extends BaseDOM
 		@_total = data.total
 		@_numItems = data.numItems
 		@_currentPage = data.index / @_numItems
-
-		@_buildPages()
+		@_totalPages = Math.ceil(@_total / @_numItems)
 
 		@goto(@_currentPage)
 
 	goto:(page)->
-		totalPages = Math.ceil(@_total / @_numItems)
 		
 		if page <= 0
 			page = 0
-			@_prevBtn.enable(false)
-			@_prevBtn.removeClass('p3')
+			@_prevBtn?.enable(false)
+			@_firstBtn?.enable(false)
 		else
-			@_prevBtn.enable(true)
-			@_prevBtn.addClass('p3')
+			@_prevBtn?.enable(true)
+			@_firstBtn?.enable(true)
 
-		if page >= totalPages
-			page = totalPages - 1
-			@_nextBtn.enable(false)
-			@_nextBtn.removeClass('p3')
+		if page >= @_totalPages - 1
+			page = @_totalPages - 1
+			@_nextBtn?.enable(false)
+			@_lastBtn?.enable(false)
 		else
-			@_nextBtn.enable(true)
-			@_nextBtn.addClass('p3')
+			@_nextBtn?.enable(true)
+			@_lastBtn?.enable(true)
 		if @_currentPage != page
 			@_currentPage = page
 			@_updateTarget()
+		@_buildPages()
 	_buildPages:()->
 		@_clear()
 
+		halfPages = (Pagination.NUM_VISIBLE_PAGES >> 1)
+		init = @_currentPage - halfPages
+		if init + Pagination.NUM_VISIBLE_PAGES >= @_totalPages
+			init = @_totalPages - Pagination.NUM_VISIBLE_PAGES
+		if init < 0
+			init = 0
+		for page in [init...(init+Pagination.NUM_VISIBLE_PAGES)]
+			item = @_pageTemplate.render(@_pagesContainer.element, {page: (page + 1).toString()}, null, true)
+			if item
+				item = item.getInstance() || new BaseDOM({element: item})
+				item.value = page
+				if page == @_currentPage
+					item.addClass('selected p3')
+				else
+					item.element.on('click', @_pageClick)
 
+	_pageClick:(e)=>
+		@goto(e.currentTarget.getInstance().value)
 
 	_clear:()->
 		items = @_pagesContainer.findAll('*', true)
@@ -72,6 +93,11 @@ class components.Pagination extends BaseDOM
 		@_prev()
 	_nextClick:()=>
 		@_next()
+
+	_firstClick:()=>
+		@goto(0)
+	_lastClick:()=>
+		@goto(@_totalPages - 1)
 
 	_updateTarget:()=>
 		if !@_target

@@ -153,7 +153,7 @@ class User extends Controller
 		{
 			$data['search'] = array('fields'=>array('cu.name','cl.action','cl.description','cl.data'), 'value'=>$data['search']);
 		}
-		$data['pagination'] = array('index'=>0, 'numItems'=>10);
+		$data['pagination'] = array('index'=>0, 'numItems'=>20);
 		if(isset($data['_index']))
 		{
 			$data['pagination']['index'] = $data['_index'];

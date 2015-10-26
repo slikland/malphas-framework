@@ -136,11 +136,14 @@ class user extends Model
 	*	@permission([1])
 	*	@log(0)
 	*/
-	function listLog()
+	function listLog($data)
 	{
-
-		return array('items'=>$this->logList());
+		return array('items'=>$this->logList($data));
 	}
+
+	/**
+	*	@log(0)
+	*/
 
 	function logList($data = array())
 	{
