@@ -24,6 +24,14 @@ Node::removeChild = (node) ->
 	
 Node::getInstance = () ->
 	return @__instance__
+Node::matches = Node::matches || Node::webkitMatchesSelector || Node::mozMatchesSelector || Node::msMatchesSelector || Node::oMatchesSelector
+Node::findParents = (query) ->
+	if @parentNode?
+		if @parentNode.matches(query)
+			return @parentNode
+		else
+			return @parentNode.findParents(query)
+	return null
 	
 # 
 # TODO: FIX IE8+
@@ -183,6 +191,16 @@ class BaseDOM extends EventDispatcher
 		while i-- > 0
 			@removeChild(childs[i])
 
+	##--------------------------------------
+	##	Check if the instance matches a query selector
+	##--------------------------------------
+	matches:(query)->
+		return @element.matches(query)
+	##--------------------------------------
+	##	Find parent nodes for a matching query selector
+	findParents:(query)->
+		return @element.findParents(query)
+	
 	##--------------------------------------
 	##	Query selector
 	##	@onlyInstances: If return only BaseDOM instances
