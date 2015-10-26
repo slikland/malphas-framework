@@ -39,6 +39,9 @@ class components.Table extends BaseDOM
 		@_service = app.serviceController.call({url: @_update, onComplete: @_dataLoaded, data: @_values}, false)
 	_dataLoaded:(e, data)=>
 		@element.templateNode.find('tbody')?.update(data.items, data.items)
+		targets = document.querySelectorAll('[for="'+@attr('id')+'"]')
+		for target in targets
+			target.getInstance()?.update?(data)
 
 	class TableHeader extends BaseDOM
 		constructor:(el)->

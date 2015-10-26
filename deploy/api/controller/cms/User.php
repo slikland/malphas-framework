@@ -153,6 +153,11 @@ class User extends Controller
 		{
 			$data['search'] = array('fields'=>array('cu.name','cl.action','cl.description','cl.data'), 'value'=>$data['search']);
 		}
+		$data['pagination'] = array('index'=>0, 'numItems'=>10);
+		if(isset($data['_index']))
+		{
+			$data['pagination']['index'] = $data['_index'];
+		}
 		return $this->db->getList('SELECT cl.action, IF(ISNULL(cl.description) OR LENGTH(cl.description) = 0, \' \', cl.description) description, IF(ISNULL(cl.data) OR LENGTH(cl.data) = 0, \' \', cl.data) data, cl.created created, cu.name `user` FROM cms_log cl LEFT JOIN cms_session cs ON cl.fk_cms_session = cs.pk_cms_session LEFT JOIN cms_user cu ON cs.fk_cms_user = cu.pk_cms_user', $data);
 	}
 }

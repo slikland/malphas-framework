@@ -2027,7 +2027,7 @@ BaseDOM = (function(_super) {
     }
     element = this.element.querySelector(query);
     if (onlyInstances) {
-      return element != null ? element.instance : void 0;
+      return element != null ? element.getInstance() : void 0;
     } else {
       return element;
     }
@@ -2045,8 +2045,8 @@ BaseDOM = (function(_super) {
       l = elements.length;
       p = 0;
       while (++i < l) {
-        if (elements[i].instance) {
-          els[p++] = elements[i].instance;
+        if (elements[i].getInstance()) {
+          els[p++] = elements[i].getInstance();
         }
       }
       elements = els;
@@ -4253,8 +4253,17 @@ components.Table = (function(_super) {
   };
 
   Table.prototype._dataLoaded = function(e, data) {
-    var _ref;
-    return (_ref = this.element.templateNode.find('tbody')) != null ? _ref.update(data.items, data.items) : void 0;
+    var target, targets, _i, _len, _ref, _ref1, _results;
+    if ((_ref = this.element.templateNode.find('tbody')) != null) {
+      _ref.update(data.items, data.items);
+    }
+    targets = document.querySelectorAll('[for="' + this.attr('id') + '"]');
+    _results = [];
+    for (_i = 0, _len = targets.length; _i < _len; _i++) {
+      target = targets[_i];
+      _results.push((_ref1 = target.getInstance()) != null ? typeof _ref1.update === "function" ? _ref1.update(data) : void 0 : void 0);
+    }
+    return _results;
   };
 
   TableHeader = (function(_super1) {
@@ -4356,20 +4365,102 @@ components.Pagination = (function(_super) {
 
   Pagination.SELECTOR = '.pagination';
 
+  Pagination.NUM_VISIBLE_PAGES = 15;
+
   function Pagination() {
     this._updateTarget = __bind(this._updateTarget, this);
+    this._nextClick = __bind(this._nextClick, this);
+    this._prevClick = __bind(this._prevClick, this);
+    this._create = __bind(this._create, this);
     Pagination.__super__.constructor.apply(this, arguments);
     this.templateNode = this.element.templateNode;
-    console.log(this.templateNode);
+    this._currentPage = 0;
+    setTimeout(this._create, 0);
   }
+
+  Pagination.prototype._create = function() {
+    this._prevBtn = this.find('.prev', true);
+    this._nextBtn = this.find('.next', true);
+    this._prevBtn.element.on('click', this._prevClick);
+    this._nextBtn.element.on('click', this._nextClick);
+    this._pagesContainer = new BaseDOM({
+      element: 'span'
+    });
+    this._nextBtn.element.parentNode.insertBefore(this._pagesContainer.element, this._nextBtn.element);
+    return this.update(this.templateNode.data);
+  };
 
   Pagination.prototype.destroy = function() {
     this.removeAll();
     return this.off();
   };
 
-  Pagination.prototype.update = function(values) {
-    return values;
+  Pagination.prototype.update = function(data) {
+    this._total = data.total;
+    this._numItems = data.numItems;
+    this._currentPage = data.index / this._numItems;
+    this._buildPages();
+    return this.goto(this._currentPage);
+  };
+
+  Pagination.prototype.goto = function(page) {
+    var totalPages;
+    totalPages = Math.ceil(this._total / this._numItems);
+    if (page <= 0) {
+      page = 0;
+      this._prevBtn.enable(false);
+      this._prevBtn.removeClass('p3');
+    } else {
+      this._prevBtn.enable(true);
+      this._prevBtn.addClass('p3');
+    }
+    if (page >= totalPages) {
+      page = totalPages - 1;
+      this._nextBtn.enable(false);
+      this._nextBtn.removeClass('p3');
+    } else {
+      this._nextBtn.enable(true);
+      this._nextBtn.addClass('p3');
+    }
+    if (this._currentPage !== page) {
+      this._currentPage = page;
+      return this._updateTarget();
+    }
+  };
+
+  Pagination.prototype._buildPages = function() {
+    return this._clear();
+  };
+
+  Pagination.prototype._clear = function() {
+    var item, items, _i, _len;
+    items = this._pagesContainer.findAll('*', true);
+    for (_i = 0, _len = items.length; _i < _len; _i++) {
+      item = items[_i];
+      if (typeof item.off === "function") {
+        item.off();
+      }
+      if (typeof item.destroy === "function") {
+        item.destroy();
+      }
+    }
+    return this._pagesContainer.removeAll();
+  };
+
+  Pagination.prototype._prev = function() {
+    return this.goto(this._currentPage - 1);
+  };
+
+  Pagination.prototype._next = function() {
+    return this.goto(this._currentPage + 1);
+  };
+
+  Pagination.prototype._prevClick = function() {
+    return this._prev();
+  };
+
+  Pagination.prototype._nextClick = function() {
+    return this._next();
   };
 
   Pagination.prototype._updateTarget = function() {
@@ -4381,7 +4472,7 @@ components.Pagination = (function(_super) {
       return;
     }
     return this._target.update({
-      '_index': this._value
+      '_index': this._currentPage * this._numItems
     });
   };
 
@@ -4589,9 +4680,12 @@ components.ActionButton = (function(_super) {
 
   ActionButton.SELECTOR = 'button[action]';
 
+  ActionButton.ORDER = 0;
+
   function ActionButton() {
     this._click = __bind(this._click, this);
     ActionButton.__super__.constructor.apply(this, arguments);
+    this._enabled = true;
     this.element.on('click', this._click);
   }
 
@@ -4601,13 +4695,76 @@ components.ActionButton = (function(_super) {
     return this.element.off('click', this._click);
   };
 
+  ActionButton.prototype.enable = function(enabled) {
+    if (enabled == null) {
+      enabled = true;
+    }
+    if (enabled) {
+      this.removeClass('disabled');
+    } else {
+      this.addClass('disabled');
+    }
+    return this._enabled = enabled;
+  };
+
   ActionButton.prototype._click = function() {
+    ActionButton.__super__._click.apply(this, arguments);
+    if (!this._enabled) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
     return app.serviceController.call({
       url: this.attr('action')
     });
   };
 
   return ActionButton;
+
+})(BaseDOM);
+
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+components.Button = (function(_super) {
+  __extends(Button, _super);
+
+  Button.SELECTOR = 'button';
+
+  function Button() {
+    this._click = __bind(this._click, this);
+    Button.__super__.constructor.apply(this, arguments);
+    this._enabled = true;
+    this.element.on('click', this._click);
+  }
+
+  Button.prototype.destroy = function() {
+    this.removeAll();
+    this.off();
+    return this.element.off('click', this._click);
+  };
+
+  Button.prototype.enable = function(enabled) {
+    if (enabled == null) {
+      enabled = true;
+    }
+    if (enabled) {
+      this.removeClass('disabled');
+    } else {
+      this.addClass('disabled');
+    }
+    return this._enabled = enabled;
+  };
+
+  Button.prototype._click = function(e) {
+    if (!this._enabled) {
+      e.preventDefault();
+      return e.stopPropagation();
+    }
+  };
+
+  return Button;
 
 })(BaseDOM);
 

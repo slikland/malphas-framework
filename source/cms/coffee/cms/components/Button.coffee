@@ -1,6 +1,5 @@
-class components.ActionButton extends BaseDOM
-	@SELECTOR: 'button[action]'
-	@ORDER: 0
+class components.Button extends BaseDOM
+	@SELECTOR: 'button'
 	constructor:()->
 		super
 		@_enabled = true
@@ -9,6 +8,7 @@ class components.ActionButton extends BaseDOM
 		@removeAll()
 		@off()
 		@element.off('click', @_click)
+
 	enable:(enabled = true)->
 		if enabled
 			@removeClass('disabled')
@@ -16,10 +16,8 @@ class components.ActionButton extends BaseDOM
 			@addClass('disabled')
 
 		@_enabled = enabled
-	_click:()=>
-		super
+	_click:(e)=>
 		if !@_enabled
 			e.preventDefault()
 			e.stopPropagation()
-			return
-		app.serviceController.call({url: @attr('action')})
+		
