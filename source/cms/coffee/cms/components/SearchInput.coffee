@@ -9,6 +9,10 @@ class components.SearchInput extends BaseDOM
 		@element.on('keyup', @_update)
 	destroy:()->
 
+	update:(data, values)->
+		if values?.search
+			@attr('value', values.search)
+
 	_checkAttributes:()->
 		if @attr('maxlength')
 			@_maxLength = Number(@attr('maxlength'))

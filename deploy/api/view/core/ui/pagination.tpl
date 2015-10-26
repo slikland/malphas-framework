@@ -6,4 +6,4 @@ div.pagination
 	button.last.fa.fa-angle-double-right
 
 !page
-	button.page: "#{page}"
+	button.page: #{page}

@@ -19,10 +19,10 @@ table
 					@extend .fa-sort
 					@extend .fa
 					&.up
-						@extend .fa-sort-desc
+						@extend .fa-sort-asc
 						opacity: 0.8
 					&.down
-						@extend .fa-sort-asc
+						@extend .fa-sort-desc
 						opacity: 0.8
 				&:hover
 					i.sort-icon
@@ -31,6 +31,8 @@ table
 						@extend .fa-sort-desc
 						&.up
 							@extend .fa-sort-asc
+						&.down
+							@extend .fa-sort-desc
 
 	tbody
 		font-family: Tahoma

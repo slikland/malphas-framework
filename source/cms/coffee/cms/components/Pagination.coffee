@@ -65,7 +65,10 @@ class components.Pagination extends BaseDOM
 			init = @_totalPages - Pagination.NUM_VISIBLE_PAGES
 		if init < 0
 			init = 0
-		for page in [init...(init+Pagination.NUM_VISIBLE_PAGES)]
+		end = init + Pagination.NUM_VISIBLE_PAGES
+		if end >= @_totalPages
+			end = @_totalPages
+		for page in [init...end]
 			item = @_pageTemplate.render(@_pagesContainer.element, {page: (page + 1).toString()}, null, true)
 			if item
 				item = item.getInstance() || new BaseDOM({element: item})
