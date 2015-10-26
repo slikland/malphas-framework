@@ -15,6 +15,6 @@ form{"action":"user/edit"}:
 			option{"value":"#{value}", "selected": "#{selected}"}:#{name}
 	field:
 		label{"for":"role"}: "Tipo"
-		textarea: "#{email}"
+		textarea{"maxlength":10}: "#{email}"
 	field.buttons:
 		button.p5{"type":"submit"}:"#{submitLabel}"
