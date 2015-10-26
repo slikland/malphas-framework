@@ -48,11 +48,11 @@ class Main
 
 		# API.call({url: 'user/getSession', onComplete: @_indexComplete, onError: @_error})
 	_routeChange:()=>
-		console.log(arguments)
+		# console.log(arguments)
 	_indexComplete:()=>
-		console.log(arguments)
+		# console.log(arguments)
 	_error:()=>
-		console.log("ERR")
+		# console.log("ERR")
 	_loadComplete:()=>
 		# @_template = AssetLoader.getInstance().getResult('template.yaml')
 

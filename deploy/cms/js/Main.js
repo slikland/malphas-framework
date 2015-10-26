@@ -4150,6 +4150,7 @@ Notification = (function(_super) {
 })(EventDispatcher);
 
 var Blocker,
+  __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -4157,6 +4158,7 @@ Blocker = (function(_super) {
   __extends(Blocker, _super);
 
   function Blocker() {
+    this._transitionEnd = __bind(this._transitionEnd, this);
     Blocker.__super__.constructor.call(this, {
       element: 'div',
       className: 'blocker'
@@ -4164,24 +4166,38 @@ Blocker = (function(_super) {
     this.css({
       display: 'none'
     });
+    this.element.on('transitionend', this._transitionEnd);
+    this.element.on('moztransitionend', this._transitionEnd);
+    this.element.on('otransitionend', this._transitionEnd);
+    this.element.on('webkittransitionend', this._transitionEnd);
+    this._showing = false;
   }
 
   Blocker.prototype.show = function(showLoader) {
     if (showLoader == null) {
       showLoader = true;
     }
+    this._showing = true;
     if (!this.element.parentNode) {
       document.body.appendChild(this.element);
     }
-    return this.css({
+    this.css({
       display: 'block'
     });
+    return this.addClass('show');
   };
 
   Blocker.prototype.hide = function() {
-    return this.css({
-      display: 'none'
-    });
+    this._showing = false;
+    return this.removeClass('show');
+  };
+
+  Blocker.prototype._transitionEnd = function() {
+    if (!this._showing) {
+      return this.css({
+        display: 'none'
+      });
+    }
   };
 
   return Blocker;
@@ -4951,17 +4967,11 @@ Main = (function() {
     app.componentController.parse();
   }
 
-  Main.prototype._routeChange = function() {
-    return console.log(arguments);
-  };
+  Main.prototype._routeChange = function() {};
 
-  Main.prototype._indexComplete = function() {
-    return console.log(arguments);
-  };
+  Main.prototype._indexComplete = function() {};
 
-  Main.prototype._error = function() {
-    return console.log("ERR");
-  };
+  Main.prototype._error = function() {};
 
   Main.prototype._loadComplete = function() {};
 
