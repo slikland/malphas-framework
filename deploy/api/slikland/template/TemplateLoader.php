@@ -19,7 +19,7 @@ class TemplateLoader{
 
 	private static function parseTemplate($template)
 	{
-		preg_match_all('/^((\s*)\<([^\s\:]+)(.*?))$/m',$template, $matches, PREG_SET_ORDER);
+		preg_match_all('/^((\s*)\<([^\s\:\{\}]+)(.*?))$/m',$template, $matches, PREG_SET_ORDER);
 		foreach($matches as $match){
 			if(strstr($template, '!' . $match[3]) !== FALSE){
 				continue;

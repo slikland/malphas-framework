@@ -274,6 +274,13 @@ class DB{
 
 	public function getList($query, $params, $array = false)
 	{
+		$numItems = 10;
+		$index = 0;
+		if(isset($params['pagination']))
+		{
+			$numItems = $params['pagination']['numItems'];
+			$index = $params['pagination']['index'];
+		}
 		$query = array($query);
 		$where = array();
 
@@ -284,22 +291,39 @@ class DB{
 			{
 				$fields = array($fields);
 			}
-			$fields = implode(' OR ', $fields);
+			// $fields = implode(' OR ', $fields);
 			$value = $params['search']['value'];
-			$searches = array();
+			$values = array();
 
 			preg_match_all('/([\'"])(.+)\1/', $value, $matches);
 			foreach($matches[2] as $match)
 			{
-				$searches[] = $fields . ' LIKE ' . '"%' . $match . '%"';
+				$values[] = '"%' . $match . '%"';
 			}
 			$value = preg_replace('/([\'"])(.+)\1/', '', $value);
 			preg_match_all('/([^\s]+)/', $value, $matches);
 			foreach($matches[1] as $match)
 			{
-				$searches[] = $fields . ' LIKE ' . '"%' . $match . '%"';
+				$values[] = '"%' . $match . '%"';
 			}
-			$where[] = implode(' OR ', $searches);
+
+			$searches = array();
+			foreach($values as $value){
+				if(strlen(trim($value)) <= 0)
+				{
+					continue;
+				}
+				$search = array();
+				foreach($fields as $field)
+				{
+					$search[] = $field . ' LIKE ' . $value;
+				}
+				$searches[] = '(' . implode(' OR ', $search) . ')';
+			}
+			if(count($searches) > 0)
+			{
+				$where[] = implode(' AND ', $searches);
+			}
 		}
 
 		if(isset($params['filter']))
@@ -366,7 +390,17 @@ class DB{
 			$query[] = 'ORDER BY ' . implode(', ', $orders);
 		}
 
-		$resource = $this->query(implode(' ', $query));
+		$query[] = 'LIMIT ' . $index .', ' . $numItems;
+
+		$query = implode(' ', $query);
+
+		if(!preg_match('/^\\s*SELECT\\s+SQL_CALC_FOUND_ROWS/i', $query))
+		{
+			$query = preg_replace('/^\\s*SELECT/', 'SELECT SQL_CALC_FOUND_ROWS', $query);
+		}
+
+
+		$resource = $this->query($query);
 		$response = array();
 		if($array)
 		{
@@ -381,7 +415,10 @@ class DB{
 				$response[] = $row;
 			}
 		}
-		return $response;
+
+		$total = $this->fetch_value("SELECT FOUND_ROWS();") + 0;
+
+		return array('items'=>$response, 'total'=>$total, 'index'=>$index, 'numItems'=>$numItems);
 	}
 }
 ?>

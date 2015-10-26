@@ -54,7 +54,6 @@ class TemplateNode extends EventDispatcher
 		if !originalData && data
 			originalData = data
 		@originalData = originalData
-		@data = data
 		foundData = data
 		if !ignoreUse
 			if @_use && o = /([\*\@])?(.*?)$/.exec(@_use)
@@ -68,6 +67,7 @@ class TemplateNode extends EventDispatcher
 					@_content = ''
 		if @_contextSelector
 			context = (context || document.body).querySelector(@_contextSelector)
+		@data = data
 
 		childContext = context
 		if @_element
@@ -86,8 +86,7 @@ class TemplateNode extends EventDispatcher
 
 		if !context
 			throw new Error('Context was not found.')
-		if (!ignoreUse && @_use) && data && (typeof(data) == 'object' || Array.isArray(data))
-			
+		if (!ignoreUse && @_use) && data && (Array.isArray(data))
 			for v in data
 				@_renderChildren(childContext, v, originalData)
 		else
@@ -101,6 +100,7 @@ class TemplateNode extends EventDispatcher
 				@_renderChildren(@_childContext, v, data, true)
 		else
 			@_renderChildren(@_childContext, data, data, true)
+		@data = data
 
 	_replaceData:(obj, data)->
 		obj = JSON.stringify(obj)

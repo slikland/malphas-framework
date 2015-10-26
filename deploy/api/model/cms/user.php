@@ -134,6 +134,7 @@ class user extends Model
 	/**
 	*	@addToMenu("Log dos usuários", 0, [1])
 	*	@permission([1])
+	*	@log(0)
 	*/
 	function listLog()
 	{

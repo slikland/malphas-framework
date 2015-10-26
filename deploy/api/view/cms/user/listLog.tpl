@@ -1,6 +1,6 @@
 h1:"Lista de log"
 input{"class":"search", "placeholder": "Busca", "for": "list"}
-table{"update":"user/logList", "id":"list"}
+table{"update":"user/logList", "id":"list"}:
 	thead
 		tr
 			th{"sort":"user"}: Usuário
@@ -8,9 +8,10 @@ table{"update":"user/logList", "id":"list"}
 			th{"sort":"description"}: Descrição
 			th{"sort":"data"}: Dados
 			th{"sort":"created"}: Data
-	tbody
-		<tableItem:#{items}
-			
+	tbody:
+		<tableItem:#{items.items}
+<core.ui.pagination{"for":"list"}: #{items}
+
 !tableItem
 	tr: 
 		td: #{user}

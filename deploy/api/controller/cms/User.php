@@ -149,7 +149,11 @@ class User extends Controller
 
 	public function getLog($data)
 	{
-		return $this->db->getList('SELECT cl.action, IF(ISNULL(cl.description) OR ISEMPTY(cl.description), \' \', cl.description) description, IF(ISNULL(cl.data) OR ISEMPTY(cl.data), \' \', cl.data) data, cl.created created, cu.name `user` FROM cms_log cl LEFT JOIN cms_session cs ON cl.fk_cms_session = cs.pk_cms_session LEFT JOIN cms_user cu ON cs.fk_cms_user = cu.pk_cms_user', $data);
+		if(isset($data['search']))
+		{
+			$data['search'] = array('fields'=>array('cu.name','cl.action','cl.description','cl.data'), 'value'=>$data['search']);
+		}
+		return $this->db->getList('SELECT cl.action, IF(ISNULL(cl.description) OR LENGTH(cl.description) = 0, \' \', cl.description) description, IF(ISNULL(cl.data) OR LENGTH(cl.data) = 0, \' \', cl.data) data, cl.created created, cu.name `user` FROM cms_log cl LEFT JOIN cms_session cs ON cl.fk_cms_session = cs.pk_cms_session LEFT JOIN cms_user cu ON cs.fk_cms_user = cu.pk_cms_user', $data);
 	}
 }
 ?>

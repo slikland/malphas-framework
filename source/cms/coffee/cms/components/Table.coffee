@@ -5,7 +5,6 @@ class components.Table extends BaseDOM
 		@_values = {}
 		@_parseHeader()
 		@_update = @attr('update')
-		console.log(@element.templateNode)
 	destroy:()->
 		@removeAll()
 		@off()
@@ -35,10 +34,11 @@ class components.Table extends BaseDOM
 					if @_values['sort'] && @_values['sort'] == v
 						v = '-' + v
 			@_values[k] = v
-		@_service = app.serviceController.call({url: @_update, onComplete: @_dataLoaded, data: @_values})
-		console.log(@_service)
+
+		app.serviceController.setURLParams(@_values)
+		@_service = app.serviceController.call({url: @_update, onComplete: @_dataLoaded, data: @_values}, false)
 	_dataLoaded:(e, data)=>
-		@element.templateNode.find('tbody')?.update(data, data)
+		@element.templateNode.find('tbody')?.update(data.items, data.items)
 
 	class TableHeader extends BaseDOM
 		constructor:(el)->

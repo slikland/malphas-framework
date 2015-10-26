@@ -2719,7 +2719,6 @@ TemplateNode = (function(_super) {
       originalData = data;
     }
     this.originalData = originalData;
-    this.data = data;
     foundData = data;
     if (!ignoreUse) {
       if (this._use && (o = /([\*\@])?(.*?)$/.exec(this._use))) {
@@ -2738,6 +2737,7 @@ TemplateNode = (function(_super) {
     if (this._contextSelector) {
       context = (context || document.body).querySelector(this._contextSelector);
     }
+    this.data = data;
     childContext = context;
     if (this._element) {
       childContext = document.createElement(this._element);
@@ -2760,7 +2760,7 @@ TemplateNode = (function(_super) {
     if (!context) {
       throw new Error('Context was not found.');
     }
-    if ((!ignoreUse && this._use) && data && (typeof data === 'object' || Array.isArray(data))) {
+    if ((!ignoreUse && this._use) && data && (Array.isArray(data))) {
       for (_i = 0, _len = data.length; _i < _len; _i++) {
         v = data[_i];
         this._renderChildren(childContext, v, originalData);
@@ -2772,18 +2772,17 @@ TemplateNode = (function(_super) {
   };
 
   TemplateNode.prototype.update = function(data, originalData) {
-    var v, _i, _len, _results;
+    var v, _i, _len;
     this.clear();
     if (data && (typeof data === 'object' || Array.isArray(data))) {
-      _results = [];
       for (_i = 0, _len = data.length; _i < _len; _i++) {
         v = data[_i];
-        _results.push(this._renderChildren(this._childContext, v, data, true));
+        this._renderChildren(this._childContext, v, data, true);
       }
-      return _results;
     } else {
-      return this._renderChildren(this._childContext, data, data, true);
+      this._renderChildren(this._childContext, data, data, true);
     }
+    return this.data = data;
   };
 
   TemplateNode.prototype._replaceData = function(obj, data) {
@@ -3573,6 +3572,43 @@ ServiceController = (function(_super) {
     return apiCall.cancel();
   };
 
+  ServiceController.prototype.setURLParams = function(params, clearParams, update) {
+    var k, pathData, v, _i, _len, _params;
+    if (clearParams == null) {
+      clearParams = null;
+    }
+    if (update == null) {
+      update = false;
+    }
+    pathData = app.router.getParsedPath();
+    if (!update) {
+      _params = params;
+    } else {
+      _params = pathData['params'] || {};
+      for (k in params) {
+        v = params[k];
+        _params[k] = v;
+      }
+      if (clearParams) {
+        for (_i = 0, _len = clearParams.length; _i < _len; _i++) {
+          k = clearParams[_i];
+          delete _params[k];
+        }
+      }
+    }
+    params = [];
+    for (k in _params) {
+      v = _params[k];
+      params.push(k + '=' + encodeURIComponent(v));
+    }
+    return app.router.goto(pathData['path'] + '?' + params.join('&'), null, false);
+  };
+
+  ServiceController.prototype.getURLParams = function() {
+    var _params;
+    return _params = app.router.getParsedPath()['params'] || {};
+  };
+
   ServiceController.prototype._callComplete = function(e, data) {
     var url;
     if (e.target.hasBlocker) {
@@ -4157,7 +4193,6 @@ components.Table = (function(_super) {
     this._values = {};
     this._parseHeader();
     this._update = this.attr('update');
-    console.log(this.element.templateNode);
   }
 
   Table.prototype.destroy = function() {
@@ -4209,17 +4244,17 @@ components.Table = (function(_super) {
       }
       this._values[k] = v;
     }
-    this._service = app.serviceController.call({
+    app.serviceController.setURLParams(this._values);
+    return this._service = app.serviceController.call({
       url: this._update,
       onComplete: this._dataLoaded,
       data: this._values
-    });
-    return console.log(this._service);
+    }, false);
   };
 
   Table.prototype._dataLoaded = function(e, data) {
     var _ref;
-    return (_ref = this.element.templateNode.find('tbody')) != null ? _ref.update(data, data) : void 0;
+    return (_ref = this.element.templateNode.find('tbody')) != null ? _ref.update(data.items, data.items) : void 0;
   };
 
   TableHeader = (function(_super1) {
@@ -4251,6 +4286,106 @@ components.Table = (function(_super) {
   })(BaseDOM);
 
   return Table;
+
+})(BaseDOM);
+
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+components.SearchInput = (function(_super) {
+  __extends(SearchInput, _super);
+
+  SearchInput.SELECTOR = 'input.search';
+
+  SearchInput.ORDER = 0;
+
+  function SearchInput() {
+    this._updateTarget = __bind(this._updateTarget, this);
+    this._update = __bind(this._update, this);
+    SearchInput.__super__.constructor.apply(this, arguments);
+    this._checkAttributes();
+    this.element.on('change', this._update);
+    this.element.on('keydown', this._update);
+    this.element.on('keyup', this._update);
+  }
+
+  SearchInput.prototype.destroy = function() {};
+
+  SearchInput.prototype._checkAttributes = function() {
+    if (this.attr('maxlength')) {
+      this._maxLength = Number(this.attr('maxlength'));
+      this._charCounter = new CharCounter(this._maxLength);
+      return this.element.parentNode.appendChild(this._charCounter);
+    }
+  };
+
+  SearchInput.prototype._update = function() {
+    var value;
+    value = this.element.value.trim().toLowerCase();
+    if (value !== this._value) {
+      clearTimeout(this._updateTimeout);
+      this._value = value;
+      return this._updateTimeout = setTimeout(this._updateTarget, 300);
+    }
+  };
+
+  SearchInput.prototype._updateTarget = function() {
+    var _ref;
+    if (!this._target) {
+      this._target = (_ref = document.getElementById(this.attr('for'))) != null ? _ref.getInstance() : void 0;
+    }
+    if (!this._target) {
+      return;
+    }
+    return this._target.update({
+      'search': this._value
+    });
+  };
+
+  return SearchInput;
+
+})(BaseDOM);
+
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+components.Pagination = (function(_super) {
+  __extends(Pagination, _super);
+
+  Pagination.SELECTOR = '.pagination';
+
+  function Pagination() {
+    this._updateTarget = __bind(this._updateTarget, this);
+    Pagination.__super__.constructor.apply(this, arguments);
+    this.templateNode = this.element.templateNode;
+    console.log(this.templateNode);
+  }
+
+  Pagination.prototype.destroy = function() {
+    this.removeAll();
+    return this.off();
+  };
+
+  Pagination.prototype.update = function(values) {
+    return values;
+  };
+
+  Pagination.prototype._updateTarget = function() {
+    var _ref;
+    if (!this._target) {
+      this._target = (_ref = document.getElementById(this.attr('for'))) != null ? _ref.getInstance() : void 0;
+    }
+    if (!this._target) {
+      return;
+    }
+    return this._target.update({
+      '_index': this._value
+    });
+  };
+
+  return Pagination;
 
 })(BaseDOM);
 
@@ -4473,64 +4608,6 @@ components.ActionButton = (function(_super) {
   };
 
   return ActionButton;
-
-})(BaseDOM);
-
-var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-components.SearchInput = (function(_super) {
-  __extends(SearchInput, _super);
-
-  SearchInput.SELECTOR = 'input.search';
-
-  SearchInput.ORDER = 0;
-
-  function SearchInput() {
-    this._updateTarget = __bind(this._updateTarget, this);
-    this._update = __bind(this._update, this);
-    SearchInput.__super__.constructor.apply(this, arguments);
-    this._checkAttributes();
-    this.element.on('change', this._update);
-    this.element.on('keydown', this._update);
-    this.element.on('keyup', this._update);
-  }
-
-  SearchInput.prototype.destroy = function() {};
-
-  SearchInput.prototype._checkAttributes = function() {
-    if (this.attr('maxlength')) {
-      this._maxLength = Number(this.attr('maxlength'));
-      this._charCounter = new CharCounter(this._maxLength);
-      return this.element.parentNode.appendChild(this._charCounter);
-    }
-  };
-
-  SearchInput.prototype._update = function() {
-    var value;
-    value = this.element.value.trim().toLowerCase();
-    if (value !== this._value) {
-      clearTimeout(this._updateTimeout);
-      this._value = value;
-      return this._updateTimeout = setTimeout(this._updateTarget, 300);
-    }
-  };
-
-  SearchInput.prototype._updateTarget = function() {
-    var _ref;
-    if (!this._target) {
-      this._target = (_ref = document.getElementById(this.attr('for'))) != null ? _ref.getInstance() : void 0;
-    }
-    if (!this._target) {
-      return;
-    }
-    return this._target.update({
-      'search': this._value
-    });
-  };
-
-  return SearchInput;
 
 })(BaseDOM);
 

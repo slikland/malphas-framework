@@ -16,6 +16,27 @@ class ServiceController extends EventDispatcher
 	cancel:(apiCall)->
 		apiCall.cancel()
 
+	setURLParams:(params, clearParams = null, update = false)->
+		pathData = app.router.getParsedPath()
+		if !update
+			_params = params
+		else
+			_params = pathData['params'] || {}
+			for k, v of params
+				_params[k] = v
+			if clearParams
+				for k in clearParams
+					delete _params[k]
+
+		params = []
+		for k, v of _params
+			params.push(k + '=' + encodeURIComponent(v))
+
+		app.router.goto(pathData['path'] + '?' + params.join('&'), null, false)
+
+	getURLParams:()->
+		_params = app.router.getParsedPath()['params'] || {}
+
 	_callComplete:(e, data)=>
 		if e.target.hasBlocker
 			app.blocker.hide()
