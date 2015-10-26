@@ -189,6 +189,7 @@ class TemplateParser extends EventDispatcher
 		else
 			instruction = (@_unescapeCharacters(o[2], @_escapeMap) || '').trim()
 			content = (@_unescapeCharacters(o[4], @_escapeMap) || '').trim()
+			initialContent = content
 
 			content = content.replace(/^([\'\"])(.*?)\1$/, '$2')
 
@@ -233,7 +234,8 @@ class TemplateParser extends EventDispatcher
 			if content?.length > 0
 				data['content'] = content
 
-			if c = /^\s*\#\{(.*?)\}\s*$/.exec(content)
+			
+			if content == initialContent && c = /^\s*\#\{(.*?)\}\s*$/.exec(content)
 				data['use'] = c[1]
 
 		return data

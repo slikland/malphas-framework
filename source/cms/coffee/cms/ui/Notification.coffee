@@ -20,15 +20,14 @@ class Notification extends EventDispatcher
 			target = new BaseDOM({element: target})
 		else
 			target = target.getInstance()
-		console.log(target)
 		item = new NotificationItem(item)
 		target.appendChildAt(item)
 
 
 	_showNotification:(e, data)=>
 		data = [].concat(data)
-		for item in data
-			console.log(item)
+		# for item in data
+		# 	console.log(item)
 
 	_hideNotification:(e, data)=>
 
@@ -56,5 +55,4 @@ class Notification extends EventDispatcher
 			@destroy?()
 
 		_closeClick:(e)=>
-			console.log("CLICK")
 			@_hide()

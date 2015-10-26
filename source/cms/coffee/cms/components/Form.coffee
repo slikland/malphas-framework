@@ -2,7 +2,6 @@ class components.Form extends BaseDOM
 	@SELECTOR: 'form'
 	constructor:()->
 		super
-		console.log(@element)
 		@element.on('submit', @_submit)
 	destroy:()->
 		@element.on('submit', @_submit)
@@ -17,8 +16,6 @@ class components.Form extends BaseDOM
 		e.stopPropagation()
 		e.preventDefault()
 		formData = new FormData(@element)
-		console.log(formData)
-		console.log(@element)
 		app.serviceController.call({url: @attr('action'), data: formData, onComplete: @_submitComplete, onError: @_submitError})
 	_submitComplete:()=>
 		@element.reset?()

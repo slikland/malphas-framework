@@ -68,7 +68,7 @@ class TemplateNode extends EventDispatcher
 		if !ignoreUse
 			if @_use && o = /([\*\@])?(.*?)$/.exec(@_use)
 				foundData = @_findObjectData(foundData, @_use)
-				if !foundData
+				if !foundData?
 					return
 				if !Array.isArray(foundData) && typeof(foundData) != 'object'
 					@_content = foundData
