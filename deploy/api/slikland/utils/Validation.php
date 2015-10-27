@@ -1,6 +1,6 @@
 <?php
 namespace slikland\utils;
-include_once('error/ValidationMessages.php');
+include_once('messages/ValidationMessages.php');
 class Validation
 {
 	static function validateServiceParams($values, $path, $data)

@@ -14,6 +14,11 @@ class components.Anchor extends BaseDOM
 		@element.off('click', @_click)
 	_click:(e)=>
 		href = @attr('href')
+		if @attr('confirm')
+			if !confirm(@attr('confirm'))
+				e.stopPropagation()
+				e.preventDefault()
+				return
 		if !href || /^http/i.test(href) || /blank/i.test(@attr('target')?.toLowerCase() || '')
 			if @element.tagName.toLowerCase() == 'button'
 				window.open(href, @attr('target'))

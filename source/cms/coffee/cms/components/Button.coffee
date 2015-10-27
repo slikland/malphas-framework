@@ -20,4 +20,8 @@ class components.Button extends BaseDOM
 		if !@_enabled
 			e.preventDefault()
 			e.stopPropagation()
-		
+		if @attr('confirm')
+			if !confirm(@attr('confirm'))
+				e.stopPropagation()
+				e.preventDefault()
+				return

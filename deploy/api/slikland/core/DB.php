@@ -151,9 +151,21 @@ class DB{
 		$values = array();
 		foreach($fields as $k=>$v)
 		{
+			if(preg_match('/^(NOW|PASSWORD)\((.*?)\)/i', $v, $match))
+			{
+				if(isset($match[2]) && !empty($match[2]))
+				{
+					$params[] = $match[1] . '(?)';
+					$values[] = $match[2];
+				}else{
+					$params[] = $v;
+				}
+			}else{
+				$params[] = '?';
+				$values[] = $v;
+			}
+
 			$columns[] = '`' . $k .'`';
-			$params[] = '?';
-			$values[] = $v;
 		}
 
 		$sql .= ' (' . implode(', ', $columns) . ') VALUES (' . implode(', ', $params) . ');';
@@ -168,9 +180,15 @@ class DB{
 		$values = array();
 		foreach($fields as $k=>$v)
 		{
-			if($v == 'NOW()')
+			if(preg_match('/^(NOW|PASSWORD)\((.*?)\)/i', $v, $match))
 			{
-				$columns[] = '`' . $k .'` = NOW()';
+				if(isset($match[2]) && !empty($match[2]))
+				{
+					$columns[] = '`' . $k .'` = ' . $match[1] . '(?)';
+					$values[] = $match[2];
+				}else{
+					$columns[] = '`' . $k .'` = ' . $v;
+				}
 			}else{
 
 				$columns[] = '`' . $k .'` = ?';

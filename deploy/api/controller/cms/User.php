@@ -27,7 +27,7 @@ class User extends Controller
 	public function login($user, $pass)
 	{
 		$this->checkDB();
-		$id = $this->db->fetch_value('SELECT pk_cms_user FROM cms_user WHERE email LIKE \''.$user.'\' AND pass LIKE PASSWORD(\''.$pass.'\')');
+		$id = $this->db->fetch_value('SELECT pk_cms_user FROM cms_user WHERE email LIKE \''.$user.'\' AND pass LIKE PASSWORD(\''.$pass.'\') AND status = 1');
 		if($id)
 		{
 			$this->db->query('UPDATE cms_session SET active = 0 WHERE fk_cms_user = '. $id);
@@ -66,7 +66,7 @@ class User extends Controller
 		if(isset($_COOKIE['sl_cms_session']))
 		{
 			$uid = $_COOKIE['sl_cms_session'];
-			$session = $this->db->fetch_one("SELECT fk_cms_user id, pk_cms_session session FROM cms_session cs WHERE cs.uid = '{$uid}' AND cs.active = 1 AND cs.updated > CURRENT_TIMESTAMP - " . CMS_SESSION_TIMEOUT);
+			$session = $this->db->fetch_one("SELECT fk_cms_user id, pk_cms_session session FROM cms_session cs LEFT JOIN cms_user cu ON cu.pk_cms_user = cs.fk_cms_user WHERE cu.status = 1 AND cs.uid = '{$uid}' AND cs.active = 1 AND cs.updated > CURRENT_TIMESTAMP - " . CMS_SESSION_TIMEOUT);
 			$id = $session['id'];
 			$sessionId = $session['session'];
 		}
@@ -108,9 +108,9 @@ class User extends Controller
 		return FALSE;
 	}
 
-	public function getRoles()
+	public function getRoles($minRole = 0)
 	{
-		return $this->db->fetch_all('SELECT pk_cms_role value, name name FROM cms_role ORDER BY pk_cms_role', FALSE);
+		return $this->db->fetch_all('SELECT pk_cms_role value, name name FROM cms_role WHERE pk_cms_role >= '.$minRole.' ORDER BY pk_cms_role', FALSE);
 	}
 
 	private function getUserIP()
@@ -144,7 +144,7 @@ class User extends Controller
 	public function getUserList()
 	{
 		$user = $this->getCurrentUser();
-		return $this->db->fetch_all('SELECT cu.pk_cms_user id, cu.name name, cu.email email, cr.name role  FROM cms_user cu LEFT JOIN cms_role cr ON cu.fk_cms_role = cr.pk_cms_role WHERE cu.fk_cms_role >= '. $user['role'] .';');
+		return $this->db->fetch_all('SELECT cu.pk_cms_user id, cu.name name, cu.email email, cr.name role  FROM cms_user cu LEFT JOIN cms_role cr ON cu.fk_cms_role = cr.pk_cms_role WHERE cu.fk_cms_role >= '. $user['role'] .' AND status = 1;');
 	}
 
 	public function getLog($data)
@@ -163,15 +163,29 @@ class User extends Controller
 
 	public function editUser($data)
 	{
-		// if(isset)
-		// {
-			
-		// }
+		if(isset($data['pass']))
+		{
+			$data['pass'] = 'PASSWORD(' . $data['pass'] . ')';
+		}
+		if(isset($data['role']))
+		{
+			$data['fk_cms_role'] = $data['role'];
+			unset($data['role']);
+		}
+		if(isset($data['id']))
+		{
+			$id = $data['id'];
+			unset($data['id']);
+			return $this->db->updateFields('cms_user', $data, 'pk_cms_user = ' . $id);
+		}else
+		{
+			return $this->db->insertFields('cms_user', $data);
+		}
 	}
 
-	public function removeUser($data)
+	public function removeUser($id)
 	{
-
+		return $this->db->query('UPDATE cms_use SET status = 0 WHERE pk_cms_user = \"'.$id.'\"');
 	}
 }
 ?>

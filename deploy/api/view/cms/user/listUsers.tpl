@@ -5,7 +5,7 @@ table{"update":"user/userList"}
 			th{"sort":"name"}: Nome
 			th{"sort":"email"}: Email
 			th{"sort":"role"}: Nível
-			th: 
+			th.nowrap{"width":"1%"}: 
 	tbody
 		<tableItem:#{users}
 			
@@ -14,5 +14,6 @@ table{"update":"user/userList"}
 		td: #{name}
 		td: #{email}
 		td: #{role}
-		td:
+		td.nowrap:
 			button.p3{"href":"user/editUser/#{id}"}: Editar
+			button.p1{"action":"user/removeUser/#{id}", "confirm":"Deseja realmente remover este usuário?"}: Remover

@@ -3697,17 +3697,22 @@ ServiceController = (function(_super) {
     }
     switch (data.code) {
       case 1:
-        return app.viewController.getInterface();
+        app.viewController.getInterface();
+        break;
       case 2:
-        return app.notification.showNotifications({
+        app.notification.showNotifications({
           message: data['message'],
           type: 1
         });
+        break;
       case 101:
-        return app.notification.showNotifications({
+        app.notification.showNotifications({
           message: data['message'],
           type: 1
         });
+    }
+    if (data['notification']) {
+      return app.notification.showNotifications(data['notification']);
     }
   };
 
@@ -5002,7 +5007,13 @@ components.Button = (function(_super) {
   Button.prototype._click = function(e) {
     if (!this._enabled) {
       e.preventDefault();
-      return e.stopPropagation();
+      e.stopPropagation();
+    }
+    if (this.attr('confirm')) {
+      if (!confirm(this.attr('confirm'))) {
+        e.stopPropagation();
+        e.preventDefault();
+      }
     }
   };
 
@@ -5042,6 +5053,13 @@ components.Anchor = (function(_super) {
   Anchor.prototype._click = function(e) {
     var href, _ref;
     href = this.attr('href');
+    if (this.attr('confirm')) {
+      if (!confirm(this.attr('confirm'))) {
+        e.stopPropagation();
+        e.preventDefault();
+        return;
+      }
+    }
     if (!href || /^http/i.test(href) || /blank/i.test(((_ref = this.attr('target')) != null ? _ref.toLowerCase() : void 0) || '')) {
       if (this.element.tagName.toLowerCase() === 'button') {
         window.open(href, this.attr('target'));
@@ -5071,6 +5089,7 @@ components.ActionButton = (function(_super) {
   function ActionButton() {
     this._click = __bind(this._click, this);
     ActionButton.__super__.constructor.apply(this, arguments);
+    console.log(this.element);
     this._enabled = true;
     this.element.on('click', this._click);
   }
@@ -5093,12 +5112,18 @@ components.ActionButton = (function(_super) {
     return this._enabled = enabled;
   };
 
-  ActionButton.prototype._click = function() {
-    ActionButton.__super__._click.apply(this, arguments);
+  ActionButton.prototype._click = function(e) {
     if (!this._enabled) {
       e.preventDefault();
       e.stopPropagation();
       return;
+    }
+    if (this.attr('confirm')) {
+      if (!confirm(this.attr('confirm'))) {
+        e.stopPropagation();
+        e.preventDefault();
+        return;
+      }
     }
     return app.serviceController.call({
       url: this.attr('action')

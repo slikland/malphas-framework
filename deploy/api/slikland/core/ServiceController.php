@@ -6,8 +6,10 @@ include_once('Model.php');
 include_once('Controller.php');
 include_once('Settings.php');
 include_once('Logger.php');
+include_once('messages/Dictionary.php');
 
 class_alias('slikland\core\Settings', 'Settings');
+class_alias('slikland\utils\Notification', 'Notification');
 
 class ServiceController
 {

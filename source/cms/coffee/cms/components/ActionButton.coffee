@@ -3,6 +3,7 @@ class components.ActionButton extends BaseDOM
 	@ORDER: 0
 	constructor:()->
 		super
+		console.log(@element)
 		@_enabled = true
 		@element.on('click', @_click)
 	destroy:()->
@@ -16,10 +17,14 @@ class components.ActionButton extends BaseDOM
 			@addClass('disabled')
 
 		@_enabled = enabled
-	_click:()=>
-		super
+	_click:(e)=>
 		if !@_enabled
 			e.preventDefault()
 			e.stopPropagation()
 			return
+		if @attr('confirm')
+			if !confirm(@attr('confirm'))
+				e.stopPropagation()
+				e.preventDefault()
+				return
 		app.serviceController.call({url: @attr('action')})

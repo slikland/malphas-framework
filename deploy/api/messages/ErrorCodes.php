@@ -10,5 +10,6 @@ $errorCodes = array(
 	// SERVICE ERRORS codes 100~200
 	'service not found'=>array(100, 'Service not found'),
 	'validation'=>array(101, 'Please fill in the fields correctly'),
+	'notification'=>array(102, 'General error'),
 );
 ?>

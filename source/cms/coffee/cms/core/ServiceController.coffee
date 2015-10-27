@@ -72,3 +72,5 @@ class ServiceController extends EventDispatcher
 			# Validation error
 			when 101
 				app.notification.showNotifications({message: data['message'], type: 1})
+		if data['notification']
+			app.notification.showNotifications(data['notification']);

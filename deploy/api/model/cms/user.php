@@ -63,7 +63,8 @@ class user extends Model
 	function addUser()
 	{
 		$response = array();
-		$roles = $this->controller->getRoles();
+		$currentUser = $this->controller->getCurrentUser();
+		$roles = $this->controller->getRoles($currentUser['role']);
 		foreach($roles as &$role)
 		{
 			$role['selected'] = 0;
@@ -81,11 +82,11 @@ class user extends Model
 		$response = array();
 		$user = $this->controller->getUser($data[0]);
 		$currentUser = $this->controller->getCurrentUser();
-		if($currentUser['role'] < $user['role'])
+		if($currentUser['role'] > $user['role'])
 		{
 			throw new Error('no permission');
 		}
-		$roles = $this->controller->getRoles();
+		$roles = $this->controller->getRoles($currentUser['role']);
 		foreach($roles as &$role)
 		{
 			$role['selected'] = ($user['role'] == $role['value'])?true:false;
@@ -108,25 +109,37 @@ class user extends Model
 	*/
 	function edit($data)
 	{
-		$insert = false;
-		if(!isset($data['id']) || empty($data['id']))
-		{
-			$fields['id'] = $data['id'];
-		}
 		$response = array();
 		$fields = array();
+
+
+		$insert = false;
+		$type = 'edit';
+		if(!isset($data['id']) || empty($data['id']))
+		{
+			$insert = true;
+			$type = 'add';
+		}else{
+			$fields['id'] = $data['id'];
+		}
 		$fields['name'] = $data['name'];
 		$fields['email'] = $data['email'];
 		if(isset($data['pass']) && !empty($data['pass']) && !preg_match('/^\-+$/', $data['pass']))
 		{
 			$fields['pass'] = $data['pass'];
 		}
-		$fields['fk_role'] = $data['role'];
+		$fields['role'] = $data['role'];
 		if(!isset($fields['id']) && !isset($fields['pass']))
 		{
 			throw new Error('validation', array(array('field'=>'pass', 'message'=>\slikland\utils\Validation::getMessage('required', array()))));
 		}
-		$this->controller->editUser($fields);
+		if($this->controller->editUser($fields))
+		{
+			$response['notification'] = new Notification($type.' user success');
+			$response['goto'] = 'user/listUsers';
+		}else{
+			throw new Error('notification', $type . ' user error');
+		}
 		return $response;
 	}
 
@@ -149,6 +162,26 @@ class user extends Model
 			$data['sort'] = '-created';
 		}
 		return $this->controller->getLog($data);
+	}
+	/**
+	*	@permission([1, 2])
+	*/
+	function removeUser($data)
+	{
+		$user = $this->controller->getUser($data[0]);
+		$currentUser = $this->controller->getCurrentUser();
+		if($currentUser['role'] > $user['role'])
+		{
+			throw new Error('no permission');
+		}
+		$response = array();
+		if($this->controller->removeUser($data[0]))
+		{
+			$response['notification'] = new Notification('remove user success');
+		}else{
+			$response['notification'] = new Notification('remove user error');
+		}
+		return $response;
 	}
 }
 ?>
