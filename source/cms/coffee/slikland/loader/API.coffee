@@ -45,6 +45,7 @@ class API extends EventDispatcher
 		@reuse = false
 
 	load: ->
+		console.log(@url)
 		if @params instanceof FormData
 			@method = 'POST'
 			formData = @params
