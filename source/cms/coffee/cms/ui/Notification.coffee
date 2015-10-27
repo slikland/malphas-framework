@@ -7,12 +7,17 @@ class Notification extends EventDispatcher
 	destroy:()->
 
 
-	showNotifications:(items)->
+	showNotifications:(items)=>
 		items = [].concat(items)
 		i = items.length
 		for item in items
-			@showNotification(item)
-	showNotification:(item)->
+			console.log(item)
+			if item['delay']?
+				console.log(item['delay'] * 1000)
+				setTimeout(@showNotification, item['delay'] * 1000, item)
+			else
+				@showNotification(item)
+	showNotification:(item)=>
 		target = document.querySelector('notification')
 		if !target
 			target = document.body

@@ -18,7 +18,7 @@ class user extends Model
 		{
 			throw new Error('user not found', 'login error');
 		}
-		return array('__user'=>$user);
+		return array('__user'=>$user, 'notification'=>new Notification('welcome', array('username'=>$user['name'])));
 	}
 
 	function logout()

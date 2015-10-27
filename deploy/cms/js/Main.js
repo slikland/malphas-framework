@@ -3671,9 +3671,6 @@ ServiceController = (function(_super) {
     if (data['refresh']) {
       app.viewController.goto(app.router.getCurrentPath());
     }
-    if (data['notification']) {
-      app.notification.showNotifications(data['notification']);
-    }
     if (data['__interface']) {
       app.viewController.renderInterface('index', data.__interface, data);
       if (app.user.logged) {
@@ -3681,13 +3678,16 @@ ServiceController = (function(_super) {
         if (!url) {
           url = '/';
         }
-        return this.call({
+        this.call({
           url: url
         });
       }
     } else if (data['__view']) {
       app.viewController.addView(e.target.path, data.__view);
-      return app.viewController.renderView(e.target.path, data);
+      app.viewController.renderView(e.target.path, data);
+    }
+    if (data['notification']) {
+      return app.notification.showNotifications(data['notification']);
     }
   };
 
@@ -4088,6 +4088,8 @@ Notification = (function(_super) {
   function Notification() {
     this._hideNotification = __bind(this._hideNotification, this);
     this._showNotification = __bind(this._showNotification, this);
+    this.showNotification = __bind(this.showNotification, this);
+    this.showNotifications = __bind(this.showNotifications, this);
     Notification.__super__.constructor.apply(this, arguments);
   }
 
@@ -4100,7 +4102,13 @@ Notification = (function(_super) {
     _results = [];
     for (_i = 0, _len = items.length; _i < _len; _i++) {
       item = items[_i];
-      _results.push(this.showNotification(item));
+      console.log(item);
+      if (item['delay'] != null) {
+        console.log(item['delay'] * 1000);
+        _results.push(setTimeout(this.showNotification, item['delay'] * 1000, item));
+      } else {
+        _results.push(this.showNotification(item));
+      }
     }
     return _results;
   };

@@ -48,8 +48,6 @@ class ServiceController extends EventDispatcher
 			app.viewController.goto(data['goto'])
 		if data['refresh']
 			app.viewController.goto(app.router.getCurrentPath())
-		if data['notification']
-			app.notification.showNotifications(data['notification']);
 		if data['__interface']
 			app.viewController.renderInterface('index', data.__interface, data)
 			if app.user.logged
@@ -60,6 +58,8 @@ class ServiceController extends EventDispatcher
 		else if data['__view']
 			app.viewController.addView(e.target.path, data.__view)
 			app.viewController.renderView(e.target.path, data)
+		if data['notification']
+			app.notification.showNotifications(data['notification']);
 
 	_callError:(data)=>
 		if data.target.hasBlocker

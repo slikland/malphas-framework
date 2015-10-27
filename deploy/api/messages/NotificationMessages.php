@@ -2,6 +2,7 @@
 global $notificationMessages;
 $notificationMessages = array(
 	'login error'=>array('message'=>'{Error} no login. Tente novamente', 'type'=>1, 'timeout'=>3),
+	'welcome'=>array('message'=>'Bem vindo {username}', 'type'=>5, 'timeout'=>3, 'delay'=>1),
 	'add user success'=>array('message'=>'{User} {added} {successfully}', 'type'=>5, 'timeout'=>0),
 	'edit user success'=>array('message'=>'{User} {edited} {successfully}', 'type'=>5, 'timeout'=>0),
 	'remove user success'=>array('message'=>'{User} {removed} {successfully}', 'type'=>5, 'timeout'=>0),

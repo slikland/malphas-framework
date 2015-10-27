@@ -10,11 +10,12 @@ class Notification extends \ArrayObject
 		return isset($notificationMessages[$message]);
 	}
 
-	public function __construct($message, $values = NULL, $type = 3, $timeout = 0) {
+	public function __construct($message, $values = NULL, $type = 3, $timeout = 0, $delay = 0) {
 		global $notificationMessages;
 		$this['message'] = $message;
 		$this['type'] = $type;
 		$this['timeout'] = $timeout;
+		$this['delay'] = $delay;
 		if(isset($notificationMessages[$message]))
 		{
 			foreach($notificationMessages[$message] as $k=>$v)
@@ -22,6 +23,8 @@ class Notification extends \ArrayObject
 				$this[$k] = $v;
 			}
 		}
+		if(!$this['timeout']) unset($this['timeout']);
+		if(!$this['delay']) unset($this['delay']);
 		$this['message'] = translate($this['message'], $values);
 	}
 }
