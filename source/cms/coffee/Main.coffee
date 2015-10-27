@@ -23,7 +23,7 @@
 class Main
 
 	constructor:()->
-		app.basePath = document.querySelector('base')?.href || ''
+		app.basePath = document.querySelector('base')?.getAttribute('href') || ''
 		Template.setRootPath(app.basePath + '../api/view/cms/')
 		Template.setExtension('')
 

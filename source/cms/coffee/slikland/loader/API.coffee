@@ -45,7 +45,6 @@ class API extends EventDispatcher
 		@reuse = false
 
 	load: ->
-		url = @url.split('.').join('/')
 		if @params instanceof FormData
 			@method = 'POST'
 			formData = @params
