@@ -4,6 +4,7 @@ include_once('../api/config.php');
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="dns-prefetch" href="<?php echo ROOT_URL ;?>">
 	<base href="<?php echo ROOT_URL . 'cms/'; ?>"></base>
 
 	<title>CMS</title>
