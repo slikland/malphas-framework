@@ -4,8 +4,7 @@ include_once('../api/config.php');
 <!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="x-dns-prefetch-control" content="off">
-	<link rel="dns-prefetch" href="<?php echo ROOT_URL ;?>">
+	<link rel="dns-prefetch" href="slikland-cms.slikland.net">
 	<base href="<?php echo ROOT_URL . 'cms/'; ?>"></base>
 
 	<title>CMS</title>
