@@ -27,7 +27,7 @@ Node::getInstance = () ->
 Node::matches = Node::matches || Node::webkitMatchesSelector || Node::mozMatchesSelector || Node::msMatchesSelector || Node::oMatchesSelector
 Node::findParents = (query) ->
 	if @parentNode?
-		if @parentNode.matches(query)
+		if @parentNode.matches?(query)
 			return @parentNode
 		else
 			return @parentNode.findParents(query)

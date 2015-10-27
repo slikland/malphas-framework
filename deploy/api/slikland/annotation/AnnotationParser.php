@@ -23,7 +23,7 @@ class AnnotationParser
 			$name = $annotation[1];
 			if(!$filters || ($filters && array_key_exists($name, $filters)))
 			{
-				$arr[] = array('name'=>$name, 'values'=>json_decode('[' . $annotation[2] . ']'), 'func'=>$filters[$name]);
+				$arr[] = array('name'=>$name, 'values'=>json_decode('[' . $annotation[2] . ']', true), 'func'=>$filters[$name]);
 			}
 		}
 		return $arr;

@@ -12,6 +12,9 @@ input, textarea
 	width: 100%
 	&:focus
 		border-color: #666666
+		
+	&.error
+		border-color: #FF0000
 
 button
 	font-family: helveticaneue
@@ -33,6 +36,8 @@ select
 	height: 29px
 	-webkit-appearance: menulist-button
 	width: 100%
+	&.error
+		border-color: #FF0000
 	
 	
 field
@@ -42,7 +47,17 @@ field
 	label
 		display: block
 		margin-bottom: 0.1em
-
+	.error-container
+		box-sizing: border-box
+		font-size: 0.8em
+		font-family: tahoma
+		padding: 4px
+		margin-bottom: 4px
+	
+		for i in (1...length(bg-colors) + 1)
+			&.p{i}
+				generateColor(i - 1, 80%)
+				border-width: 1px
 
 for i in (1...length(bg-colors) + 1)
 	button.p{i}

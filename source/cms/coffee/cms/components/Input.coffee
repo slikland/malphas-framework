@@ -8,6 +8,7 @@ class components.Input extends BaseDOM
 		@element.on('change', @_update)
 		@element.on('keydown', @_update)
 		@element.on('keyup', @_update)
+
 	destroy:()->
 
 	_checkAttributes:()->
@@ -15,7 +16,12 @@ class components.Input extends BaseDOM
 			@_maxLength = Number(@attr('maxlength'))
 			@_charCounter = new CharCounter(@_maxLength)
 			@element.parentNode.appendChild(@_charCounter)
+	showError:(error)->
+		@findParents('field')?.getInstance()?.showError(error)
+		@addClass('error')
 
+	clearError:()->
+		@removeClass('error')
 
 	_focus:()=>
 		if @_charCounter

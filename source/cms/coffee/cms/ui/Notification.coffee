@@ -1,6 +1,6 @@
 class Notification extends EventDispatcher
 
-	@DEFAULT_TIMEOUT: 10
+	@DEFAULT_TIMEOUT: 8
 
 	constructor:()->
 		super

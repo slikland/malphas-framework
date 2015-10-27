@@ -26,15 +26,16 @@ ENGINE = InnoDB;
 -- Table `cms_user`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `cms_user` (
-  `pk_cms_user` INT NOT NULL AUTO_INCREMENT COMMENT '',
-  `fk_cms_role` INT NULL COMMENT '',
-  `name` VARCHAR(255) NULL COMMENT '',
-  `email` VARCHAR(255) NULL COMMENT '',
-  `pass` VARCHAR(255) NULL COMMENT '',
-  `created` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP COMMENT '',
-  `change_password` TINYINT(1) NULL DEFAULT 0 COMMENT '',
-  PRIMARY KEY (`pk_cms_user`)  COMMENT '',
-  INDEX `cms_user_cms_role_idx` (`fk_cms_role` ASC)  COMMENT '',
+  `pk_cms_user` INT NOT NULL AUTO_INCREMENT,
+  `fk_cms_role` INT NULL,
+  `name` VARCHAR(255) NULL,
+  `email` VARCHAR(255) NULL,
+  `pass` VARCHAR(255) NULL,
+  `created` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `change_password` TINYINT(1) NULL DEFAULT 0,
+  `status` INT NULL DEFAULT 1,
+  PRIMARY KEY (`pk_cms_user`),
+  INDEX `cms_user_cms_role_idx` (`fk_cms_role` ASC),
   CONSTRAINT `cms_user_cms_role`
     FOREIGN KEY (`fk_cms_role`)
     REFERENCES `cms_role` (`pk_cms_role`)

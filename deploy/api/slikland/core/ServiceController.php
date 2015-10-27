@@ -11,7 +11,7 @@ class_alias('slikland\core\Settings', 'Settings');
 
 class ServiceController
 {
-	private static $prependAnnotation = array('permission'=>'controller\cms\User::checkPermission');
+	private static $prependAnnotation = array('permission'=>'controller\cms\User::checkPermission', 'validate'=>'slikland\utils\Validation::validateServiceParams');
 	private static $appendAnnotation = array('log'=>'slikland\core\ServiceController::log');
 
 	public static function execute($servicePath = NULL, $data = NULL, $output = TRUE)
@@ -45,7 +45,7 @@ class ServiceController
 		try{
 			if(!$service)
 			{
-				throw new \slikland\error\ServiceError('Service not found');
+				throw new \slikland\error\Error('service not found');
 			}
 		
 			if($service)
@@ -66,7 +66,23 @@ class ServiceController
 						{
 							foreach($annotations as $annotation)
 							{
-								call_user_func($annotation['func'], $annotation['values'], $service['path'], $data);
+								$return = call_user_func($annotation['func'], $annotation['values'], $service['path'], $data);
+								switch($annotation['name'])
+								{
+									case 'validate':
+										if($return)
+										{
+											if(!isset($validations)) $validations = array();
+											$validations = array_merge($validations, $return);
+										}
+										break;
+									default:
+										break;
+								}
+							}
+							if(isset($validations) && !empty($validations))
+							{
+								throw new Error('validation', $validations);
 							}
 						}
 						$params = array_merge($data, array('__path'=>$service['path']), $service['params']);
@@ -98,7 +114,7 @@ class ServiceController
 			$response = $e->toObject();
 		}catch(\Exception $e)
 		{
-			$e = new \slikland\error\ServiceError($e->getMessage());
+			$e = new \slikland\error\Error($e->getMessage());
 			$response = $e->toObject();
 		}
 		if($output)
@@ -134,31 +150,6 @@ class ServiceController
 
 		$logged = true;
 	}
-
-	// private static function addToMenuPermission($values, $path, $data)
-	// {
-	// 	global $logged;
-	// 	if(!$values)
-	// 	{
-	// 		$values = array();
-	// 	}
-
-	// 	if(!isset($values[0]) || $values[0] !== 0)
-	// 	{
-	// 		if(!isset($values[0]) || is_null($values[0])){
-	// 			$values[0] = $path;
-	// 		}
-	// 		if(!isset($values[1]) || is_null($values[1])){
-	// 			$values[1] = '';
-	// 		}
-	// 		if(!isset($values[2]) || is_null($values[2])){
-	// 			$values[2] = json_encode($data);
-	// 		}
-	// 		\slikland\core\Logger::log($values[0], $values[1], $values[2]);
-	// 	}
-
-	// 	$logged = true;
-	// }
 
 	private static function output($data)
 	{

@@ -344,7 +344,7 @@ class DB{
 					$filters[] = $fields . ' = "' . $value . '"';
 				}
 			}
-			$where[] = implode(' AND ', $fields);
+			$where[] = implode(' AND ', $filters);
 		}
 
 		$orders = array();

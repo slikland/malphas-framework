@@ -1811,6 +1811,20 @@ Node.prototype.getInstance = function() {
   return this.__instance__;
 };
 
+Node.prototype.matches = Node.prototype.matches || Node.prototype.webkitMatchesSelector || Node.prototype.mozMatchesSelector || Node.prototype.msMatchesSelector || Node.prototype.oMatchesSelector;
+
+Node.prototype.findParents = function(query) {
+  var _base;
+  if (this.parentNode != null) {
+    if (typeof (_base = this.parentNode).matches === "function" ? _base.matches(query) : void 0) {
+      return this.parentNode;
+    } else {
+      return this.parentNode.findParents(query);
+    }
+  }
+  return null;
+};
+
 BaseDOM = (function(_super) {
   __extends(BaseDOM, _super);
 
@@ -2018,6 +2032,14 @@ BaseDOM = (function(_super) {
       _results.push(this.removeChild(childs[i]));
     }
     return _results;
+  };
+
+  BaseDOM.prototype.matches = function(query) {
+    return this.element.matches(query);
+  };
+
+  BaseDOM.prototype.findParents = function(query) {
+    return this.element.findParents(query);
   };
 
   BaseDOM.prototype.find = function(query, onlyInstances) {
@@ -3681,6 +3703,11 @@ ServiceController = (function(_super) {
           message: data['message'],
           type: 1
         });
+      case 101:
+        return app.notification.showNotifications({
+          message: data['message'],
+          type: 1
+        });
     }
   };
 
@@ -4051,7 +4078,7 @@ Notification = (function(_super) {
 
   __extends(Notification, _super);
 
-  Notification.DEFAULT_TIMEOUT = 10;
+  Notification.DEFAULT_TIMEOUT = 8;
 
   function Notification() {
     this._hideNotification = __bind(this._hideNotification, this);
@@ -4687,6 +4714,20 @@ components.Input = (function(_super) {
     }
   };
 
+  Input.prototype.showError = function(error) {
+    var _ref, _ref1;
+    if ((_ref = this.findParents('field')) != null) {
+      if ((_ref1 = _ref.getInstance()) != null) {
+        _ref1.showError(error);
+      }
+    }
+    return this.addClass('error');
+  };
+
+  Input.prototype.clearError = function() {
+    return this.removeClass('error');
+  };
+
   Input.prototype._focus = function() {
     if (this._charCounter) {
       this._charCounter.show();
@@ -4755,6 +4796,7 @@ components.Form = (function(_super) {
   Form.SELECTOR = 'form';
 
   function Form() {
+    this._showErrors = __bind(this._showErrors, this);
     this._submitError = __bind(this._submitError, this);
     this._submitComplete = __bind(this._submitComplete, this);
     this._submit = __bind(this._submit, this);
@@ -4790,9 +4832,136 @@ components.Form = (function(_super) {
     return typeof (_base = this.element).reset === "function" ? _base.reset() : void 0;
   };
 
-  Form.prototype._submitError = function() {};
+  Form.prototype._submitError = function(e, data) {
+    this._clearErrors();
+    switch (data != null ? data.code : void 0) {
+      case 101:
+        return this._showErrors(data.data);
+    }
+  };
+
+  Form.prototype._clearErrors = function() {
+    var field, fields, item, items, _i, _j, _len, _len1, _results;
+    fields = this.findAll(components.Field.SELECTOR, true);
+    for (_i = 0, _len = fields.length; _i < _len; _i++) {
+      field = fields[_i];
+      field.clearError();
+    }
+    items = this.findAll(components.Input.SELECTOR, true);
+    _results = [];
+    for (_j = 0, _len1 = items.length; _j < _len1; _j++) {
+      item = items[_j];
+      _results.push(item.clearError());
+    }
+    return _results;
+  };
+
+  Form.prototype._showErrors = function(items) {
+    var input, item, _i, _len, _ref, _results;
+    _results = [];
+    for (_i = 0, _len = items.length; _i < _len; _i++) {
+      item = items[_i];
+      input = this.find('[name="' + item.field + '"]');
+      _results.push((_ref = input.getInstance()) != null ? _ref.showError(item.message) : void 0);
+    }
+    return _results;
+  };
 
   return Form;
+
+})(BaseDOM);
+
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+components.Field = (function(_super) {
+  __extends(Field, _super);
+
+  Field.SELECTOR = 'field';
+
+  function Field() {
+    this._showErrors = __bind(this._showErrors, this);
+    this._submitError = __bind(this._submitError, this);
+    this._submitComplete = __bind(this._submitComplete, this);
+    this._submit = __bind(this._submit, this);
+    Field.__super__.constructor.apply(this, arguments);
+    this.element.on('submit', this._submit);
+    this._name = this.attr('name');
+  }
+
+  Field.get({
+    name: function() {
+      return this._name;
+    }
+  });
+
+  Field.set({
+    name: function(value) {
+      return this._name = value;
+    }
+  });
+
+  Field.prototype.destroy = function() {
+    this.element.on('submit', this._submit);
+    this.removeAll();
+    return this.off();
+  };
+
+  Field.prototype.addComponent = function(component) {};
+
+  Field.prototype.removeComponent = function() {};
+
+  Field.prototype._submit = function(e) {
+    var formData;
+    e.stopPropagation();
+    e.preventDefault();
+    formData = new FormData(this.element);
+    return app.serviceController.call({
+      url: this.attr('action'),
+      data: formData,
+      onComplete: this._submitComplete,
+      onError: this._submitError
+    });
+  };
+
+  Field.prototype._submitComplete = function() {
+    var _base;
+    return typeof (_base = this.element).reset === "function" ? _base.reset() : void 0;
+  };
+
+  Field.prototype._submitError = function(e, data) {
+    switch (data != null ? data.code : void 0) {
+      case 101:
+        return this._showErrors(data.data);
+    }
+  };
+
+  Field.prototype._showErrors = function(items) {};
+
+  Field.prototype.clearError = function() {
+    var _ref, _ref1;
+    if ((_ref = this._errorContainer) != null) {
+      _ref.css('display', 'none');
+    }
+    return (_ref1 = this._errorContainer) != null ? _ref1.html = '' : void 0;
+  };
+
+  Field.prototype.showError = function(error) {
+    var item;
+    if (!this._errorContainer) {
+      this._errorContainer = new BaseDOM({
+        element: 'div',
+        className: 'p1 error-container'
+      });
+      item = this.find(components.Input.SELECTOR);
+      this.element.insertBefore(this._errorContainer.element, item);
+    }
+    this._errorContainer.css('display', 'block');
+    return this._errorContainer.html += error + '<br>';
+  };
+
+  return Field;
 
 })(BaseDOM);
 

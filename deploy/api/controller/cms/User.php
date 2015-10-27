@@ -7,11 +7,11 @@ class User extends Controller
 		$user = self::getInstance()->getCurrentUser();
 		if(!$user)
 		{
-			throw new AuthenticationError('not logged');
+			throw new Error('not logged');
 		}
 		if(isset($values[0]) && !in_array($user['role'], $values[0]))
 		{
-			throw new AuthenticationError('no permission');
+			throw new Error('no permission');
 		}
 	}
 
@@ -159,6 +159,19 @@ class User extends Controller
 			$data['pagination']['index'] = $data['_index'];
 		}
 		return $this->db->getList('SELECT cl.action, IF(ISNULL(cl.description) OR LENGTH(cl.description) = 0, \' \', cl.description) description, IF(ISNULL(cl.data) OR LENGTH(cl.data) = 0, \' \', cl.data) data, cl.created created, cu.name `user` FROM cms_log cl LEFT JOIN cms_session cs ON cl.fk_cms_session = cs.pk_cms_session LEFT JOIN cms_user cu ON cs.fk_cms_user = cu.pk_cms_user', $data);
+	}
+
+	public function editUser($data)
+	{
+		// if(isset)
+		// {
+			
+		// }
+	}
+
+	public function removeUser($data)
+	{
+
 	}
 }
 ?>

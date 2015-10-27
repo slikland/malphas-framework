@@ -16,8 +16,7 @@ class user extends Model
 		$user = $this->controller->login($data['user'], $data['pass']);
 		if(!$user)
 		{
-			throw new ServiceError('User not found');
-			// throw new AuthenticationError('not logged');
+			throw new Error('user not found');
 		}
 		return array('__user'=>$user);
 	}
@@ -25,7 +24,7 @@ class user extends Model
 	function logout()
 	{
 		$this->controller->logout();
-		throw new AuthenticationError('not logged');
+		throw new Error('not logged');
 	}
 
 	/**
@@ -42,7 +41,7 @@ class user extends Model
 		$session = $this->controller->getSession(False);
 		if(!$session)
 		{
-			throw new AuthenticationError('not logged');
+			throw new Error('not logged');
 		}
 		return TRUE;
 	}
@@ -84,7 +83,7 @@ class user extends Model
 		$currentUser = $this->controller->getCurrentUser();
 		if($currentUser['role'] < $user['role'])
 		{
-			throw new AuthenticationError('no permission');
+			throw new Error('no permission');
 		}
 		$roles = $this->controller->getRoles();
 		foreach($roles as &$role)
@@ -96,10 +95,15 @@ class user extends Model
 		$response['email'] = $user['email'];
 		$response['id'] = $user['id'];
 		$response['submitLabel'] = "Editar";
+		$response['pass'] = "-----";
 		return $response;
 	}
 
 	/**
+	*	@validate(["name","email","pass"], "required")
+	*	@validate(["name"], "length", {"min":5, "max":255})
+	*	@validate(["pass"], "length", {"min":5, "max":24})
+	*	@validate(["email"], "email")
 	*	@permission([1, 2])
 	*/
 	function edit($data)
@@ -107,27 +111,22 @@ class user extends Model
 		$insert = false;
 		if(!isset($data['id']) || empty($data['id']))
 		{
-			$insert = true;
+			$fields['id'] = $data['id'];
 		}
 		$response = array();
 		$fields = array();
 		$fields['name'] = $data['name'];
 		$fields['email'] = $data['email'];
-		if(isset($data['password']) && !empty($data['password']) && !preg_match('/^\-+$/', $data['password'])){
-
-			$fields['password'] = $data['password'];
+		if(isset($data['pass']) && !empty($data['pass']) && !preg_match('/^\-+$/', $data['pass']))
+		{
+			$fields['pass'] = $data['pass'];
 		}
 		$fields['fk_role'] = $data['role'];
-		if($insert)
+		if(!isset($fields['id']) && !isset($fields['pass']))
 		{
-			if(!isset($fields['password']))
-			{
-				throw new ServiceError('bla');
-			}
-			$this->addUser($fields);
-		}else{
-			$this->editUser($fields);
+			throw new Error('validation', array(array('field'=>'pass', 'message'=>\slikland\utils\Validation::getMessage('required', array()))));
 		}
+		$this->controller->editUser($fields);
 		return $response;
 	}
 

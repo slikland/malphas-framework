@@ -69,3 +69,6 @@ class ServiceController extends EventDispatcher
 				app.viewController.getInterface()
 			when 2
 				app.notification.showNotifications({message: data['message'], type: 1})
+			# Validation error
+			when 101
+				app.notification.showNotifications({message: data['message'], type: 1})
