@@ -13,7 +13,7 @@ class_alias('slikland\utils\Notification', 'Notification');
 
 class ServiceController
 {
-	private static $prependAnnotation = array('permission'=>'controller\cms\User::checkPermission', 'validate'=>'slikland\utils\Validation::validateServiceParams');
+	private static $prependAnnotation = array('permission'=>'controller\cms\User::checkPermission', 'validate'=>'slikland\utils\Validation::validateServiceParams', 'trim'=>'slikland\core\ServiceController::trim');
 	private static $appendAnnotation = array('log'=>'slikland\core\ServiceController::log');
 
 	public static function execute($servicePath = NULL, $data = NULL, $output = TRUE)
@@ -68,7 +68,7 @@ class ServiceController
 						{
 							foreach($annotations as $annotation)
 							{
-								$return = call_user_func($annotation['func'], $annotation['values'], $service['path'], $data);
+								$return = call_user_func_array($annotation['func'], array($annotation['values'], $service['path'], &$data));
 								switch($annotation['name'])
 								{
 									case 'validate':
@@ -95,7 +95,7 @@ class ServiceController
 						{
 							foreach($annotations as $annotation)
 							{
-								call_user_func($annotation['func'], $annotation['values'], $service['path'], $data);
+								call_user_func_array($annotation['func'], array($annotation['values'], $service['path'], &$data));
 							}
 						}
 					}else if(!isset($service['view']))
@@ -220,6 +220,37 @@ class ServiceController
 		}
 		return null;
 	}
+
+	private static function trim($values, $path, &$data)
+	{
+		if(!$values)
+		{
+			return;
+		}
+		if(!is_array($values))
+		{
+			$values = array($values);
+		}
+		if($values[0] == '*')
+		{
+			$newValues = array();
+			foreach($data as $k=>$v)
+			{
+				if(is_string($v))
+				{
+					$newValues[] = $k;
+				}
+			}
+			$values = $newValues;
+		}
+
+		foreach($values as $value)
+		{
+			if(isset($data[$value]) && is_string($data[$value])){
+				$data[$value] = trim($data[$value]);
+			}
+		}
+	}	
 
 }
 

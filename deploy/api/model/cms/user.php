@@ -16,7 +16,7 @@ class user extends Model
 		$user = $this->controller->login($data['user'], $data['pass']);
 		if(!$user)
 		{
-			throw new Error('user not found');
+			throw new Error('user not found', 'login error');
 		}
 		return array('__user'=>$user);
 	}
@@ -105,6 +105,7 @@ class user extends Model
 	*	@validate(["name"], "length", {"min":5, "max":255})
 	*	@validate(["pass"], "length", {"min":5, "max":24})
 	*	@validate(["email"], "email")
+	*	@trim("*")
 	*	@permission([1, 2])
 	*/
 	function edit($data)
@@ -115,12 +116,21 @@ class user extends Model
 
 		$insert = false;
 		$type = 'edit';
+		$userExists = $this->controller->userExists($data['email']);
 		if(!isset($data['id']) || empty($data['id']))
 		{
 			$insert = true;
 			$type = 'add';
+			if($userExists)
+			{
+				throw new Error('validation', array(array('field'=>'email', 'message'=>\slikland\utils\Validation::getMessage('user exists', array()))));
+			}
 		}else{
 			$fields['id'] = $data['id'];
+			if($userExists && $fields['id'] != $userExists)
+			{
+				throw new Error('validation', array(array('field'=>'email', 'message'=>\slikland\utils\Validation::getMessage('user exists', array()))));
+			}
 		}
 		$fields['name'] = $data['name'];
 		$fields['email'] = $data['email'];

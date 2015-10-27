@@ -24,6 +24,11 @@ class User extends Controller
 		return FALSE;
 	}
 
+	public function userExists($email)
+	{
+		return $this->db->fetch_value('SELECT pk_cms_user FROM cms_user WHERE email LIKE "'.$email.'" AND status = 1');
+	}
+
 	public function login($user, $pass)
 	{
 		$this->checkDB();
@@ -185,7 +190,7 @@ class User extends Controller
 
 	public function removeUser($id)
 	{
-		return $this->db->query('UPDATE cms_use SET status = 0 WHERE pk_cms_user = \"'.$id.'\"');
+		return $this->db->query('UPDATE cms_user SET status = 0 WHERE pk_cms_user = "'.$id.'"');
 	}
 }
 ?>
