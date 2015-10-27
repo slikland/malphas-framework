@@ -11,9 +11,7 @@ class Notification extends EventDispatcher
 		items = [].concat(items)
 		i = items.length
 		for item in items
-			console.log(item)
 			if item['delay']?
-				console.log(item['delay'] * 1000)
 				setTimeout(@showNotification, item['delay'] * 1000, item)
 			else
 				@showNotification(item)

@@ -3,7 +3,6 @@ class components.ActionButton extends BaseDOM
 	@ORDER: 0
 	constructor:()->
 		super
-		console.log(@element)
 		@_enabled = true
 		@element.on('click', @_click)
 	destroy:()->

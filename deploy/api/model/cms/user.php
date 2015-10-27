@@ -24,7 +24,7 @@ class user extends Model
 	function logout()
 	{
 		$this->controller->logout();
-		throw new Error('not logged');
+		throw new Error('not logged', 'byebye');
 	}
 
 	/**
