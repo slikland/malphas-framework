@@ -178,8 +178,9 @@ class user extends Model
 		if($this->controller->removeUser($data[0]))
 		{
 			$response['notification'] = new Notification('remove user success');
+			$response['goto'] = 'user/listUsers';
 		}else{
-			$response['notification'] = new Notification('remove user error');
+			throw new Error('notification', 'remove user error');
 		}
 		return $response;
 	}

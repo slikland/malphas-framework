@@ -13,7 +13,7 @@ $dictionary = array(
 	'removed' => 'removido',
 	'success' => 'sucesso',
 	'successfully' => 'com sucesso',
-	'error' => 'error',
+	'error' => 'erro',
 	'user'=>'usuário'
 );
 
