@@ -3492,7 +3492,6 @@ API = (function(_super) {
 
   API.prototype.load = function() {
     var formData, k, n, v, _ref, _ref1, _ref2;
-    console.log(this.url);
     if (this.params instanceof FormData) {
       this.method = 'POST';
       formData = this.params;
