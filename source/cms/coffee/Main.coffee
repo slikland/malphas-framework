@@ -20,6 +20,8 @@
 #import cms.ui.*
 #import cms.components.*
 
+#import slikland.chart.Chart
+
 class Main
 
 	constructor:()->
@@ -47,8 +49,8 @@ class Main
 		app.componentController.parse()
 
 		# API.call({url: 'user/getSession', onComplete: @_indexComplete, onError: @_error})
-	_routeChange:()=>
-		# console.log(arguments)
+	_routeChange:(e, data)=>
+		app.serviceController.call({url: data['path']})
 	_indexComplete:()=>
 		# console.log(arguments)
 	_error:()=>

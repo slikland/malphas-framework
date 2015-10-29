@@ -1,0 +1,1 @@
+class chart.BarChart extends chart.RendererBase

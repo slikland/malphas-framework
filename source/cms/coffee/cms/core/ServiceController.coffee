@@ -32,7 +32,7 @@ class ServiceController extends EventDispatcher
 		for k, v of _params
 			params.push(k + '=' + encodeURIComponent(v))
 
-		app.router.goto(pathData['path'] + '?' + params.join('&'), null, false)
+		app.router.replace(pathData['path'] + '?' + params.join('&'), null, false)
 
 	getURLParams:()->
 		_params = app.router.getParsedPath()['params'] || {}

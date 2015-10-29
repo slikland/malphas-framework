@@ -37,4 +37,4 @@ class ViewController
 			app.serviceController.call({url: path, __v: true})
 		else
 			app.serviceController.call({url: path, __v: false})
-		app.router.goto(path)
+		app.router.goto(path, null, false)
