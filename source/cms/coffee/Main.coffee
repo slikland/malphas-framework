@@ -20,8 +20,6 @@
 #import cms.ui.*
 #import cms.components.*
 
-#import slikland.chart.Chart
-
 class Main
 
 	constructor:()->

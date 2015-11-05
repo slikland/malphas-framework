@@ -1,0 +1,79 @@
+Charts
+
+#Bar / column
+https://google-developers.appspot.com/chart/interactive/docs/gallery/columnchart
+https://google-developers.appspot.com/chart/interactive/docs/gallery/barchart
+bar = horizontal
+column = vertical
+- Simple 
+- Stacked
+- Multiple y axis
+
+Label + info
+
+#Combo chart
+Bar + line chart
+
+#Line chart
+https://google-developers.appspot.com/chart/interactive/docs/gallery/linechart
+
+#Area chart
+Line + fill
+https://google-developers.appspot.com/chart/interactive/docs/gallery/areachart
+https://google-developers.appspot.com/chart/interactive/docs/gallery/steppedareachart
+
+
+#Pie Chart
+https://google-developers.appspot.com/chart/interactive/docs/gallery/piechart 
+
+#Donut chart
+Pie with hole
+https://google-developers.appspot.com/chart/interactive/docs/gallery/piechart#donut 
+
+#Gauge chart
+https://google-developers.appspot.com/chart/interactive/docs/gallery/gauge 
+
+#Calendar chart
+https://developers.google.com/chart/interactive/docs/gallery/calendar 
+
+
+
+
+
+
+header: [
+    [
+        {"name": "label"}, 
+        {"name": "data", "values": [
+            [
+                {"name": "time"},
+                {"name": "value"}
+            ]
+        ]}
+]
+rawdata: 
+[
+    [
+        "BLA",
+        [
+            [123, 321],
+            [123, 321]
+        ]
+    ]
+]
+data: 
+[
+    {
+        "label": "Bla", 
+        "data": [
+            {
+                "time": 123,
+                "value": 123
+            },
+            {
+                "time": 123,
+                "value": 123
+            }
+       ]
+    }
+]

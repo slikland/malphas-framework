@@ -29,7 +29,42 @@ class index extends Model{
 		$response = array();
 
 		$response['title'] = Settings::get('cms_title');
-
+		$response['chart1'] = array(
+			'header'=>array(
+				array('name'=>'labels'),
+				array('name'=>'values'),
+				array(
+					'name'=>'data',
+					'values'=>array(
+						array('name'=>'time'),
+						array('name'=>'value'),
+						array('name'=>'value2'),
+						array('name'=>'value3'),
+					)),
+			),
+			'data'=>array(
+				array("Time", "Value"),
+				array('value', 'value2', 'value3'),
+				array(
+					array(111, 222, 100, 100),
+					array(333, 444, 100, 100),
+					array(111, 222, 100, 100),
+					array(333, 444, 100, 100),
+					array(111, 222, 100, 100),
+					array(333, 444, 100, 100),
+					array(111, 222, 100, 100),
+					array(333, 444, 100, 100),
+					array(111, 222, 100, 100),
+					array(333, 444, 100, 100),
+					array(111, 222, 100, 100),
+					array(333, 444, 100, 100),
+					array(111, 222, 100, 100),
+					array(333, 444, 100, 100),
+					array(111, 222, 100, 100),
+					array(333, 444, 100, 100),
+				)
+			)
+		);
 		return $response;
 	}
 
