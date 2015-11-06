@@ -41,6 +41,7 @@ class ServiceController
 		}
 		if($view = slikland\template\TemplateLoader::load($servicePath))
 		{
+			$view = translate($view, NULL, '/(\{\=(.*?)\})/');
 			$service['view'] = $view;
 		}
 		$response = null;

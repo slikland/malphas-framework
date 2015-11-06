@@ -17,7 +17,7 @@ $dictionary = array(
 	'user'=>'usuário'
 );
 
-function translate($text, $values = array())
+function translate($text, $values = array(), $regexp = '/(\{(.*?)\})/')
 {
 	global $dictionary;
 	global $translateValues;
@@ -28,7 +28,7 @@ function translate($text, $values = array())
 	{
 		$translateValues = $dictionary;
 	}
-	$text = preg_replace_callback('/(\{(.*?)\})/', '_translateReplace', $text);
+	$text = preg_replace_callback($regexp, '_translateReplace', $text);
 	// preg_match_all('/\{(.*?)\}/')
 	// foreach($values as $k=>$v)
 	// {

@@ -35,7 +35,7 @@ class User extends Controller
 		$id = $this->db->fetch_value('SELECT pk_cms_user FROM cms_user WHERE email LIKE \''.$user.'\' AND pass LIKE PASSWORD(\''.$pass.'\') AND status = 1');
 		if($id)
 		{
-			$this->db->query('UPDATE cms_session SET active = 0 WHERE fk_cms_user = '. $id);
+			// $this->db->query('UPDATE cms_session SET active = 0 WHERE fk_cms_user = '. $id);
 			$insert = $this->db->insert('INSERT INTO cms_session (fk_cms_user, ip, updated) VALUES (?, ?, CURRENT_TIMESTAMP)', array($id, $this->getUserIP()));
 			$uid = \slikland\core\UIDGenerator::encode($insert);
 			$this->db->query('UPDATE cms_session SET uid = ? WHERE pk_cms_session = ?', array($uid, $insert));
@@ -94,6 +94,7 @@ class User extends Controller
 
 	private function removeSession()
 	{
+		$this->db->query('UPDATE cms_session SET active = 0 WHERE uid = ?', array($_COOKIE['sl_cms_session']));
 		if(isset($_COOKIE['sl_cms_session']))
 		{
 			unset($_COOKIE['sl_cms_session']);
