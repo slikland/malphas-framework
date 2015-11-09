@@ -17,7 +17,13 @@ function sl_autoloader($class, $prevClassName = NULL)
 
 	if(array_key_exists(1, $dbt) && array_key_exists('file', $dbt[1]))
 	{
-		$localPath = str_replace(str_replace(API_PATH, '', dirname(debug_backtrace()[1]['file']) . '/'), '', $classPath);
+		$relativePath = str_replace(API_PATH, '', dirname(debug_backtrace()[1]['file']) . '/');
+		if(strpos($relativePath, 'vendor') === 0)
+		{
+			return FALSE;
+		}
+		$localPath = str_replace($relativePath, '', $classPath);
+		$paths[] = $relativePath . $localPath;
 		$paths[] = $localPath;
 		$paths[] = 'controller/' . $localPath;
 		$paths[] = 'model/' . $localPath;
@@ -28,6 +34,7 @@ function sl_autoloader($class, $prevClassName = NULL)
 	foreach($paths as $path)
 	{
 		$fullPath = API_PATH . $path . '.php';
+		
 		if(file_exists($fullPath))
 		{
 			include_once($fullPath);
