@@ -26,6 +26,7 @@ class components.Input extends BaseDOM
 	_focus:()=>
 		if @_charCounter
 			@_charCounter.show()
+		@findParents('field')?.getInstance()?.addClass('focused')
 		@_update()
 
 	_update:()=>
@@ -33,6 +34,7 @@ class components.Input extends BaseDOM
 		@_charCounter?.update(value.length)
 
 	_blur:()=>
+		@findParents('field')?.getInstance()?.removeClass('focused')
 		@_charCounter?.hide()
 
 

@@ -119,6 +119,8 @@ class TemplateNode extends EventDispatcher
 			if !value
 				value = ''
 			obj = obj.replace(new RegExp('#\\{' + o[1] + '\\}', 'g'), value)
+			obj = obj.replace(new RegExp('\r\n', 'g'), '\n')
+			obj = obj.replace(new RegExp('[\n|\r]', 'g'), '\\n')
 		return JSON.parse(obj)
 
 	_findObjectData:(obj, path)->

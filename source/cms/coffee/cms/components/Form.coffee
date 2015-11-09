@@ -34,5 +34,7 @@ class components.Form extends BaseDOM
 			item.clearError()
 	_showErrors:(items)=>
 		for item in items
-			input = @find('[name="'+item.field+'"]')
-			input.getInstance()?.showError(item.message)
+			fields = [].concat(item.field)
+			for field in fields
+				input = @find('[name="'+field+'"]')
+				input?.getInstance()?.showError(item.message)

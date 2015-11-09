@@ -17,6 +17,8 @@ input, textarea
 		border-color: #FF0000
 input[type=file]
 	border-width: 0px
+textarea
+	height: 6em
 
 button
 	font-family: helveticaneue
@@ -51,6 +53,10 @@ field
 	label
 		display: block
 		margin-bottom: 0.1em
+		opacity(0.6)
+	&.focused
+		label
+			opacity(1)
 	.error-container
 		box-sizing: border-box
 		font-size: 0.8em
