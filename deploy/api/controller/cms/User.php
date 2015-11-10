@@ -94,9 +94,9 @@ class User extends Controller
 
 	private function removeSession()
 	{
-		$this->db->query('UPDATE cms_session SET active = 0 WHERE uid = ?', array($_COOKIE['sl_cms_session']));
 		if(isset($_COOKIE['sl_cms_session']))
 		{
+			$this->db->query('UPDATE cms_session SET active = 0 WHERE uid = ?', array($_COOKIE['sl_cms_session']));
 			unset($_COOKIE['sl_cms_session']);
 		}
 		setcookie('sl_cms_session', '', time()-1, '/', $_SERVER['HTTP_HOST']);
