@@ -16,13 +16,18 @@
 #import cms.core.ComponentController
 #import cms.core.ViewController
 #import cms.core.User
+#import cms.core.Resizer
 
 #import cms.ui.*
+#import cms.components.standalone.StandaloneBase
 #import cms.components.*
 
 class Main
 
 	constructor:()->
+
+		app.body = new BaseDOM({element: document.body})
+
 		app.basePath = document.querySelector('base')?.getAttribute('href') || ''
 		Template.setRootPath(app.basePath + '../api/view/cms/')
 		Template.setExtension('')

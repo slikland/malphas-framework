@@ -1,4 +1,5 @@
 components = {}
+components.standalone = {}
 class ComponentController
 	@getInstance:()=>
 		@_instance ?= new @(arguments...)
@@ -15,8 +16,13 @@ class ComponentController
 	_listComponents:()=>
 		@_components = []
 		for k, component of components
+			if k == 'standalone'
+				continue
 			@_components.push(component)
 		@_components = @_components.sort(@_sortComponents)
+		@_standalones = []
+		for k, component of components.standalone
+			@_standalones.push(component)
 	_sortComponents:(a, b)=>
 		sortOrder = 0
 		if a.ORDER?
@@ -46,12 +52,14 @@ class ComponentController
 			for item in items
 				if !item.getInstance()
 					new component({element: item})
+		setTimeout(@_parseStandalones, 0)
 	_mutationChanged:(mutation)=>
 		for k, component of @_components
 			items = @_target.querySelectorAll(component.SELECTOR)
 			for item in items
 				if !item.getInstance()
 					new component({element: item})
+		setTimeout(@_parseStandalones, 0)
 		for mut in mutation
 			for item in mut.removedNodes
 				item.getInstance()?.destroy()
@@ -61,6 +69,7 @@ class ComponentController
 			items = target.querySelectorAll(component.SELECTOR)
 			for item in items
 				if !item.getInstance()
+					@_parseStandalones(item)
 					@_items.push(new component({element: item}))
 
 		i = @_items.length
@@ -69,3 +78,6 @@ class ComponentController
 			if !item.element.parentNode
 				item.destroy()
 				@_items[i].splice(i, 1)
+	_parseStandalones:(item)=>
+		for st in @_standalones
+			st.parseDOM()

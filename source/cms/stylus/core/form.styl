@@ -1,6 +1,21 @@
 form
 	position: relative
 	max-width: 600px
+.repeater
+	@extend .fa-plus-circle
+	@extend .fa
+	color: bg-colors[4]
+	cursor: pointer
+	font-size: 1.5em
+	position: absolute
+	top: 0px
+	right: -1.5em
+	transition: color 0.1s, transform 0.1s
+	&:hover
+		transform: scale(1.1, 1.1)
+	&.remove
+		transform: rotate(45deg)
+		color: bg-colors[0]
 input, textarea
 	font-family: Tahoma
 	border-width: 1px
@@ -12,7 +27,7 @@ input, textarea
 	width: 100%
 	&:focus
 		border-color: #666666
-		
+		box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);
 	&.error
 		border-color: #FF0000
 input[type=file]
