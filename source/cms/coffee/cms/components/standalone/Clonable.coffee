@@ -1,4 +1,4 @@
-class components.standalone.Cloneable extends StandaloneBase
+class components.standalone.Clonable extends StandaloneBase
 	@SELECTOR: '[clonable]'
 	constructor:(params)->
 		@_added = false
@@ -44,8 +44,20 @@ class components.standalone.Cloneable extends StandaloneBase
 		if children.length <= i
 			last = true
 		tempDiv = document.createElement('form')
-		@_target.templateNode.render(tempDiv, @originalData)
+		@_target.templateNode.render(tempDiv, @_target.templateNode.originalData)
 		tempDiv.reset()
+		items = tempDiv.querySelectorAll('input,textarea,select')
+		for item in items
+			switch item.tagName.toLowerCase()
+				when 'input'
+					item.value = ''
+					item.checked = 0
+					item.selected = 0
+				when 'textarea'
+					item.value = ''
+					item.innerText = ''
+				when 'select'
+					item.value = ''
 		for child in tempDiv.childNodes
 			if last
 				parent.appendChild(child)

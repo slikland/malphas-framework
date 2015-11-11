@@ -3,7 +3,7 @@ form{"action":"user/edit"}:
 	field:
 		label{"for":"name"}: "Nome"
 		input{"name":"name","id":"name", "value": "#{name}", "maxlength": 255}
-	field:
+	field{"clonable":true}:
 		label{"for":"email"}: "E-mail"
 		input{"name":"email","id":"email", "value": "#{email}", "maxlength": 255}
 	field:
