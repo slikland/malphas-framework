@@ -43,8 +43,9 @@ class components.standalone.Cloneable extends StandaloneBase
 		last = false
 		if children.length <= i
 			last = true
-		tempDiv = document.createElement('div')
-		@_target.templateNode.render(tempDiv)
+		tempDiv = document.createElement('form')
+		@_target.templateNode.render(tempDiv, @originalData)
+		tempDiv.reset()
 		for child in tempDiv.childNodes
 			if last
 				parent.appendChild(child)
