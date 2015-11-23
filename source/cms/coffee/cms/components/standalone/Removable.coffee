@@ -3,6 +3,7 @@ class components.standalone.Removable extends StandaloneBase
 	constructor:(params)->
 		@_added = false
 		@_lastTop = -8
+		@_lastLeft = 0
 		@_target = params.element.element || params.element
 		if !@_target
 			throw new Error('No target element for removable')
@@ -14,11 +15,14 @@ class components.standalone.Removable extends StandaloneBase
 		@element.on('click', @_click)
 
 	_resize:()=>
-		bounds = @getBounds(@_target)
+		bounds = @_target.getBoundingClientRect()
+		parentBounds = @_target.parentNode.getBoundingClientRect()
+		left = bounds.left - parentBounds.left
+		top = bounds.top - parentBounds.top
 		@css({
-			top: @_lastTop - bounds.top + 8 + 'px'
+			top: top + 8 + 'px'
+			left: (left + bounds.width) - 8 + 'px'
 		})
-		@_lastTop -= bounds.top
 	
 	_click:()=>
 		@_remove()
