@@ -104,7 +104,7 @@ class ServiceController
 						$response['header'] = 'HTTP/1.0 404 Not Found';
 					}
 				}
-				if(isset($service['view'])){
+				if(isset($service['view']) && !isset($response['__view'])){
 					$response['__view'] = $service['view'];
 				}
 			}

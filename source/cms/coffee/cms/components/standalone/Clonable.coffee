@@ -7,7 +7,7 @@ class components.standalone.Clonable extends StandaloneBase
 		if !@_target
 			throw new Error('No target element for cloneable')
 		super({element: 'span'})
-		@addClass('repeater')
+		@addClass('clonable')
 		@_target.parentNode.insertBefore(@element, @_target)
 		Resizer.getInstance().on('resize', @_resize)
 		@_resize()

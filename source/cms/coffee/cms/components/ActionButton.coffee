@@ -27,3 +27,5 @@ class components.ActionButton extends BaseDOM
 				e.preventDefault()
 				return
 		app.serviceController.call({url: @attr('action')})
+		e.stopPropagation()
+		e.preventDefault()

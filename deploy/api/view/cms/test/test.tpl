@@ -1,5 +1,5 @@
 form{"action":"test/updateTest","clonable":true}
-	fieldset
+	fieldset{"removable":true}
 		legend:"BLA"
 		field
 			label:"Name"
