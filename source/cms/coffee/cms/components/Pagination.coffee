@@ -37,6 +37,13 @@ class components.Pagination extends BaseDOM
 
 	goto:(page)->
 		
+		if page >= @_totalPages - 1
+			page = @_totalPages - 1
+			@_nextBtn?.enable(false)
+			@_lastBtn?.enable(false)
+		else
+			@_nextBtn?.enable(true)
+			@_lastBtn?.enable(true)
 		if page <= 0
 			page = 0
 			@_prevBtn?.enable(false)
@@ -45,13 +52,6 @@ class components.Pagination extends BaseDOM
 			@_prevBtn?.enable(true)
 			@_firstBtn?.enable(true)
 
-		if page >= @_totalPages - 1
-			page = @_totalPages - 1
-			@_nextBtn?.enable(false)
-			@_lastBtn?.enable(false)
-		else
-			@_nextBtn?.enable(true)
-			@_lastBtn?.enable(true)
 		if @_currentPage != page
 			@_currentPage = page
 			@_updateTarget()

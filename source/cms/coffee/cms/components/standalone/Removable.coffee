@@ -20,7 +20,7 @@ class components.standalone.Removable extends StandaloneBase
 		left = bounds.left - parentBounds.left
 		top = bounds.top - parentBounds.top
 		@css({
-			top: top + 8 + 'px'
+			top: top - 8 + 'px'
 			left: (left + bounds.width) - 8 + 'px'
 		})
 	
