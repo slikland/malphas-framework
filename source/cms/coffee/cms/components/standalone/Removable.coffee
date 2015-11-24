@@ -9,20 +9,31 @@ class components.standalone.Removable extends StandaloneBase
 			throw new Error('No target element for removable')
 		super({element: 'span'})
 		@addClass('removable')
-		@_target.parentNode.insertBefore(@element, @_target)
+
+		@_inserted = false
+
+		if ['input','textarea'].indexOf(@_target.tagName.toLowerCase()) >= 0
+			@_target.parentNode.insertBefore(@element, @_target)
+		else
+			@_inserted = true
+			@_target.appendChild(@element)
 		Resizer.getInstance().on('resize', @_resize)
 		@_resize()
 		@element.on('click', @_click)
 
 	_resize:()=>
-		bounds = @_target.getBoundingClientRect()
-		parentBounds = @_target.parentNode.getBoundingClientRect()
-		left = bounds.left - parentBounds.left
-		top = bounds.top - parentBounds.top
-		@css({
-			top: top - 8 + 'px'
-			left: (left + bounds.width) - 8 + 'px'
-		})
+		cssObj = {}
+		if @_inserted
+			cssObj['top'] = -8 + 'px'
+			cssObj['right'] = - 8 + 'px'
+		else
+			bounds = @_target.getBoundingClientRect()
+			parentBounds = @_target.parentNode.getBoundingClientRect()
+			left = bounds.left - parentBounds.left
+			top = bounds.top - parentBounds.top
+			cssObj['top'] = top - 8 + 'px'
+			cssObj['left'] = (left + bounds.width) - 8 + 'px'
+		@css(cssObj)
 	
 	_click:()=>
 		@_remove()
