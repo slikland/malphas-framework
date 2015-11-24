@@ -118,6 +118,7 @@ class TemplateNode extends EventDispatcher
 			value = ObjectUtils.findChild(data, o[1])
 			if !value
 				value = ''
+			value = value.toString().replace(/\"/g, '\\"')
 			obj = obj.replace(new RegExp('#\\{' + o[1] + '\\}', 'g'), value)
 			obj = obj.replace(new RegExp('\r\n', 'g'), '\n')
 			obj = obj.replace(new RegExp('[\n|\r]', 'g'), '\\n')
