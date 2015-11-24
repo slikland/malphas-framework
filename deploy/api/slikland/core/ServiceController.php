@@ -101,7 +101,7 @@ class ServiceController
 						}
 					}else if(!isset($service['view']))
 					{
-						$response['header'] = 'HTTP/1.0 404 Not Found';
+						$response['__header'] = 'HTTP/1.0 404 Not Found';
 					}
 				}
 				if(isset($service['view']) && !isset($response['__view'])){
@@ -158,9 +158,22 @@ class ServiceController
 	{
 		if(isset($data['ignore']) && $data['ignore'])
 		{
-		}else if(isset($data['header']))
+		}else if(isset($data['__header']))
 		{
-			header($data['header']);
+			if(is_array($data['__header']))
+			{
+				foreach($data['__header'] as $k=>$v)
+				{
+					if(is_numeric($k + 0))
+					{
+						header($v);
+					}else{
+						header($k . ': ' . $v);
+					}
+				}
+			}else{
+				header($data['__header']);
+			}
 			if(isset($data['content']))
 			{
 				print $data['content'];
