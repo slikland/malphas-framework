@@ -1,3 +1,3 @@
 form{"action":"cms/updateCKEditor"}:
-	textarea{"type":"ckeditor","name":"ckEditorValue", "ck.config":"1"}: "#{ckEditorValue}"
+	textarea{"type":"ckeditor","name":"ckEditorValue"}: "#{ckEditorValue}"
 	button:"Submit"
