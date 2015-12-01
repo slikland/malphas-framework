@@ -19,6 +19,10 @@ class components.Anchor extends BaseDOM
 				e.stopPropagation()
 				e.preventDefault()
 				return
+		if href?.test(/^javascript:/)
+			e.stopPropagation()
+			e.preventDefault()
+			return
 		if !href || /^http/i.test(href) || /blank/i.test(@attr('target')?.toLowerCase() || '')
 			if @element.tagName.toLowerCase() == 'button'
 				window.open(href, @attr('target'))

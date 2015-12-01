@@ -10,6 +10,7 @@ include_once('../api/config.php');
 	<title>CMS</title>
 	<script src="js/Main.js"></script>
 	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<script src="js/vendors/ckeditor/ckeditor.js"></script>
 </head>
 <body>
 <div id="wrapper">

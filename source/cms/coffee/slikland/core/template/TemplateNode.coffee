@@ -92,7 +92,11 @@ class TemplateNode extends EventDispatcher
 			for k, v of attrs
 				if !v || v.length == 0
 					continue
-				childContext.setAttribute(k, v)
+				try
+					childContext.setAttribute(k, v)
+				catch e
+					console.log(k, v)
+					childContext[k] = v
 
 		if !context
 			throw new Error('Context was not found.')

@@ -56,6 +56,7 @@ class Template
 		return Boolean(@CACHE[id])
 
 	@renderTemplate:(id, context = null, data = {}, onComplete = null, onError = null)->
+		@currentData = data
 		tParser = @find(id)
 		if !tParser
 			return
