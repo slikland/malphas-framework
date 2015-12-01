@@ -30,6 +30,10 @@ class ServiceController
 			$servicePath = '/cms/index';
 		}
 		$service = self::findService($servicePath);
+		if(!$service['cms'])
+		{
+			$logged = true;
+		}
 		if(!isset($service['method']))
 		{
 			$service['method'] = 'index';
