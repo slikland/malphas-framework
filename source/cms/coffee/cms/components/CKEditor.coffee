@@ -7,7 +7,6 @@ class components.CKEditor extends BaseDOM
 		@_form = @findParents('form')
 		if @_form
 			@_form.on('submit', @_updateTextarea)
-		console.log(@_form)
 		# @_templateNode = @element.templateNode
 	_updateTextarea:()=>
 

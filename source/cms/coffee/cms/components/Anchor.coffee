@@ -19,7 +19,7 @@ class components.Anchor extends BaseDOM
 				e.stopPropagation()
 				e.preventDefault()
 				return
-		if href?.test(/^javascript:/)
+		if href && /^javascript:/.test(href)
 			e.stopPropagation()
 			e.preventDefault()
 			return
