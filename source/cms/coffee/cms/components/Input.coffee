@@ -9,9 +9,27 @@ class components.Input extends BaseDOM
 		@element.on('keydown', @_update)
 		@element.on('keyup', @_update)
 
+		if @element.tagName.toLowerCase() == 'textarea'
+			if @attr('value')
+				@text = @attr('value')
+
 	destroy:()->
 
+	_rebuildAsTextarea:()=>
+		element = document.createElement('textarea')
+		attrs = @element.attributes
+		i = attrs.length
+		while i-- > 0
+			element.setAttribute(attrs[i].name, attrs[i].value)
+		element.innerHTML = @_element.value
+		@_element.parentNode.insertBefore(element, @_element)
+		@_element.parentNode.removeChild(@_element)
+		@_element = element
+		@_element.__instance__ = @
+
 	_checkAttributes:()->
+		if @attr('type') == 'textarea'
+			@_rebuildAsTextarea()
 		if @attr('maxlength')
 			@_maxLength = Number(@attr('maxlength'))
 			@_charCounter = new CharCounter(@_maxLength)

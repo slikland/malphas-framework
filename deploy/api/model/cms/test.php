@@ -16,10 +16,9 @@ class test extends Model
 		return $response;
 	}
 
-	function updateTest()
+	function updateTest($data)
 	{
 		$response = array();
-
 		return $response;
 	}
 }
