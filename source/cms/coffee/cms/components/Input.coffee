@@ -34,6 +34,8 @@ class components.Input extends BaseDOM
 			@_maxLength = Number(@attr('maxlength'))
 			@_charCounter = new CharCounter(@_maxLength)
 			@element.parentNode.appendChild(@_charCounter)
+		if @attr('restrict')
+			@_restrict = new Restrict(@attr('restrict'))
 	showError:(error)->
 		@findParents('field')?.getInstance()?.showError(error)
 		@addClass('error')
@@ -48,6 +50,7 @@ class components.Input extends BaseDOM
 		@_update()
 
 	_update:()=>
+		@_restrict?.update(@element)
 		value = @element.value
 		@_charCounter?.update(value.length)
 
@@ -73,3 +76,17 @@ class components.Input extends BaseDOM
 		hide:()->
 			@addClass('hide-up')
 			@removeClass('show-up')
+	class Restrict
+		constructor:(@_restrict)->
+			@_re = new RegExp('[^' + @_restrict + ']', 'g')
+		update:(target)->
+			if target instanceof BaseDOM
+				target = target.element
+			else if !target instanceof HTMLElement
+				throw new Error('Not an HTMLElement')
+			initValue = target.value
+			value = initValue.replace(@_re, '')
+			if value != initValue
+				p = target.selectionStart
+				target.value = value
+				target.setSelectionRange(p, p)
