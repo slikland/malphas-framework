@@ -16,6 +16,16 @@ class test extends Model
 		return $response;
 	}
 
+	/**
+	*	@addToMenu("Range")
+	*/
+	function range()
+	{
+		$response = array();
+
+		return $response;
+	}
+
 	function updateTest($data)
 	{
 		$response = array();
