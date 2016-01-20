@@ -53,4 +53,6 @@ a
 @import 'components/*'
 // @import 'component/*'
 
-
+for i in (1...length(bg-colors) + 1)
+	&.color{i}
+		generateTextColor(i - 1, 80%)

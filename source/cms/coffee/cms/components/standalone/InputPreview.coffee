@@ -7,8 +7,8 @@ class components.standalone.InputPreview extends StandaloneBase
 
 		value = @attr('value')
 		if value && value.trim().length > 0
-			@_initialValue = value
-		@_setSource(value)
+			@_initialValue = value + '?r=' + Math.random() + new Date().getTime()
+		@_setSource()
 
 		@element.on('change', @_change)
 	_setSource:(value)->

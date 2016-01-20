@@ -63,8 +63,16 @@ class index extends Model{
 					array(111, 222, 100, 100),
 					array(333, 444, 100, 100),
 				)
+			),
+		);
+
+		$response['grids'] = array(
+			array(
+				array('id'=>'1', 'x'=>0,'y'=>0,'w'=>2,'h'=>2,'thumb'=>'http://lorempixel.com/400/200/?1'),
+				array('id'=>'1', 'x'=>2,'y'=>1,'w'=>1,'h'=>1,'thumb'=>'http://lorempixel.com/400/200/?2'),
 			)
 		);
+
 		return $response;
 	}
 
