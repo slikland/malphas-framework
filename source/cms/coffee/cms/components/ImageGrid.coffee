@@ -2,6 +2,7 @@ class components.ImageGrid extends BaseDOM
 	@SELECTOR: '.image-grid'
 	constructor:()->
 		super
+		console.log(arguments)
 		@css('position', 'relative')
 		@_templateNode = @element.templateNode
 		@_checkAttributes()
@@ -23,17 +24,14 @@ class components.ImageGrid extends BaseDOM
 		app.viewController.goto(href)
 	_edit:(e, data)=>
 		href = @attr('editAction')
-		href += data
+		href += data.id
 		app.viewController.goto(href)
 	_remove:(e, data)=>
 		if @attr('removeConfirm')
 			if !window.confirm(@attr('removeConfirm'))
 				return
 		href = @attr('removeAction')
-		href += data
-		app.viewController.goto(href)
-	_edit:(e, data)=>
-		href = @attr('editAction')
+		href += data.id
 		app.viewController.goto(href)
 
 	_addEventListeners:()->
@@ -111,7 +109,6 @@ class components.ImageGrid extends BaseDOM
 		b = @getBounds()
 		p = [e.pageX - b.left, e.pageY - b.top]
 		[x, y] = @_getCoordinates(p[0], p[1])
-		console.log(@_findGridItem(x, y).hasData)
 		if @_findGridItem(x, y).hasData
 			return
 		@_initPosition = p
@@ -149,9 +146,9 @@ class components.ImageGrid extends BaseDOM
 			@_contentWidth = Number(@attr('width'))
 
 		if @attr('height')
-			@_contentHeigh = Number(@attr('height'))
+			@_contentHeight = Number(@attr('height'))
 
-		if @_contentWidth && @_contentHeigh
+		if @_contentWidth && @_contentHeight
 			@_fixedSize = true
 		else
 			window.addEventListener('resize', @_resize)
@@ -192,8 +189,8 @@ class components.ImageGrid extends BaseDOM
 				@appendChild(item)
 				@_grid[c++] = item
 
-		if @_templateNode?.data?
-			@_items = @_templateNode.data
+		if @element.data?
+			@_items = @element.data.items || @element.data
 			i = @_items.length
 			while i-- > 0
 				item = @_items[i]
@@ -260,11 +257,11 @@ class components.ImageGrid extends BaseDOM
 			@_redraw()
 
 		_editClick:(e)=>
-			@trigger(GridItem.EDIT, @_data.id)
+			@trigger(GridItem.EDIT, @_data)
 			e.preventDefault()
 			e.stopImmediatePropagation()
 		_removeClick:(e)=>
-			@trigger(GridItem.REMOVE, @_data.id)
+			@trigger(GridItem.REMOVE, @_data)
 			e.preventDefault()
 			e.stopImmediatePropagation()
 		updateSize:(w, h)->

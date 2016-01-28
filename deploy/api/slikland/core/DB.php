@@ -349,6 +349,10 @@ class DB{
 			$filters = array();
 			foreach($params['filter'] as $filter)
 			{
+				if(!isset($filter['fields']))
+				{
+					continue;
+				}
 				$fields = $filter['fields'];
 				if(!is_array($fields))
 				{
@@ -362,7 +366,10 @@ class DB{
 					$filters[] = $fields . ' = "' . $value . '"';
 				}
 			}
-			$where[] = implode(' AND ', $filters);
+			if(count($filters) > 0)
+			{
+				$where[] = implode(' AND ', $filters);
+			}
 		}
 
 		$orders = array();
@@ -401,6 +408,10 @@ class DB{
 		if(count($where) > 0)
 		{
 			$query[] = 'WHERE ' . implode(' AND ', $where);
+		}
+
+		if(isset($params['group']) && !empty($params['group'])){
+			$query[] = 'GROUP BY ' . $params['group'];
 		}
 
 		if(count($orders) > 0)

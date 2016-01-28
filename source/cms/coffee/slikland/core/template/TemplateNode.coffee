@@ -63,6 +63,7 @@ class TemplateNode extends EventDispatcher
 	render:(context, data, originalData = null, ignoreUse = false)->
 		if !originalData && data
 			originalData = data
+		context.data = data
 		@originalData = originalData
 		foundData = data
 		if !ignoreUse
@@ -78,7 +79,7 @@ class TemplateNode extends EventDispatcher
 		if @_contextSelector
 			context = (context || document.body).querySelector(@_contextSelector)
 		@data = data
-
+		context.data = data
 		childContext = context
 		if @_element
 			childContext = document.createElement(@_element)
@@ -97,7 +98,7 @@ class TemplateNode extends EventDispatcher
 				catch e
 					console.log(k, v)
 					childContext[k] = v
-
+		childContext.data = data
 		if !context
 			throw new Error('Context was not found.')
 		if (!ignoreUse && @_use) && data && (Array.isArray(data))
