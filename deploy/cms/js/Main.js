@@ -4865,14 +4865,13 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
 components.Range = (function(_super) {
   __extends(Range, _super);
 
-  Range.SELECTOR = 'input.rangeInput';
+  Range.SELECTOR = '.rangeInput';
 
   Range.ORDER = 0;
 
   function Range() {
     this._update = __bind(this._update, this);
     Range.__super__.constructor.apply(this, arguments);
-    console.log(123);
     if (this.attr('cssAttribute')) {
       this._cssAttribute = this.attr('cssAttribute');
     }
@@ -4889,13 +4888,15 @@ components.Range = (function(_super) {
 
   Range.prototype._update = function() {
     if (this._target) {
-      return this._target.style[this._cssAttribute] = this.element.value + 'px';
+      if (this.element.value === "left" || this.element.value === "right") {
+        return this._target.style[this._cssAttribute] = this.element.value;
+      } else {
+        return this._target.style[this._cssAttribute] = this.element.value + 'px';
+      }
     }
   };
 
-  Range.prototype._checkAttributes = function() {
-    return console.log("asdasdasdas");
-  };
+  Range.prototype._checkAttributes = function() {};
 
   return Range;
 

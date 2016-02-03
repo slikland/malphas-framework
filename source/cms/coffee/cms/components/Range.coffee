@@ -1,9 +1,9 @@
 class components.Range extends BaseDOM
-	@SELECTOR: 'input.rangeInput'
+	@SELECTOR: '.rangeInput'
 	@ORDER: 0
 	constructor:()->
 		super
-		console.log(123)
+
 		if @attr('cssAttribute')
 			@_cssAttribute = @attr('cssAttribute')
 		if @attr('for')
@@ -15,8 +15,12 @@ class components.Range extends BaseDOM
 	destroy:()->
 
 	_update:()=>
+
 		if @_target
-			@_target.style[@_cssAttribute] = @element.value + 'px'
+			if @element.value == "left" || @element.value == "right"
+				@_target.style[@_cssAttribute] = @element.value
+			else
+				@_target.style[@_cssAttribute] = @element.value + 'px'
 
 	_checkAttributes:()->
-		console.log "asdasdasdas"
+		
