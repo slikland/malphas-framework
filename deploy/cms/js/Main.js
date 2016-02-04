@@ -1014,7 +1014,39 @@ ObjectUtils = (function() {
   };
 
   ObjectUtils.clone = function(p_target) {
-    return JSON.parse(JSON.stringify(p_target));
+    var copy, err, i, k, len, v;
+    try {
+      return JSON.parse(JSON.stringify(p_target));
+    } catch (_error) {
+      err = _error;
+      if (!p_target || typeof p_target !== 'object') {
+        return p_target;
+      }
+      copy = null;
+      if (p_target instanceof Array) {
+        copy = [];
+        i = 0;
+        len = p_target.length;
+        while (i < len) {
+          copy[i] = this.clone(p_target[i]);
+          i++;
+        }
+        return copy;
+      }
+      if (p_target instanceof Object) {
+        copy = {};
+        for (k in p_target) {
+          v = p_target[k];
+          if (v !== 'object') {
+            copy[k] = v;
+          } else {
+            copy[k] = this.clone(v);
+          }
+        }
+        return copy;
+      }
+      throw new Error('Unable to copy');
+    }
   };
 
   ObjectUtils.findChild = function(obj, query) {
@@ -1033,6 +1065,37 @@ ObjectUtils = (function() {
       obj = this.findChild(obj, query.splice(1).join('.'));
     }
     return obj;
+  };
+
+  ObjectUtils.parseLinkedArray = function(p_source) {
+    var i, item, j, names, numNames, o, ret;
+    if (!p_source || (p_source && p_source.length < 1)) {
+      return [];
+    }
+    i = p_source.length;
+    names = p_source[0];
+    numNames = names.length;
+    ret = [];
+    while (i-- > 1) {
+      o = {};
+      j = numNames;
+      item = p_source[i];
+      while (j-- > 0) {
+        o[names[j]] = item[j];
+      }
+      ret[i - 1] = o;
+    }
+    return ret;
+  };
+
+  ObjectUtils.merge = function(a, b) {
+    var k;
+    for (k in b) {
+      if (!a.hasOwnProperty(k)) {
+        a[k] = b[k];
+      }
+    }
+    return a;
   };
 
   return ObjectUtils;
@@ -2752,7 +2815,7 @@ TemplateNode = (function(_super) {
   };
 
   TemplateNode.prototype.render = function(context, data, originalData, ignoreUse) {
-    var attrs, childContext, e, foundData, k, o, v, _i, _len;
+    var attrs, childContext, e, foundData, initialData, k, o, v, _i, _len;
     if (originalData == null) {
       originalData = null;
     }
@@ -2762,6 +2825,7 @@ TemplateNode = (function(_super) {
     if (!originalData && data) {
       originalData = data;
     }
+    initialData = data;
     context.data = data;
     this.originalData = originalData;
     foundData = data;
@@ -2784,6 +2848,9 @@ TemplateNode = (function(_super) {
     }
     this.data = data;
     context.data = data;
+    if (!Array.isArray(data) && !Array.isArray(initialData) && !(data instanceof String) && !(initialData instanceof String)) {
+      initialData = ObjectUtils.merge(initialData, data);
+    }
     childContext = context;
     if (this._element) {
       childContext = document.createElement(this._element);
@@ -2794,7 +2861,7 @@ TemplateNode = (function(_super) {
       childContext.innerHTML = this._replaceData(this._content, data);
     }
     if (this._attributes) {
-      attrs = this._replaceData(this._attributes, data);
+      attrs = this._replaceData(this._attributes, initialData);
       for (k in attrs) {
         v = attrs[k];
         if (!v || v.length === 0) {

@@ -22,6 +22,11 @@ class test extends Model
 	function range()
 	{
 		$response = array();
+		$response['bla'] = '123';
+		$response['items'] = array(
+			array('value'=>1),
+			array('value'=>2),
+		);
 
 		return $response;
 	}

@@ -63,6 +63,7 @@ class TemplateNode extends EventDispatcher
 	render:(context, data, originalData = null, ignoreUse = false)->
 		if !originalData && data
 			originalData = data
+		initialData = data
 		context.data = data
 		@originalData = originalData
 		foundData = data
@@ -80,6 +81,8 @@ class TemplateNode extends EventDispatcher
 			context = (context || document.body).querySelector(@_contextSelector)
 		@data = data
 		context.data = data
+		if !Array.isArray(data) && !Array.isArray(initialData) && !(data instanceof String) && !(initialData instanceof String)
+			initialData = ObjectUtils.merge(initialData, data)
 		childContext = context
 		if @_element
 			childContext = document.createElement(@_element)
@@ -89,7 +92,7 @@ class TemplateNode extends EventDispatcher
 			childContext.innerHTML = @_replaceData(@_content, data)
 
 		if @_attributes
-			attrs = @_replaceData(@_attributes, data)
+			attrs = @_replaceData(@_attributes, initialData)
 			for k, v of attrs
 				if !v || v.length == 0
 					continue
