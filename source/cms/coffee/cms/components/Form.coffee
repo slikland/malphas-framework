@@ -13,6 +13,8 @@ class components.Form extends BaseDOM
 	removeComponent:()->
 
 	_submit:(e)=>
+		if @attr('target')?.toLowerCase() == '_blank'
+			return
 		e.stopPropagation()
 		e.preventDefault()
 
