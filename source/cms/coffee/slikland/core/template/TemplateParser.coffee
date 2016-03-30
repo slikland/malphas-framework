@@ -150,14 +150,18 @@ class TemplateParser extends EventDispatcher
 		data = data.replace(/\/\*[\s\S]*?\*\//mg, '')
 
 		data = data.replace(/^\s*$[\n|\r]/gm, '')
-		blockRE = /(^\s*)([^\s].*?\n)((?:\1\s[\s\S].*?(?:\n|$))*)/gm
+		# blockRE = /(^\s*\(.*?\)\n)?(\s*)([^\s].*?\n)((?:\2\s[\s\S].*?(?:\n|$))*)/gm
+		blockRE = /(\s*)([^\s].*?\n)((?:\1\s[\s\S].*?(?:\n|$))*)/gm
 
 		[data, @_escapeMap] = @_escapeCharacters(data, @_escapeMap || [])
 		[data, @_escapeMap] = @_escapeLineBreaks(data, @_escapeMap)
 		[data, @_escapeMap] = @_escapeConditionals(data, @_escapeMap)
 		childs = []
 		while o = blockRE.exec(data)
-			templateNode = new TemplateNode(@_parseNodeData(o[2]))
+			parsedData = @_parseNodeData(o[2])
+			if !parsedData
+				continue
+			templateNode = new TemplateNode(parsedData)
 			if o[3] && o[3].trim().length > 0
 				templateNode.children = @_parseBlocks(o[3])
 			childs.push(templateNode)
@@ -198,8 +202,9 @@ class TemplateParser extends EventDispatcher
 			instructionData = @_unescapeCharacters(instructionData, attrs)
 			instructionData = @_unescapeCharacters(instructionData, @_escapeMap)
 
-			if cond = /^\s*(\((?:if|for).*?)\)\s*$/.exec(instructionData)
+			if cond = /^\s*\((if|for)(.*?)\)\s*$/.exec(instruction)
 				data['condition'] = cond[1]
+				data['conditionData'] = cond[2]
 			else
 				attrsRE = /([\.\#])?([\w\-]+)/g
 				if !instructionData

@@ -7,6 +7,7 @@ class TemplateNode extends EventDispatcher
 		@_element = @nodeData['element']
 		@_content = @nodeData['content']
 		@_condition = @nodeData['condition']
+		@_conditionData = @nodeData['conditionData']
 		@_children = []
 		@_contextSelector = @nodeData['contextSelector']
 
@@ -63,6 +64,11 @@ class TemplateNode extends EventDispatcher
 	render:(context, data, originalData = null, ignoreUse = false)->
 		if !originalData && data
 			originalData = data
+		if @_condition? && @_conditionData?
+			cData = @_conditionData
+			cData = cData.replace(/\#\{(.*?)\}/ig, 'data[\'$1\']')
+			if !eval(cData)
+				return
 		initialData = data
 		context.data = data
 		@originalData = originalData
