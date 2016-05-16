@@ -6,6 +6,20 @@ class Model{
 
 	}
 
+	function getController($name, $singleton = FALSE)
+	{
+		$name = '\\controller\\' . preg_replace('/^\\*/', '', preg_replace('/\\//', '\\', $name));
+		if(class_exists($name))
+		{
+			if($singleton)
+			{
+				return $name::getInstance();
+			}
+			return new $name();
+		}
+		return NULL;
+	}
+
 	function __get($name){
 		switch($name)
 		{
