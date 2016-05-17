@@ -6,7 +6,6 @@ class Controller{
 	{
 		if(!self::$instance)
 		{
-			// var_dump(__CLASS__);
 			self::$instance = new static();
 		}
 		return self::$instance;
@@ -27,6 +26,19 @@ class Controller{
 		}
 	}
 
+	function getController($name, $singleton = FALSE)
+	{
+		$name = '\\controller\\' . preg_replace('/^\\*/', '', preg_replace('/\\//', '\\', $name));
+		if(class_exists($name))
+		{
+			if($singleton)
+			{
+				return $name::getInstance();
+			}
+			return new $name();
+		}
+		return NULL;
+	}
 }
 
 class_alias('\slikland\core\Controller', 'Controller');
