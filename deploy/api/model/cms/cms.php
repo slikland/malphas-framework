@@ -20,6 +20,14 @@ class cms extends Model{
 	}
 
 	/**
+	*	@addToMenu("Map")
+	*/
+	function map($data){
+		$response = array();
+		return $response;
+	}
+
+	/**
 	*	@addToMenu("CKEditor")
 	*/
 	function ckEditor($data)
