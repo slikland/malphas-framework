@@ -33,6 +33,8 @@ class components.Map extends BaseDOM
 		@_mapContainer.attr("id", "mapContainer")
 		@appendChild(@_mapContainer)
 
+		@_geocoder = new google.maps.Geocoder();
+
 		@_map = new google.maps.Map(document.getElementById('mapContainer'), {
 			center: {lat: @_lat, lng: @_lng},
 			zoom: @_zoom
@@ -66,6 +68,7 @@ class components.Map extends BaseDOM
 		location = @_marker.getPosition()
 
 		@_setLocation(location)
+		@_geocodePosition(location)
 
 	_placeChange:(event)=>
 		place = @_autocomplete.getPlace()
@@ -89,5 +92,14 @@ class components.Map extends BaseDOM
 	_keyDown:(event)=>
 		if event.keyCode == 13
 			event.preventDefault()
+
+	_geocodePosition:(position)=>
+		@_geocoder.geocode({'location':position}, @_geoCallback)
+
+	_geoCallback:(results, status)=>
+		if status == google.maps.GeocoderStatus.OK
+			@_input.attr("value", results[0].formatted_address)
+		else
+			throw new Error("Ops, looks like GeocoderStatus inst OK!")
 
 	destroy:()->
