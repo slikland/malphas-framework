@@ -70,10 +70,10 @@ class components.Form extends BaseDOM
 	_clearErrors:()->
 		fields = @findAll(components.Field.SELECTOR, true)
 		for field in fields
-			field.clearError()
+			field.clearError?()
 		items = @findAll(components.Input.SELECTOR, true)
 		for item in items
-			item.clearError()
+			item.clearError?()
 	_showErrors:(items)=>
 		for item in items
 			fields = [].concat(item.field)
