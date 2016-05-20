@@ -2,7 +2,6 @@ class components.standalone.InputPreview extends StandaloneBase
 	@SELECTOR: 'input[preview]'
 	constructor:(params)->
 		super
-
 		@_setupPreview(@attr('preview'))
 
 		value = @attr('value')

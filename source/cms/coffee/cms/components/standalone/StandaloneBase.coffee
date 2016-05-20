@@ -9,11 +9,13 @@ class StandaloneBase extends BaseDOM
 			if (i = @_parsedItems.indexOf(item)) >= 0
 				@_parsedItems.splice(i, 1)
 				continue
-			new @({element: item})
+			if !item.getAttribute('standalone.' + @.name)
+				new @({element: item})
 		@_parsedItems = newItems
 
 	constructor:(params)->
 		instance = params?.__instance__ || params?.element?.getInstance?()
 		super
+		@element.setAttribute('standalone.' + @constructor.name, 'true')
 		if instance
 			@_element.__instance__ = instance
