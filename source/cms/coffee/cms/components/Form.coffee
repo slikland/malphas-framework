@@ -65,7 +65,7 @@ class components.Form extends BaseDOM
 			return
 		switch data?.code
 			when 101
-				@_showErrors(data.data)
+				@_showErrors?(data.data)
 
 	_clearErrors:()->
 		fields = @findAll(components.Field.SELECTOR, true)
@@ -79,4 +79,4 @@ class components.Form extends BaseDOM
 			fields = [].concat(item.field)
 			for field in fields
 				input = @find('[name="'+field+'"]')
-				input?.getInstance()?.showError(item.message)
+				input?.getInstance()?.showError?(item.message)

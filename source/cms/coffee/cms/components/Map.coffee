@@ -21,14 +21,14 @@ class components.Map extends BaseDOM
 		@_lat = Number(@attr("lat")) || -14.235004
 		@_lng = Number(@attr("lng")) || -51.92527999999999
 
-		@_input = new BaseDOM({element:@find(".address-input")})
-		@_input.element.on("keydown", @_keyDown)
-
 		@_latInput = @find(".lat-input")
 		@_lngInput = @find(".lng-input")
 		@_zoomInput = new BaseDOM({element:@find(".zoom-input")})
 
 	initMap:=>
+		@_input = @find(".address-input", true)
+		@_input.element.on("keydown", @_keyDown)
+
 		@_mapContainer = new BaseDOM({className:"map-container"})
 		@_mapContainer.attr("id", "mapContainer")
 		@appendChild(@_mapContainer)
