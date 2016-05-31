@@ -45,6 +45,7 @@ class Template
 	@setExtension:(extension = '.tpl')->
 		@EXTENSION = extension
 	@addTemplate:(id, template)->
+		
 		if template not instanceof TemplateParser
 			tParser = new TemplateParser()
 			tParser.parse(template)

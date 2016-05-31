@@ -48,6 +48,9 @@ class ServiceController extends EventDispatcher
 			app.viewController.goto(data['goto'])
 		if data['refresh']
 			app.viewController.goto(app.router.getCurrentPath())
+		if data['reload']
+			window.location.reload()
+			return
 		if data['__interface']
 			app.viewController.renderInterface('index', data.__interface, data)
 			if app.user.logged

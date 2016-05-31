@@ -45,6 +45,21 @@ class API extends EventDispatcher
 		@reuse = false
 
 	load: ->
+		urlParams = window.location.search
+		paramObj = {}
+		if urlParams
+			urlParams = urlParams.replace(/^\??/, '').split('&')
+			pc = 0
+			for up in urlParams
+				parts = up.split('=')
+				if parts[0]?.trim().length > 0
+					paramObj[parts[0].trim()] =  parts[1]?.trim()
+					pc++
+		if pc > 0
+			try
+				if !@params
+					@params = {}
+				@params = ObjectUtils.merge(@params, paramObj)
 		if @params instanceof FormData
 			@method = 'POST'
 			formData = @params

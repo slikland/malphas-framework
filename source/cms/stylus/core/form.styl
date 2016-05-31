@@ -21,7 +21,10 @@ input[type=file]
 textarea
 	height: 6em
 
-button
+.buttonType
+	padding: 2px 5px
+
+button, .buttonType
 	font-family: helveticaneue
 	font-weight: bold
 	border-width: 1px
@@ -83,6 +86,11 @@ fieldset
 
 for i in (1...length(bg-colors) + 1)
 	button.p{i}
+		generateColor(i - 1)
+		border-width: 1px
+
+for i in (1...length(bg-colors) + 1)
+	.buttonType.p{i}
 		generateColor(i - 1)
 		border-width: 1px
 
