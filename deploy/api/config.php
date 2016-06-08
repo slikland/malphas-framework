@@ -11,37 +11,30 @@ error_reporting(E_ALL);
 *	@param RELATIVE_URL someproject/
 *	@param ROOT_URL http:/domain/someproject/
 */
-define('API_PATH', dirname(realpath(__FILE__)) . '/');
-define('ROOT_PATH', dirname(API_PATH) . '/');
-define('DYNAMIC_PATH', ROOT_PATH . 'dynamic/');
 
 $http = "http";
 if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') $http = 'https';
 if(isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') $http = 'https';
 
-$pageURL = $http . '://';
-$relative = dirname(dirname(substr(__FILE__, strlen($_SERVER['DOCUMENT_ROOT'])))) . '/';
-if(strlen(preg_replace('/[\.\/]/', '', $relative)) === 0)
-{
-	$relative = '/';
-}
-$relative = '/'.ltrim($relative, '/');
+$rootPath = dirname(dirname(__FILE__));
+$scriptPath = realpath(dirname($_SERVER['SCRIPT_FILENAME']));
+$rootPathRE = str_replace('/', '\\/', $rootPath);
+$path = str_replace('/', '\\/', preg_replace('/^' . $rootPathRE . '/', '', $scriptPath));
+$relativeRootPath = preg_replace('/' . $path . '$/', '', dirname($_SERVER['SCRIPT_NAME']));
+$requestURI = preg_replace('/^' . str_replace('/', '\\/', $relativeRootPath) . '/', '', $_SERVER['REQUEST_URI']);
 
-define('RELATIVE_URL', $relative);
+$rootPath .= '/';
+$relativeRootPath .= '/';
+$rootURL = $host . $relativeRootPath;
+$currentURL = rtrim($rootURL, '/') . $requestURI;
 
-$base = dirname(substr($_SERVER['SCRIPT_FILENAME'], strlen($_SERVER['DOCUMENT_ROOT']))) . '/';
-if(strlen(preg_replace('/[\.\/]/', '', $base)) === 0)
-{
-	$base = '/';
-}
-$base = '/'.ltrim($base, '/');
-
-
-$pageURL .= $_SERVER["HTTP_HOST"].RELATIVE_URL;
-$pageURL = rtrim($pageURL, '/') . '/';
-
-define('ROOT_URL', $pageURL);
-
+define('API_PATH', $rootPath . 'api/');
+define('ROOT_PATH', $rootPath);
+define('DYNAMIC_PATH', $rootPath . 'dynamic/');
+define('RELATIVE_URL', rtrim($relativeRootPath, '/') . '/');
+define('ROOT_URL', rtrim($rootURL, '/') . '/');
+define('REQUEST_URI', $requestURI);
+define('CURRENT_URL', $currentURL);
 
 
 define('CMS_SESSION_TIMEOUT', '60000');
