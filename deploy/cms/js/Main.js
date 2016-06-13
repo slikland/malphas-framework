@@ -4831,6 +4831,53 @@ var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments)
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
+components.TagsInput = (function(_super) {
+  __extends(TagsInput, _super);
+
+  TagsInput.SELECTOR = '.tagsInput';
+
+  TagsInput.ORDER = 0;
+
+  function TagsInput() {
+    this._update = __bind(this._update, this);
+    var parentElement;
+    TagsInput.__super__.constructor.apply(this, arguments);
+    parentElement = this.element.parentNode;
+    this._addInput = document.createElement("input");
+    this._addInput.type = "text";
+    this._addInput.name = "tagsRef";
+    parentElement.appendChild(this._addInput);
+    this._tagContainer = document.createElement("div");
+    this._tagContainer.className = "tag-container";
+    parentElement.appendChild(this._tagContainer);
+    console.log(this._tagContainer, this._addInput);
+    this.element.on('keypress', this._update);
+  }
+
+  TagsInput.prototype.destroy = function() {};
+
+  TagsInput.prototype._update = function() {
+    var addTagElement, valueInputAdd;
+    if (event.keyCode === 44 || event.keyCode === 13) {
+      valueInputAdd = this._addInput.value + this.element.value + ',';
+      this._addInput.value = valueInputAdd;
+      addTagElement = document.createElement("div");
+      addTagElement.className = "tag-content";
+      addTagElement.innerHTML = this.element.value;
+      this._tagContainer.appendChild(addTagElement);
+      this.element.value = '';
+      return event.preventDefault();
+    }
+  };
+
+  return TagsInput;
+
+})(BaseDOM);
+
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
 components.Table = (function(_super) {
   var TableHeader;
 
@@ -5463,6 +5510,94 @@ components.Map = (function(_super) {
   Map.prototype.destroy = function() {};
 
   return Map;
+
+})(BaseDOM);
+
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+components.Lightbox = (function(_super) {
+  __extends(Lightbox, _super);
+
+  Lightbox.SELECTOR = '.lightbox';
+
+  function Lightbox() {
+    this._click = __bind(this._click, this);
+    this._close = __bind(this._close, this);
+    Lightbox.__super__.constructor.apply(this, arguments);
+    this._enabled = true;
+    this.element.on('click', this._click);
+  }
+
+  Lightbox.prototype.destroy = function() {};
+
+  Lightbox.prototype.enable = function(enabled) {
+    if (enabled == null) {
+      enabled = true;
+    }
+  };
+
+  Lightbox.prototype._close = function(e) {
+    return document.body.removeChild(this._addLightbox);
+  };
+
+  Lightbox.prototype._click = function(e) {
+    var H, W, image, left, top, windowsH, windowsW, _ref;
+    this._addLightbox = new BaseDOM({
+      className: "bg-lightbox"
+    });
+    document.body.appendChild(this._addLightbox);
+    W = parseInt(this.attr('w'));
+    H = parseInt(this.attr('h'));
+    image = this.attr('open');
+    console.log(image);
+    windowsW = window.innerWidth;
+    windowsH = window.innerHeight;
+    top = (windowsH - H) / 2;
+    left = (windowsW - W) / 2;
+    this._bgImage = new BaseDOM({
+      className: "image-lightbox"
+    });
+    this._bgImage.element.style.top = top + 'px';
+    this._bgImage.element.style.left = left + 'px';
+    this._addLightbox.appendChild(this._bgImage);
+    this._addImage = new BaseDOM({
+      element: "img"
+    });
+    this._addImage.attr("width", W + 'px');
+    this._addImage.attr("height", H + 'px');
+    this._addImage.element.src = image;
+    this._bgImage.appendChild(this._addImage);
+    this._addDivClose = new BaseDOM({
+      className: "closed"
+    });
+    this._bgImage.appendChild(this._addDivClose);
+    this._addClose = new BaseDOM({
+      element: "i",
+      className: "fa fa-circle fa-2x"
+    });
+    this._addClose.css({
+      'position': 'absolute',
+      'left': '0px',
+      'top': '0px'
+    });
+    this._addDivClose.appendChild(this._addClose);
+    this._addSecondClose = new BaseDOM({
+      element: "i",
+      className: "fa fa-times"
+    });
+    this._addSecondClose.css({
+      'position': 'absolute',
+      'left': '7px',
+      'top': '7px',
+      'color': '#FFFFFF'
+    });
+    this._addDivClose.appendChild(this._addSecondClose);
+    return (_ref = this._addDivClose) != null ? _ref.element.on('click', this._close) : void 0;
+  };
+
+  return Lightbox;
 
 })(BaseDOM);
 
