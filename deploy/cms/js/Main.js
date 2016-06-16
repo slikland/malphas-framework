@@ -3580,11 +3580,18 @@ API = (function(_super) {
     this.type = type != null ? type : 'json';
     this.headers = headers != null ? headers : null;
     this._loaded = __bind(this._loaded, this);
+    this.load = __bind(this.load, this);
     this.reuse = false;
   }
 
-  API.prototype.load = function() {
+  API.prototype.load = function(params) {
     var formData, k, n, paramObj, parts, pc, up, urlParams, v, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4;
+    if (params == null) {
+      params = null;
+    }
+    if (params) {
+      this.params = params;
+    }
     urlParams = window.location.search;
     paramObj = {};
     if (urlParams) {
@@ -4839,38 +4846,216 @@ components.TagsInput = (function(_super) {
   TagsInput.ORDER = 0;
 
   function TagsInput() {
-    this._update = __bind(this._update, this);
-    var parentElement;
+    this._addItemList = __bind(this._addItemList, this);
+    this._searchComplete = __bind(this._searchComplete, this);
+    this._search = __bind(this._search, this);
+    this._add = __bind(this._add, this);
+    this._delete = __bind(this._delete, this);
+    this._insertTags = __bind(this._insertTags, this);
+    var i, tagValue, totalTags, _i;
     TagsInput.__super__.constructor.apply(this, arguments);
-    parentElement = this.element.parentNode;
-    this._addInput = document.createElement("input");
-    this._addInput.type = "text";
-    this._addInput.name = "tagsRef";
-    parentElement.appendChild(this._addInput);
-    this._tagContainer = document.createElement("div");
-    this._tagContainer.className = "tag-container";
-    parentElement.appendChild(this._tagContainer);
-    console.log(this._tagContainer, this._addInput);
-    this.element.on('keypress', this._update);
+    this._parentElement = this.element.parentNode;
+    tagValue = this.attr('tagValue');
+    this._addInput = new BaseDOM({
+      element: "input"
+    });
+    this._addInput.element.type = "hidden";
+    this._addInput.element.name = "tagsRef";
+    this._addInput.element.value = tagValue;
+    this._parentElement.appendChild(this._addInput);
+    this._tagContainer = new BaseDOM({
+      className: "tag-container"
+    });
+    this._parentElement.appendChild(this._tagContainer);
+    this._valuesTag = this._addInput.element.value.split(",");
+    totalTags = this._valuesTag.length - 1;
+    for (i = _i = 0; 0 <= totalTags ? _i < totalTags : _i > totalTags; i = 0 <= totalTags ? ++_i : --_i) {
+      this._insertTags(this._valuesTag[i]);
+    }
+    this._searchAPI = new API(API.ROOT_PATH + 'tags/findTag/');
+    this._searchAPI.reuse = true;
+    this._searchAPI.on(API.COMPLETE, this._searchComplete);
+    this.element.on('keypress', this._add);
+    this.element.on('keyup', this._search);
   }
 
   TagsInput.prototype.destroy = function() {};
 
-  TagsInput.prototype._update = function() {
-    var addTagElement, valueInputAdd;
+  TagsInput.prototype._insertTags = function(text) {
+    var addDeleteIcon;
+    this._addTagElement = new BaseDOM({
+      className: "tag-content"
+    });
+    addDeleteIcon = new BaseDOM({
+      element: "i",
+      className: "fa fa-times fa-fw deleteTag"
+    });
+    this._addTagElement.element.innerHTML = text;
+    this._addTagElement.attr("name", text);
+    this._addTagElement.appendChild(addDeleteIcon);
+    this._tagContainer.appendChild(this._addTagElement);
+    return addDeleteIcon != null ? addDeleteIcon.element.on('click', this._delete) : void 0;
+  };
+
+  TagsInput.prototype._delete = function(clicked) {
+    var childDelete, insertData, itemRemove, parentDelete, textDeleted;
+    parentDelete = clicked.target.parentNode.parentNode;
+    childDelete = clicked.target.parentNode;
+    textDeleted = childDelete.getAttribute("name");
+    parentDelete.removeChild(childDelete);
+    this._valuesTag = this._addInput.element.value.split(",");
+    itemRemove = this._valuesTag.indexOf(textDeleted);
+    this._valuesTag.splice(itemRemove, 1);
+    insertData = this._valuesTag.join();
+    return this._addInput.element.value = insertData;
+  };
+
+  TagsInput.prototype._add = function() {
+    var findText, text, valueInputAdd;
     if (event.keyCode === 44 || event.keyCode === 13) {
-      valueInputAdd = this._addInput.value + this.element.value + ',';
-      this._addInput.value = valueInputAdd;
-      addTagElement = document.createElement("div");
-      addTagElement.className = "tag-content";
-      addTagElement.innerHTML = this.element.value;
-      this._tagContainer.appendChild(addTagElement);
+      text = this.element.value;
+      text = text.replace(/\,/g, "");
+      this._valuesTag = this._addInput.element.value.split(",");
+      findText = this._valuesTag.indexOf(text);
+      if (findText > -1 || text === ' ') {
+        this.element.value = '';
+        event.preventDefault();
+        return;
+      }
+      valueInputAdd = this._addInput.element.value + text + ',';
+      this._addInput.element.value = valueInputAdd;
+      this._insertTags(text);
       this.element.value = '';
-      return event.preventDefault();
+      event.preventDefault();
     }
   };
 
+  TagsInput.prototype._search = function() {
+    var text;
+    if (event.keyCode !== 44 && event.keyCode !== 13) {
+      text = this.element.value;
+      if (text !== '') {
+        return this._callSearch(text);
+      } else {
+        if (this._searchElement) {
+          this._parentElement.removeChild(this._searchElement.element);
+          return this._searchElement = null;
+        }
+      }
+    }
+  };
+
+  TagsInput.prototype._callSearch = function(text) {
+    this._searchAPI.cancel();
+    clearTimeout(this._searchTimeout);
+    return this._searchTimeout = setTimeout(this._searchAPI.load, 500, {
+      search: text
+    });
+  };
+
+  TagsInput.prototype._searchComplete = function(e, data) {
+    var i, total, _i, _results;
+    if (data) {
+      total = data.length;
+      if (total > 0) {
+        if (this._searchElement) {
+          this._searchElement.element.innerHTML = '';
+        }
+        if (!this._searchElement) {
+          this._searchElement = new BaseDOM({
+            className: "search-tag"
+          });
+          this._parentElement.appendChild(this._searchElement);
+        }
+        _results = [];
+        for (i = _i = 0; 0 <= total ? _i < total : _i > total; i = 0 <= total ? ++_i : --_i) {
+          _results.push(this._addItemList(data[i]['name']));
+        }
+        return _results;
+      } else {
+        this._parentElement.removeChild(this._searchElement.element);
+        return this._searchElement = null;
+      }
+    }
+  };
+
+  TagsInput.prototype._addItemList = function(text) {
+    var addItemList;
+    addItemList = new BaseDOM({
+      element: "p"
+    });
+    addItemList.element.innerHTML = text;
+    return this._searchElement.appendChild(addItemList);
+  };
+
   return TagsInput;
+
+})(BaseDOM);
+
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+components.TaggleWrapper = (function(_super) {
+  __extends(TaggleWrapper, _super);
+
+  TaggleWrapper.SELECTOR = '.tags';
+
+  TaggleWrapper.ORDER = 0;
+
+  function TaggleWrapper() {
+    this._searchComplete = __bind(this._searchComplete, this);
+    this._onSelect = __bind(this._onSelect, this);
+    TaggleWrapper.__super__.constructor.apply(this, arguments);
+    this._searchAPI = new API(API.ROOT_PATH + 'tags/tagsGenerate/');
+    this._searchAPI.reuse = true;
+    this._searchAPI.on(API.COMPLETE, this._searchComplete);
+    this._callSearch();
+  }
+
+  TaggleWrapper.prototype._onSelect = function(e, v) {
+    e.preventDefault();
+    if (e.which === 1) {
+      return taggle.add(v.item.value);
+    }
+  };
+
+  TaggleWrapper.prototype.destroy = function() {};
+
+  TaggleWrapper.prototype._callSearch = function() {
+    this._searchAPI.cancel();
+    clearTimeout(this._searchTimeout);
+    return this._searchTimeout = setTimeout(this._searchAPI.load, 500, {});
+  };
+
+  TaggleWrapper.prototype._searchComplete = function(e, data) {
+    var container, input, taggle, tags, tagsSel;
+    tagsSel = this.attr('tags');
+    if (!tagsSel) {
+      taggle = new Taggle($('.tags.textarea')[0], {
+        duplicateTagClass: 'bounce'
+      });
+    } else {
+      tags = tagsSel.split(",");
+      taggle = new Taggle($('.tags.textarea')[0], {
+        tags: tags,
+        duplicateTagClass: 'bounce'
+      });
+    }
+    container = taggle.getContainer();
+    input = taggle.getInput();
+    return $(input).autocomplete({
+      source: data,
+      appendTo: container,
+      position: {
+        at: 'left bottom',
+        of: container
+      },
+      select: this._onSelect
+    });
+  };
+
+  return TaggleWrapper;
 
 })(BaseDOM);
 
@@ -5191,6 +5376,10 @@ components.Pagination = (function(_super) {
 
   Pagination.prototype._create = function() {
     var _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
+    if (this._created) {
+      return;
+    }
+    this._created = true;
     this._prevBtn = this.find('.prev', true);
     this._nextBtn = this.find('.next', true);
     this._firstBtn = this.find('.first', true);
@@ -5222,6 +5411,7 @@ components.Pagination = (function(_super) {
   };
 
   Pagination.prototype.update = function(data) {
+    this._create();
     this._total = data.total;
     this._numItems = data.numItems;
     this._currentPage = data.index / this._numItems;
@@ -5364,6 +5554,27 @@ components.Pagination = (function(_super) {
   };
 
   return Pagination;
+
+})(BaseDOM);
+
+var __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+components.Masked = (function(_super) {
+  __extends(Masked, _super);
+
+  Masked.SELECTOR = '.mask';
+
+  Masked.ORDER = 0;
+
+  function Masked() {
+    Masked.__super__.constructor.apply(this, arguments);
+    $(".mask").mask("99/99/9999");
+  }
+
+  Masked.prototype.destroy = function() {};
+
+  return Masked;
 
 })(BaseDOM);
 
@@ -6511,6 +6722,87 @@ components.Field = (function(_super) {
   };
 
   return Field;
+
+})(BaseDOM);
+
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+components.CropperImg = (function(_super) {
+  __extends(CropperImg, _super);
+
+  CropperImg.SELECTOR = '.cropper';
+
+  CropperImg.ORDER = 0;
+
+  function CropperImg() {
+    this._show = __bind(this._show, this);
+    this._call = __bind(this._call, this);
+    this._create = __bind(this._create, this);
+    CropperImg.__super__.constructor.apply(this, arguments);
+    this._parentElement = this.element.parentNode;
+    this._image = this.attr("value");
+    this.element.on("change", this._create);
+    this._FileReader = new FileReader;
+  }
+
+  CropperImg.prototype._create = function() {
+    var that;
+    that = this;
+    if (this._addImgContainer) {
+      this._parentElement.removeChild(this._addImgContainer.element);
+    }
+    this._addImgContainer = new BaseDOM({
+      className: "img-container"
+    });
+    this._parentElement.appendChild(this._addImgContainer);
+    this._image = this.element.files[0];
+    this._addImg = new BaseDOM({
+      element: "img"
+    });
+    this._addImgContainer.appendChild(this._addImg);
+    this._FileReader.onload = function() {
+      var dataURL;
+      dataURL = this.result;
+      that._addImg.element.src = dataURL;
+      that._call();
+    };
+    return this._FileReader.readAsDataURL(this._image);
+  };
+
+  CropperImg.prototype._call = function() {
+    this._imageContent = document.querySelector('.img-container > img');
+    this._cropper = new Cropper(this._imageContent, {
+      dragMode: 'none',
+      aspectRatio: 1024 / 614,
+      viewMode: 3,
+      autoCropArea: 1,
+      restore: false,
+      guides: false,
+      center: true,
+      scalable: false,
+      highlight: false,
+      cropBoxMovable: true,
+      zoomable: false,
+      toggleDragModeOnDblclick: false,
+      cropBoxResizable: false
+    });
+    this._imageContent.addEventListener("cropend", this._show);
+    return this._imageContent.addEventListener("built", this._show);
+  };
+
+  CropperImg.prototype._show = function() {
+    this._imageCreate = document.getElementsByClassName("imageCreate");
+    return this._imageCreate[0].value = this._cropper.getCroppedCanvas({
+      "width": 1024,
+      "height": 614
+    }).toDataURL();
+  };
+
+  CropperImg.prototype.destroy = function() {};
+
+  return CropperImg;
 
 })(BaseDOM);
 

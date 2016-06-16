@@ -44,7 +44,9 @@ class API extends EventDispatcher
 	constructor: (@url, @params = null, @method = 'POST', @type = 'json', @headers = null) ->
 		@reuse = false
 
-	load: ->
+	load:(params = null)=>
+		if params
+			@params = params
 		urlParams = window.location.search
 		paramObj = {}
 		if urlParams

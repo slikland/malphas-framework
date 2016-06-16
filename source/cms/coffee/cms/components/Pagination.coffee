@@ -10,6 +10,9 @@ class components.Pagination extends BaseDOM
 
 		setTimeout(@_create, 0)
 	_create:()=>
+		if @_created
+			return
+		@_created = true
 		@_prevBtn = @find('.prev', true)
 		@_nextBtn = @find('.next', true)
 		@_firstBtn = @find('.first', true)
@@ -28,6 +31,7 @@ class components.Pagination extends BaseDOM
 		@off()
 		
 	update:(data)->
+		@_create()
 		@_total = data.total
 		@_numItems = data.numItems
 		@_currentPage = data.index / @_numItems
