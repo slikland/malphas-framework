@@ -6775,7 +6775,7 @@ components.CropperImg = (function(_super) {
     this._imageContent = document.querySelector('.img-container > img');
     this._cropper = new Cropper(this._imageContent, {
       dragMode: 'none',
-      aspectRatio: 1024 / 614,
+      aspectRatio: 900 / 540,
       viewMode: 3,
       autoCropArea: 1,
       restore: false,
@@ -6795,8 +6795,8 @@ components.CropperImg = (function(_super) {
   CropperImg.prototype._show = function() {
     this._imageCreate = document.getElementsByClassName("imageCreate");
     return this._imageCreate[0].value = this._cropper.getCroppedCanvas({
-      "width": 1024,
-      "height": 614
+      "width": 900,
+      "height": 540
     }).toDataURL();
   };
 

@@ -36,7 +36,7 @@ class components.CropperImg extends BaseDOM
 		@_imageContent = document.querySelector('.img-container > img')
 		@_cropper = new Cropper(@_imageContent, {
 			dragMode: 'none',
-			aspectRatio: 1024 / 614,
+			aspectRatio: 900 / 540,
 			viewMode: 3,
 			autoCropArea: 1,
 			restore: false,
@@ -55,6 +55,6 @@ class components.CropperImg extends BaseDOM
 
 	_show:()=>
 		@_imageCreate = document.getElementsByClassName("imageCreate")
-		@_imageCreate[0].value = @_cropper.getCroppedCanvas({"width":1024,"height":614}).toDataURL()
+		@_imageCreate[0].value = @_cropper.getCroppedCanvas({"width":900,"height":540}).toDataURL()
 
 	destroy:()->
