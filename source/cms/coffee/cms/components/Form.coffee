@@ -13,17 +13,20 @@ class components.Form extends BaseDOM
 	removeComponent:()->
 
 	_submit:(e)=>
-		if @attr('target')?.toLowerCase() == '_blank'
-			return
-		e.stopPropagation()
-		e.preventDefault()
+		classe = @attr('class')
+		# console.log classe
+		if classe != 'formMobile' && classe != 'wpUpvideo' && classe != 'wpUplink' && classe != 'formResize'
+			if @attr('target')?.toLowerCase() == '_blank'
+				return
+			e.stopPropagation()
+			e.preventDefault()
 
 
-		@_checkConditions()
+			@_checkConditions()
 
-		formData = new FormData(@element)
+			formData = new FormData(@element)
 
-		app.serviceController.call({url: @attr('action'), data: formData, onComplete: @_submitComplete, onError: @_submitError})
+			app.serviceController.call({url: @attr('action'), data: formData, onComplete: @_submitComplete, onError: @_submitError})
 	_checkConditions:()=>
 		@_removedEditable = []
 		submitIfs = @findAll('[submitif]')
