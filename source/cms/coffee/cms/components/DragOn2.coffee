@@ -12,7 +12,6 @@ class components.DragOn2 extends BaseDOM
 		@_textBox.on("keyup", @_update)
 		@_changeAlign.on("change", @_updateAlign)
 
-		
 		# window.setTimeout("@_update()", 5000);
 		
 	destroy:()->
@@ -20,7 +19,7 @@ class components.DragOn2 extends BaseDOM
 	_update:()=>
 
 		text = $(@_textBox).val()
-		formatText = "<p>"+text.replace(/,/g,"").replace('/ e /g',"").replace(/\n/g,"<br />")+"</p>"
+		formatText = "<p>"+text.replace(/\r?\n/g,"<br />")+"</p>"
 		$(@addContent).html(formatText)
 		align = $(@_changeAlign).val()
 
