@@ -327,7 +327,11 @@ class Block
 
 	function _replaceObject($match)
 	{
-		$name = $match[1];
+		$name = NULL;
+		if(isset($match[1]))
+		{
+			$name = $match[1];
+		}
 		$data = NULL;
 		if($name)
 		{
