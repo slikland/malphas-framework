@@ -16,6 +16,10 @@ try{
 }catch(Exception $e)
 {
 	// @header('Content-type: text/html');
+	if(DEBUG)
+	{
+		var_dump($e);
+	}
 	print $e;
 }
 

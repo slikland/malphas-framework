@@ -268,6 +268,10 @@ class Block
 			}
 		}catch(\Exception $e)
 		{
+			if(DEBUG)
+			{
+				var_dump($e);
+			}
 		}
 
 		if(!is_string($object))
@@ -285,6 +289,10 @@ class Block
 			}
 		}catch(\Exception $e)
 		{
+			if(DEBUG)
+			{
+				var_dump($e);
+			}
 			if($object)
 			{
 				$object = array('html' => $object);
@@ -525,6 +533,10 @@ class Block
 			$template->get($f, array($this, '_renderLoadedBlock'));
 		}catch(\Exception $e)
 		{
+			if(DEBUG)
+			{
+				var_dump($e);
+			}
 		}
 		return array($data, $div);
 	}

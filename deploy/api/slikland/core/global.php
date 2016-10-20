@@ -40,7 +40,8 @@ function print_headers()
 
 function output($data = NULL, $format = 'json')
 {
-	$output = (string)$data;
+	$output = '';
+	$output = @(string)$data;
 	try{
 		switch(strtolower($format))
 		{
@@ -58,7 +59,10 @@ function output($data = NULL, $format = 'json')
 		}
 	}catch(Exception $e)
 	{
-
+		if(DEBUG)
+		{
+			var_dump($e);
+		}
 	}
 	print_headers();
 	print $output;
@@ -96,9 +100,9 @@ function error($error, $code, $data = NULL)
 	throw $error;
 }
 
-function password($password)
+function password($password, $key = NULL)
 {
-	return \slikland\utils\crypt\Password::encode($password);
+	return \slikland\utils\crypt\Password::encode($password, $key);
 }
 
 function uid_encode($id)
@@ -111,25 +115,32 @@ function uid_decode($uid)
 	return \slikland\utils\crypt\UID::decode($uid);
 }
 
-function getModule($module)
+function get_module($moduleName)
 {
-	$modulePath = '/modules/';
-	$module = preg_replace('/\//', '\\', $modulePath . $module);
-	if(class_exists($module))
+	$modulePath = '/module/';
+	$module = preg_replace('/\//', '\\', $modulePath . $moduleName);
+	if(!class_exists($module))
 	{
-		try{
-			if(method_exists($module, 'getInstance'))
-			{
-				return $module::getInstance();
-			}
-		}catch(Exception $e)
-		{
-
-		}
-		return new $module();
+		$module = preg_replace('/\//', '\\', '/slikland' . $modulePath . $moduleName);
+	}
+	if(!class_exists($module))
+	{
+		return;
 	}
 
-	return NULL;
+	try{
+		if(method_exists($module, 'getInstance'))
+		{
+			return $module::getInstance();
+		}
+	}catch(Exception $e)
+	{
+		if(DEBUG)
+		{
+			var_dump($e);
+		}
+	}
+	return new $module();
 }
 
 function checkHost($hostRE)

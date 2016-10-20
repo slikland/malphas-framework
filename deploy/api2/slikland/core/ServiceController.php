@@ -120,9 +120,17 @@ class ServiceController
 			}
 		}catch(\slikland\error\Error $e)
 		{
+			if(DEBUG)
+			{
+				var_dump($e);
+			}
 			$response = $e->toObject();
 		}catch(\Exception $e)
 		{
+			if(DEBUG)
+			{
+				var_dump($e);
+			}
 			$e = new \slikland\error\Error($e->getMessage());
 			$response = $e->toObject();
 		}

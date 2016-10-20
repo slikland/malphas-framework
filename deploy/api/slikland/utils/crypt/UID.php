@@ -7,6 +7,10 @@ class UID
 	
 	public static function encode($k)
 	{
+		if(is_nan($k))
+		{
+			return NULL;
+		}
 		$key = '';
 		$keyIndexes = array();
 		$charLength = strlen(self::$chars) - 1;
@@ -51,6 +55,12 @@ class UID
 			$v -= $keyIndexes[$p];
 			$v = ((($v % $charLength) + $charLength) % $charLength);
 			$value .= $v;
+		}
+		if(is_nan($value))
+		{
+			$value = NAN;
+		}else{
+			$value = (int) $value;
 		}
 		
 		return $value;

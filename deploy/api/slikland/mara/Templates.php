@@ -185,6 +185,10 @@ class Templates
 			$this->_addInstance($block);
 		}catch(\Exception $e)
 		{
+			if(DEBUG)
+			{
+				var_dump($e);
+			}
 		}
 	}
 
@@ -226,6 +230,10 @@ class Templates
 				$block = new \slikland\mara\Block($o[2], $file);
 			}catch(\Exception $e)
 			{
+				if(DEBUG)
+				{
+					var_dump($e);
+				}
 				continue;
 			}
 

@@ -30,20 +30,23 @@ class ServiceController
 				{
 
 				}
+				$requestMethod = NULL;
 
 				if(isset($annotations['method']))
 				{
-					switch (strtoupper($annotations['method'][0])) {
-						case 'GET':
-							$data = $_GET;
-							break;
-						case 'POST':
-							$data = $_POST;
-							break;
-						default:
-							$data = $_REQUEST;
-							break;
-					}
+					$requestMethod = $annotations['method'][0];
+				}
+				switch (strtoupper($requestMethod))
+				{
+					case 'GET':
+						$data = $_GET;
+						break;
+					case 'POST':
+						$data = $_POST;
+						break;
+					default:
+						$data = $_REQUEST;
+						break;
 				}
 
 				if(!$data) $data = array();
@@ -74,9 +77,17 @@ class ServiceController
 
 		}catch(\slikland\error\Error $e)
 		{
+			if(DEBUG)
+			{
+				var_dump($e);
+			}
 			$response = $e->toObject();
 		}catch(Exception $e)
 		{
+			if(DEBUG)
+			{
+				var_dump($e);
+			}
 			$response = $e;
 		}
 		output($response, $format);
@@ -94,12 +105,11 @@ class ServiceController
 		$methodArr = array();
 
 		$path = 'service/';
-		if(preg_match('/^(core|setup)\/?/', $service))
+		if(preg_match('/^(core|setup|cms\/user)(\/|$)/', $service))
 		{
 			$path = 'slikland/service/';
 			$service = preg_replace('/^core/', '', $service);
 		}
-
 		while(count($serviceArr) > 0)
 		{
 			$fileName = implode('/', $serviceArr);
@@ -122,10 +132,10 @@ class ServiceController
 					if(count($methodArr) > 0){
 						return NULL;
 					}else{
+						array_unshift($methodArr, array_pop($serviceArr));
 						continue;
 					}
 				}
-
 				if(method_exists($service, $method))
 				{
 					$response['method'] = $method;

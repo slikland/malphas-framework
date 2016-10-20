@@ -62,6 +62,10 @@ class FileUpload
 			return $imageName;
 		}catch(Exception $e)
 		{
+			if(DEBUG)
+			{
+				var_dump($e);
+			}
 			return NULL;
 		}
 	}
