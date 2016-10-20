@@ -1,4 +1,6 @@
-class components.standalone.InputPreview extends StandaloneBase
+#namespace components.standalone
+
+class InputPreview extends StandaloneBase
 	@SELECTOR: 'input[preview]'
 	constructor:(params)->
 		super

@@ -1,4 +1,6 @@
-class components.Input extends BaseDOM
+#namespace components
+
+class Input extends BaseDOM
 	@SELECTOR: 'input,select,textarea'
 	constructor:()->
 		super

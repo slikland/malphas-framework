@@ -1,4 +1,6 @@
-class components.Table extends BaseDOM
+#namespace components
+
+class Table extends BaseDOM
 	@SELECTOR: 'table'
 	constructor:()->
 		super
@@ -6,7 +8,8 @@ class components.Table extends BaseDOM
 		@_parseHeader()
 		@_update = @attr('update')
 		@_templateNode = @element.templateNode
-		@_updateTargets(@_templateNode.data)
+		if @_templateNode?
+			@_updateTargets(@_templateNode.data)
 	destroy:()->
 		@removeAll()
 		@off()

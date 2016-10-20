@@ -1,4 +1,6 @@
-class components.Masked extends BaseDOM
+#namespace components
+
+class Masked extends BaseDOM
 	@SELECTOR: '.mask'
 	@ORDER: 0
 	constructor:()->

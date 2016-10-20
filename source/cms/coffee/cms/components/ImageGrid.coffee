@@ -1,4 +1,6 @@
-class components.ImageGrid extends BaseDOM
+#namespace components
+
+class ImageGrid extends BaseDOM
 	@SELECTOR: '.image-grid'
 	constructor:()->
 		super

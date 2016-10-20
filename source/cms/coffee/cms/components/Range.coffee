@@ -1,4 +1,6 @@
-class components.Range extends BaseDOM
+#namespace components
+
+class Range extends BaseDOM
 	@SELECTOR: '.rangeInput'
 	@ORDER: 0
 	constructor:()->

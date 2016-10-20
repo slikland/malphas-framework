@@ -1,4 +1,6 @@
-class components.ActionButton extends BaseDOM
+#namespace components
+
+class ActionButton extends BaseDOM
 	@SELECTOR: 'button[action]'
 	@ORDER: 0
 	constructor:()->

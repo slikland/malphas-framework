@@ -1,4 +1,6 @@
-class components.Lightbox extends BaseDOM
+#namespace components
+
+class Lightbox extends BaseDOM
 	@SELECTOR: '.lightbox'
 	constructor:()->
 		super

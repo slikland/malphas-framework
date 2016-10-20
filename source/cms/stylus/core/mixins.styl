@@ -7,7 +7,27 @@ inline-block()
 	float: left
 .right
 	float: right
-	
+.center-content
+	text-align: center
+	&:before
+		content: ''
+		vertical-align: middle
+		display: inline-block
+		height: 100%
+	>*
+		display: inline-block
+		text-align: initial
+		float: none !important
+		vertical-align: middle !important
+		
+.no-select
+	-webkit-touch-callout: none
+	-webkit-user-select: none
+	-khtml-user-select: none
+	-moz-user-select: none
+	-ms-user-select: none
+	user-select: none
+
 .hidden
 	visibility: hidden
 	display: none

@@ -1,4 +1,6 @@
-class components.Field extends BaseDOM
+#namespace components
+
+class Field extends BaseDOM
 	@SELECTOR: 'field'
 	constructor:()->
 		super

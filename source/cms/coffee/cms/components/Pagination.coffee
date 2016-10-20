@@ -1,6 +1,9 @@
-class components.Pagination extends BaseDOM
+#namespace components
+
+class Pagination extends BaseDOM
 	@SELECTOR: '.pagination'
 	@NUM_VISIBLE_PAGES: 15
+	@ORDER: -10
 	constructor:()->
 		super
 		@_templateNode = @element.templateNode
@@ -65,6 +68,7 @@ class components.Pagination extends BaseDOM
 
 		halfPages = (Pagination.NUM_VISIBLE_PAGES >> 1)
 		init = @_currentPage - halfPages
+
 		if init + Pagination.NUM_VISIBLE_PAGES >= @_totalPages
 			init = @_totalPages - Pagination.NUM_VISIBLE_PAGES
 		if init < 0

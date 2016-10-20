@@ -21,28 +21,31 @@ Node::removeChild = (node) ->
 		el = node.element
 		node.parent = @
 	Node::__removeChild__.call(@, el)
-	
-Node::getInstance = () ->
-	return @__instance__
-Node::matches = Node::matches || Node::webkitMatchesSelector || Node::mozMatchesSelector || Node::msMatchesSelector || Node::oMatchesSelector
+Element::matches = Element::matches || Element::webkitMatchesSelector || Element::mozMatchesSelector || Element::msMatchesSelector || Element::oMatchesSelector
 Node::findParents = (query) ->
 	if @parentNode?
-		if @parentNode.matches?(query)
+		if @parentNode.matches(query)
 			return @parentNode
 		else
 			return @parentNode.findParents(query)
 	return null
-	
+
 # 
 # TODO: FIX IE8+
 # Node.get({instance: ()-> return @__instance__})
 
 # BaseDOM: SlikLand DOM
+###*
+Base DOM manipulation class
+@class BaseDOM
+###
+
 class BaseDOM extends EventDispatcher
 	# 
 	# Deprecated params: constructor:(element = 'div', className = null, namespace = null)->
 	# 
 	constructor:(p_options...)->
+		super
 		# 
 		# Default params:
 		# 
@@ -50,13 +53,16 @@ class BaseDOM extends EventDispatcher
 		className = null
 		namespace = null
 
-		i = p_options.length
-		while i--
-			option = p_options[i]
-			if option.element? then element = option.element
-			if option.className? then className = option.className
-			if option.namespace? then namespace = option.namespace
+		if typeof(p_options[0]) == 'string' || p_options[0] instanceof HTMLElement
+			element = p_options[0]
+		else
 
+			i = p_options.length
+			while i--
+				option = p_options[i]
+				if option.element? then element = option.element
+				if option.className? then className = option.className
+				if option.namespace? then namespace = option.namespace
 		if typeof(element) == 'string'
 			if namespace
 				@_namespace = namespace
@@ -68,7 +74,7 @@ class BaseDOM extends EventDispatcher
 		if className
 			@addClass(className)
 		@_element.__instance__ = @
-		
+
 
 	##------------------------------------------------------------------------------
 	##
@@ -101,17 +107,17 @@ class BaseDOM extends EventDispatcher
 
 	@get width:()->
 		return @getBounds().width
-	@get height:(value)->
+	@get height:()->
 		return @getBounds().height
 	
 	@get left:()->
 		return @getBounds().left
-	@get top:(value)->
+	@get top:()->
 		return @getBounds().top
 
 	@get x:()->
 		return @getBounds().left
-	@get y:(value)->
+	@get y:()->
 		return @getBounds().top
 
 
@@ -154,13 +160,13 @@ class BaseDOM extends EventDispatcher
 	##--------------------------------------
 
 	@get isAttached:()->
-		return document.contains(@element) || document.body.contains(@element)
+		return document.contains?(@element) || document.body.contains(@element)
+
+	@get attributes:()->
+		return @element.attributes
 
 	appendChild:(child)->
-		el = child
-		if child instanceof BaseDOM
-			el = child.element
-		@appendChildAt(el)
+		@appendChildAt(child)
 
 	appendChildAt:(child, index = -1)->
 		el = child
@@ -173,6 +179,9 @@ class BaseDOM extends EventDispatcher
 		if child instanceof BaseDOM
 			child.parent = @
 		return child
+
+	remove:()->
+		@parent?.removeChild?(@)
 
 	removeChild:(child)->
 		el = child
@@ -200,7 +209,6 @@ class BaseDOM extends EventDispatcher
 	##	Find parent nodes for a matching query selector
 	findParents:(query)->
 		return @element.findParents(query)
-	
 	##--------------------------------------
 	##	Query selector
 	##	@onlyInstances: If return only BaseDOM instances
@@ -208,7 +216,7 @@ class BaseDOM extends EventDispatcher
 	find:(query, onlyInstances = false)->
 		element = @element.querySelector(query)
 		if onlyInstances
-			return element?.getInstance()
+			return element?.__instance__
 		else
 			return element
 
@@ -224,8 +232,8 @@ class BaseDOM extends EventDispatcher
 			l = elements.length
 			p = 0
 			while ++i < l
-				if elements[i].getInstance()
-					els[p++] = elements[i].getInstance()
+				if elements[i].__instance__
+					els[p++] = elements[i].__instance__
 			elements = els
 		return elements
 
@@ -367,4 +375,4 @@ class BaseDOM extends EventDispatcher
 
 	destroy:()->
 		@off?()
-		@_element?.remove?()
+		@remove?()

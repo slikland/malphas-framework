@@ -1,5 +1,6 @@
 <?php
-include_once('config.php');
+include_once('core/paths.php');
+include_once('core/global.php');
 function sl_autoloader($class, $prevClassName = NULL)
 {
 	if(class_exists($class))
@@ -25,9 +26,6 @@ function sl_autoloader($class, $prevClassName = NULL)
 		$localPath = str_replace($relativePath, '', $classPath);
 		$paths[] = $relativePath . $localPath;
 		$paths[] = $localPath;
-		$paths[] = 'controller/' . $localPath;
-		$paths[] = 'model/' . $localPath;
-		$paths[] = 'slikland/error/' . $localPath;
 	}
 
 	$found = false;
@@ -51,11 +49,10 @@ function sl_autoloader($class, $prevClassName = NULL)
 	$className = $classParts[count($classParts) - 1];
 	if(!$found && class_exists($className))
 	{
-		// define($className, $class);
 		class_alias($className, $class);
 		$found = true;
 	}
 	return $found;
 }
 spl_autoload_register('sl_autoloader');
-?>
+

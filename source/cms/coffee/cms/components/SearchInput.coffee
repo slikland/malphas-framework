@@ -1,4 +1,6 @@
-class components.SearchInput extends BaseDOM
+#namespace components
+
+class SearchInput extends BaseDOM
 	@SELECTOR: 'input.search'
 	@ORDER: 0
 	constructor:()->

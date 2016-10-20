@@ -1,4 +1,5 @@
-class components.ViewStack extends BaseDOM
+#namespace components
+class ViewStack extends BaseDOM
 	@SELECTOR: 'viewstack'
 	constructor:()->
 		super

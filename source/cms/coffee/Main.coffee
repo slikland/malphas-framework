@@ -22,37 +22,51 @@
 #import cms.components.standalone.StandaloneBase
 #import cms.components.*
 
+#import slikland.mara.Mara
+
 class Main
-
+	@RENDER_TEMPLATE: 'app_renderTemplate'
 	constructor:()->
-
 		app.body = new BaseDOM({element: document.body})
+		setTimeout(@_init, 0)
 
-		app.basePath = document.querySelector('base')?.getAttribute('href') || ''
-		Template.setRootPath(app.basePath + '../api/view/cms/')
-		Template.setExtension('')
+		app.template = new slikland.Mara('templates/')
+		app.templateContext = document.body
 
-		app.blocker = new Blocker()
+		app.on(Main.RENDER_TEMPLATE, @_renderTemplate)
 
-		API.ROOT_PATH = app.basePath + '../api/cms/'
+		# app.basePath = document.querySelector('base')?.getAttribute('href') || ''
+		# Template.setRootPath(app.basePath + '../api/view/cms/')
+		# Template.setExtension('')
 
-		app.serviceController = ServiceController.getInstance()
-		app.user = new User()
+		# app.blocker = new Blocker()
 
-		app.router = new NavigationRouter()
-		app.router.init(app.basePath)
-		app.router.on(NavigationRouter.CHANGE, @_routeChange)
+		# API.ROOT_PATH = app.basePath + '../api/cms/'
 
-		app.componentController = ComponentController.getInstance()
+		# app.serviceController = ServiceController.getInstance()
+		# app.user = new User()
 
-		app.viewController = ViewController.getInstance()
-		app.viewController.getInterface()
+		# app.router = new NavigationRouter(app.basePath)
+		# app.router.on(NavigationRouter.CHANGE, @_routeChange)
+		# app.router.setup(app.basePath)
 
-		app.notification = new Notification()
-		app.componentController.parse()
+
+		# app.componentController = ComponentController.getInstance()
+		
+		# app.viewController = ViewController.getInstance()
+		# app.viewController.getInterface()
+
+		# app.notification = new Notification()
+		# app.componentController.parse()
 
 		# API.call({url: 'user/getSession', onComplete: @_indexComplete, onError: @_error})
+
+	_init:()=>
+		app.body.css('visibility', '')
+
 	_routeChange:(e, data)=>
+		console.log("CHANGE")
+		console.log(data)
 		app.serviceController.call({url: data['path']})
 	_indexComplete:()=>
 		# console.log(arguments)
@@ -63,7 +77,13 @@ class Main
 
 		# console.log(jsyaml.load(@_template))
 
+	_renderTemplate:(e, data)=>
+		if data.target && data.currentTarget
+			target = data.currentTarget.findParents(data.target)
+			if !target
+				target = document.body.querySelector(data.target)
+		app.template.render(data.template, data.data || {}, target || app.templateContext)
 
-app.on(App.WINDOW_LOAD, ()->
+app.on('windowLoad', ()->
 	new Main()
 )

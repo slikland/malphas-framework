@@ -1,4 +1,6 @@
-class components.standalone.Removable extends StandaloneBase
+#namespace components.standalone
+
+class Removable extends StandaloneBase
 	@SELECTOR: '[removable]'
 	constructor:(params)->
 		@_added = false

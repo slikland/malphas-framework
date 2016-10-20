@@ -1,4 +1,6 @@
-class components.standalone.Clonable extends StandaloneBase
+#namespace components.standalone
+
+class Clonable extends StandaloneBase
 	@SELECTOR: '[clonable]'
 	constructor:(params)->
 		@_added = false

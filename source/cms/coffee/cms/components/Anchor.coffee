@@ -1,4 +1,6 @@
-class components.Anchor extends BaseDOM
+#namespace components
+
+class Anchor extends BaseDOM
 	@SELECTOR: 'a[href],button[href]'
 	@ORDER: 0
 	constructor:()->
@@ -26,6 +28,9 @@ class components.Anchor extends BaseDOM
 		if !href || /^http/i.test(href) || @attr('target')?.length > 0
 			if @element.tagName.toLowerCase() == 'button'
 				window.open(href, @attr('target'))
+			return
+		if href && e.metaKey && @element.tagName.toLowerCase() == 'button'
+			window.open(href, @attr('target'))
 			return
 		e.stopPropagation()
 		e.preventDefault()

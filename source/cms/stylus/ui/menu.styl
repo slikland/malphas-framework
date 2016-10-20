@@ -1,36 +1,58 @@
 nav
+	@extend .card
 	position: fixed
 	top: headerHeight
 	bottom: 0px
+	padding: 0
+	margin: 0
 	width: menuWidth
-	background-color: rgba(4, 0, 8, 0.7)
+	background-color: #FFFFFF
+	color: lighten(#000000, 50)
 	overflow: auto
-	slide-right(0.3s, 0.1s)
+	font-size: 14px
+	font-weight: 400
 	
-	a
-		display: inline-block
-		box-sizing: border-box
-		width: 100%
-		padding-top: 0.75em
-		padding-bottom: 0.75em
-		padding-left: 0.75em
-		vertical-align: middle
-		color: #FFFFFF
-		border-top: 1px solid #999999
-		border-bottom: 1px solid #333333
-		font-weight: bold
-		
-		&:hover,&.selected
-			background-color: rgba(255, 255, 255, 0.2)
-	
+	>h1
+		padding: 0.6em
+		font-size: 18px
+		vertical-align: bottom
+		img
+			float: left
+
 	ul
-		width: 100%
+		font-weight: normal
+		padding: 0.4em
+		padding-left: 0.2em
 		li
-			width: 100%
-			&:last-child
-				border-bottom: 1px solid #333333
-			a
-				padding-left: 1.5em
-				background-color: rgba(0, 0, 0, 0.1)
-				border-bottom: 0px
-				border-top: 1px solid #333333
+			padding: 0.4em
+	&>ul
+		font-weight: 600
+				
+	
+	// a
+	// 	display: inline-block
+	// 	box-sizing: border-box
+	// 	width: 100%
+	// 	padding-top: 0.75em
+	// 	padding-bottom: 0.75em
+	// 	padding-left: 0.75em
+	// 	vertical-align: middle
+	// 	color: #FFFFFF
+	// 	border-top: 1px solid #999999
+	// 	border-bottom: 1px solid #333333
+	// 	font-weight: bold
+		
+	// 	&:hover,&.selected
+	// 		background-color: rgba(255, 255, 255, 0.2)
+	
+	// ul
+	// 	width: 100%
+	// 	li
+	// 		width: 100%
+	// 		&:last-child
+	// 			border-bottom: 1px solid #333333
+	// 		a
+	// 			padding-left: 1.5em
+	// 			background-color: rgba(0, 0, 0, 0.1)
+	// 			border-bottom: 0px
+	// 			border-top: 1px solid #333333

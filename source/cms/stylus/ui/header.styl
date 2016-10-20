@@ -1,34 +1,21 @@
-header
-	slide-down()
-	position: fixed
-	top: 0px
-	width: 100%
+body > header
+	box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12)
 	height: headerHeight
-	background-color: rgba(0, 0, 0, 0.7)
-	line-height: headerHeight
-	color: #FFFFFF
-	font-weight: bold
-	div
-		inline-block()
-	>div
-		inline-block()
-		height: 100%
+	background-color: #607d8b
+	z-index: 1
+	display: table
+	width: 100%
+	h1
+		@extend h3
+		font-weight: 400
+		color: #FFFFFF
 		line-height: headerHeight
-		box-sizing: border-box
-		padding-left: 8px
-		padding-right: 8px
-	
-	.left
-		.logo
-			max-height: headerHeight - 16px
-			vertical-align: middle
-			margin-right: 8px
-		span.cms
-			vertical-align: middle
-			
+		padding: 0 0.4em
+		display: table-cell
 		
-	.right
-		span.separator
-			padding: 0 0.3em
-		span.sign-out
-			color: #FF3333
+	aside
+		text-align: right
+		display: table-cell
+		vertical-align: middle
+		&>*
+			vertical-align: middle

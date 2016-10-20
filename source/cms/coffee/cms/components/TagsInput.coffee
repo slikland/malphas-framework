@@ -1,4 +1,6 @@
-class components.TagsInput extends BaseDOM
+#namespace components
+
+class TagsInput extends BaseDOM
 	@SELECTOR: '.tagsInput'
 	@ORDER: 0
 	constructor:()->

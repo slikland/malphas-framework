@@ -1,4 +1,6 @@
-class components.Map extends BaseDOM
+#namespace components
+
+class Map extends BaseDOM
 	@SELECTOR: '.map'
 	@ORDER: 0
 	@MAP_API: "https://maps.googleapis.com/maps/api/js?key={API_KEY}&libraries=places&callback=initMapComponent"

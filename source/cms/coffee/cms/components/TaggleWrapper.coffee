@@ -1,4 +1,6 @@
-class components.TaggleWrapper extends BaseDOM
+#namespace components
+
+class TaggleWrapper extends BaseDOM
 	@SELECTOR: '.tags'
 	@ORDER: 0
 	constructor:()->

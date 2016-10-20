@@ -1,4 +1,6 @@
-class components.Form extends BaseDOM
+#namespace components
+
+class Form extends BaseDOM
 	@SELECTOR: 'form'
 	constructor:()->
 		super
@@ -13,20 +15,21 @@ class components.Form extends BaseDOM
 	removeComponent:()->
 
 	_submit:(e)=>
-		classe = @attr('class')
-		# console.log classe
-		if classe != 'formMobile' && classe != 'wpUpvideo' && classe != 'wpUplink' && classe != 'formResize'
-			if @attr('target')?.toLowerCase() == '_blank'
-				return
-			e.stopPropagation()
-			e.preventDefault()
+		if @attr('target')?.toLowerCase() == '_blank'
+			return
+		e.stopPropagation()
+		e.preventDefault()
 
 
-			@_checkConditions()
+		items = @findAll("input,textarea", true)
+		for item in items
+			item.update?()
 
-			formData = new FormData(@element)
+		@_checkConditions()
 
-			app.serviceController.call({url: @attr('action'), data: formData, onComplete: @_submitComplete, onError: @_submitError})
+		formData = new FormData(@element)
+
+		app.serviceController.call({url: @attr('action'), data: formData, onComplete: @_submitComplete, onError: @_submitError})
 	_checkConditions:()=>
 		@_removedEditable = []
 		submitIfs = @findAll('[submitif]')

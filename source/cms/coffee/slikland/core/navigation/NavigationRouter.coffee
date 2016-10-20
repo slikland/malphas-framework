@@ -1,24 +1,38 @@
+###*
+@class NavigationRouter
+@extends EventDispatcher
+@final
+###
 class NavigationRouter extends EventDispatcher
 
+	###*
+	@event CHANGE
+	@static
+	###
 	@CHANGE: 'route_path_change'
-	@ROUTE: 'route_match'
+	###*
+	@event CHANGE_ROUTE
+	@static
+	###
+	@CHANGE_ROUTE: 'route_match'
 
-	###################
-	## Class methods ##
-	###################
-
+	###*
+	@class NavigationRouter
+	@constructor
+	###
 	constructor:()->
 		@_routes = []
 		@_numRoutes = 0
 		@_trigger = true
+		super
 
-	# Initializer
-	#
-	# rootPath - {String} to root path
-	# forceHashBang - {Boolean} to force hash bang
-	#
-	# Use root path if not set in base tag
-	init:(p_rootPath = null, p_forceHashBang = false)->
+	###*
+	@method setup
+	@param {String} [p_rootPath = null] Use root path if not set in base tag
+	@param {Boolean} [p_forceHashBang = false] Force hash bang for old browsers
+	@return {NavigationRouter}
+	###
+	setup:(p_rootPath = null, p_forceHashBang = false)->
 		if !p_rootPath
 			p_rootPath = window.location.href
 			try
@@ -26,14 +40,17 @@ class NavigationRouter extends EventDispatcher
 				if base.length > 0
 					base = base[0]
 					p_rootPath = base.getAttribute('href')
+			catch err
+				console.log err.stack
+
 		@_rootPath = p_rootPath.replace(/^(.*?)\/*$/, '$1/')
-		@defaultTitle = document.title
+		@_rawPath = ''
 
 		if p_forceHashBang
 			@_usePushState = false
 		else
 			@_usePushState = window?.history?.pushState?
-		@_rawPath = ''
+
 		if @_usePushState
 			if @_rootPath != window.location.href
 				path = @_getPath()
@@ -52,28 +69,40 @@ class NavigationRouter extends EventDispatcher
 			else
 				# fix to browsers that not support addEventListener
 				window.attachEvent("onhashchange", @_onPathChange)
+		@_onPathChange()
 		return @
 
-	#####################
-	## Path controller ##
-	#####################
+	###*
+	@method _getPath
+	@return {String}
+	@private
+	###
 	_getPath:()->
-		rawPath = window.location.href
-		hasSlash = rawPath.substr(rawPath.length-1, rawPath.length) == '/'
-		if hasSlash
-			rawPath = rawPath.substr(0, rawPath.length-1)
+		rawPath = window.location.href.replace(/\/*$/g,'')
 
-		if rawPath.indexOf(@_rootPath) == 0
+		if rawPath.indexOf(@_rootPath.replace(/\/*$/g,'')) == 0
 			rawPath = rawPath.substr(@_rootPath.length)
 		rawPath = rawPath.replace(/^(?:#?!?\/*)([^?]*\??.*?)$/, '$1')
 		return rawPath
 
+	###*
+	@method _parsePath
+	@param {String} p_rawPath
+	@return {Object}
+	@private
+	###
 	_parsePath:(p_rawPath)->
 		pathParts = /^(?:#?!?\/*)([^?]*)\??(.*?)$/.exec(p_rawPath)
 		path = pathParts[1]
 		params = @_parseParams(pathParts[2])
 		return {rawPath: p_rawPath, path: path, params: params}
 
+	###*
+	@method _parseParams
+	@param {String} p_path
+	@return {Object}
+	@private
+	###
 	_parseParams:(p_path)->
 		params = {}
 		if p_path
@@ -83,17 +112,30 @@ class NavigationRouter extends EventDispatcher
 				params[o[1]] = o[2]
 		return params
 
-	_onPathChange:()=>
+	###*
+	@method _onPathChange
+	@param {Event} [evt = null]
+	@private
+	###
+	_onPathChange:(evt=null)=>
 		@_currentPath = @_getPath()
+
 		if @_trigger
 			@_triggerPath(@_currentPath)
 		@_trigger = true
+		
 		if @_replaceData
-			@goto(@_replaceData[0], @_replaceData[1], false)
+			@goto(@_replaceData[0], false)
 			@_replaceData = null
 		else
 			@trigger(NavigationRouter.CHANGE, @_parsePath(@_currentPath))
+		false
 
+	###*
+	@method _triggerPath
+	@param {String} p_path
+	@private
+	###
 	_triggerPath:(p_path)->
 		pathData = @_parsePath(p_path)
 		[routes, routeData] = @_checkRoutes(pathData.path)
@@ -101,23 +143,30 @@ class NavigationRouter extends EventDispatcher
 			i = routes.length
 			while i-- > 0
 				route = routes[i]
-				route.callback?(route.route, routeData, p_path, pathData, route.data)
-				@trigger(NavigationRouter.ROUTE, {route: route.route, routeData: routeData, path: p_path, pathData: pathData, data: route.data})
+				@trigger(NavigationRouter.CHANGE_ROUTE, {route: route.route, routeData: routeData, path: p_path, pathData: pathData, data: route.data})
+		false
 
-	setTitle:(p_title)->
-		document.title = p_title
-
+	###*
+	@method getCurrentPath
+	@return {String}
+	###
 	getCurrentPath:()->
 		return @_currentPath
 
+	###*
+	@method getParsedPath
+	@return {Object}
+	###
 	getParsedPath:()->
 		return @_parsePath(@_currentPath)
 
-	goto:(p_path, p_title = null, p_trigger = true)->
-		# console.log 'p_path', p_path, typeof(p_path)
+	###*
+	@method goto
+	@param {String} p_path
+	@param {Boolean} [p_trigger = true]
+	###
+	goto:(p_path, p_trigger = true)->
 		p_path = p_path.replace(/^(?:#?!?\/*)([^?]*\??.*?)$/, '$1')
-		if p_title
-			@setTitle(p_title)
 		if p_path == @_currentPath
 			return
 		@_currentPath = p_path
@@ -129,11 +178,15 @@ class NavigationRouter extends EventDispatcher
 			@_trigger = true
 		else
 			window.location.hash = '!' + '/' + p_path
-	
-	replace:(p_path, p_title = null, p_trigger = false)->
+		false
+		
+	###*
+	@method replace
+	@param {String} p_path
+	@param {Boolean} [p_trigger = false]
+	###
+	replace:(p_path, p_trigger = false)->
 		p_path = p_path.replace(/^(?:#?!?\/*)([^?]*\??.*?)$/, '$1')
-		if p_title
-			@setTitle(p_title)
 		if p_path != @_currentPath
 			@_currentPath = p_path
 			if @_usePushState
@@ -141,32 +194,39 @@ class NavigationRouter extends EventDispatcher
 			else
 				@_trigger = false
 				history.back()
-				@_replaceData = [p_path, p_title]
+				@_replaceData = [p_path]
 		if p_trigger
 			@triggerPath(p_path)
+		false
 
+	###*
+	@method triggerPath
+	@param {String} p_path
+	###
 	triggerPath:(p_path)->
 		@_triggerPath(p_path)
+		false
 
+	###*
+	@method triggerCurrentPath
+	@param {String} p_path
+	###
 	triggerCurrentPath:()->
 		@_triggerPath(@_getPath())
+		false
 
-	############
-	## Routes ##
-	############
-
-	# Add a route
-	#
-	# route - {String} to route
-	# callback - {Function} to callback
-	# data - {Object} to data
-	addRoute:(p_route, p_callback, p_data = null)->
-		
+	###*
+	Add a route
+	@method addRoute
+	@param {String} p_route
+	@param {Object} [p_data = null]
+	###
+	addRoute:(p_route, p_data = null)->
+		# console.log "addRoute"
 		if typeof(p_route)!='string'
 			i = p_route.length
 			while i-- > 0
-				@addRoute(p_route[i], p_callback, p_data)
-		else
+				@addRoute(p_route[i], p_data)
 
 		r = /\{(.*?)\}/g
 		labels = []
@@ -174,45 +234,56 @@ class NavigationRouter extends EventDispatcher
 		while o = r.exec(p_route)
 			labels[p++] = o[1]
 		r = p_route
-		if r == '*'
-			r = '.*'
+		if r == '*' then r = '.*'
+
 		try
 			r = r.replace(/(.*?)\/*$/, '$1')
 			routeRE = new RegExp('(?:' + r.replace(/\{.*?\}/g, '(.+?)') + '$)', 'g')
-		catch e
+		catch err
+			console.log err.stack
 			return
-		@_routes[@_numRoutes++] = {data: p_data, route: p_route, routeRE: routeRE, labels: labels, numLabels: labels.length, numSlashes: p_route.split('/').length, callback: p_callback}
-		@_routes.sort(@_sortRoutes)
 
-	# Remove a route
-	#
-	# route - {String} to route
-	# callback - {Function} to callback
-	removeRoute:(p_route, p_callback)->
+		@_routes[@_numRoutes++] = {data: p_data, route: p_route, routeRE: routeRE, labels: labels, numLabels: labels.length, numSlashes: p_route.split('/').length}
+		@_routes.sort(@_sortRoutes)
+		false
+
+	###*
+	Remove a route
+	@method removeRoute
+	@param {String} p_route
+	###
+	removeRoute:(p_route)->
 		i = @_numRoutes
 		while i-- > 0
 			route = @_routes[i]
 			if route.route == p_route
-				if p_callback
-					if p_callback == route.callback
-						@_routes.splice(i, 1)
-				else
-					@_routes.splice(i, 1)
+				@_routes.splice(i, 1)
 
 		@_numRoutes = @_routes.length
+		false
 
+	###*
+	Remove all routes
+	@method removeAllRoutes
+	###
 	removeAllRoutes:()->
 		@_routes.length = 0
 		@_numRoutes = @_routes.length
 
+	###*
+	@method _checkRoutes
+	@param {String} p_path
+	@private
+	@return {Array}
+	###
 	_checkRoutes:(p_path)->
 		i = @_numRoutes
-		p_path = '/' + p_path
 		foundRoute = null
+		data = null
 		routes = []
 		routesIndex = 0
+		p_path = '/' + p_path
 
-		data = null
 		while i-- > 0
 			route = @_routes[i]
 			if foundRoute
@@ -223,6 +294,7 @@ class NavigationRouter extends EventDispatcher
 			re = route.routeRE
 			re.lastIndex = 0
 
+			# if !(o = re.exec(p_path) and route.route isnt '/' or p_path is route.route)
 			if !(o = re.exec(p_path))
 				continue
 			data = {}
@@ -233,6 +305,13 @@ class NavigationRouter extends EventDispatcher
 				data[label] = v
 		return [routes, data]
 
+	###*
+	@method _sortRoutes
+	@param {String} p_a
+	@param {String} p_b
+	@private
+	@return {Number}
+	###
 	_sortRoutes:(p_a, p_b)->
 		if p_a.numLabels < p_b.numLabels
 			return -1

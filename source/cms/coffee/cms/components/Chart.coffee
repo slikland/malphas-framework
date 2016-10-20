@@ -1,6 +1,8 @@
+#namespace components
+
 #import slikland.chart.Chart
 
-class components.Chart extends chart.Chart
+class Chart extends chart.Chart
 	@SELECTOR: 'chart'
 	@ORDER: 0
 	constructor:()->

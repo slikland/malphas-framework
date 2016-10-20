@@ -1,7 +1,11 @@
-class components.Button extends BaseDOM
+#namespace components
+
+class Button extends BaseDOM
 	@SELECTOR: 'button'
+	@ORDER: 0
 	constructor:()->
 		super
+		console.log(@element)
 		@_enabled = true
 		@element.on('click', @_click)
 	destroy:()->
@@ -17,6 +21,8 @@ class components.Button extends BaseDOM
 
 		@_enabled = enabled
 	_click:(e)=>
+		if e.metaKey?
+			return
 		if !@_enabled
 			e.preventDefault()
 			e.stopPropagation()
