@@ -1,0 +1,25 @@
+buildGrid(numGrid = 12, prefix = 'col-')
+	m = 0.2em
+	+prefix-classes(prefix)
+		for i in (1...numGrid + 1)
+			cardMargin = m * 2
+			&.{i}
+				width: unquote('calc(' + (i / numGrid * 100) % + ' - ' + cardMargin + ')')
+				float: left
+	
+.col-clear
+	clear: both
+.col-right
+	float: right
+.col-left
+	float: left
+.col-clear-left
+	clear: left
+.col-clear-right
+	clear: right
+	
+
+buildGrid(12)
+
+.col-full
+	@extend .col-12

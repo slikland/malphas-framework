@@ -1,0 +1,61 @@
+field
+	font-weight: normal
+	font-size: 1em
+	width: 100%
+	margin-top: 1.2em
+	margin-bottom: 0.4em
+	display: inline-block
+	label
+		font-weight: 500
+		position: absolute
+		bottom: 0px
+		pointer-events: none
+		z-index: 1
+		font-size: 1em
+		padding: 0.2em
+		padding-left: 0.4em
+		padding-bottom: 0.3em
+		transition: bottom 0.1s, font-size 0.1s
+	input
+		font-family: Roboto
+		// font-weight: 200
+		font-size: 1em
+		border: 1px solid #EEEEEE
+		padding: 0.4em
+		padding-bottom: 0.2em
+		padding-left: 0.2em
+		border-bottom: 2px solid #EEEEEE
+		background: transparent
+		transition: border-color 0.1s, border-left-color 0.1s, border-right-color 0.1s, border-top-color 0.1s, border-bottom-color 0.1s
+	validation
+		display: none
+		
+	.validation-message
+		padding-left: 0.5em
+		position: absolute
+		font-size: 0.6em
+		color: colors[0]
+		bottom: -0.1em
+		height: 0px
+	
+	&.filled
+		label
+			// margin-top: -1.2em
+			font-size: 0.8em
+			bottom: 1.8em
+		input
+			border-top-color: rgba(0, 0, 0, 0)
+			border-left-color: rgba(0, 0, 0, 0)
+			border-right-color: rgba(0, 0, 0, 0)
+			border-bottom-color: #CCCCCC
+			
+		
+	&.valid
+		input
+			border-bottom-color: colors[4]
+			
+	&.invalid
+		input
+			border-bottom-color: colors[0]
+			
+		

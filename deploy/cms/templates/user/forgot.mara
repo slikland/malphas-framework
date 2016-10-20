@@ -1,0 +1,20 @@
+modal:
+	card:{"width": "300"}
+		form:{"action":"../api/cms/user/forgot"}
+			header: {"background": "#455a64"}
+				align:
+					span: {"html":"Esqueci minha senha", "align": "bl"}
+			content:
+				span.text-small: "Caso o email esteja cadastrado, você irá receber uma nova senha no seu e-mail."
+				field:
+					label: "Email"
+					input: {"type": "text", "validation": "email;required"}
+					validation:
+						email: 
+							message: "Email inválido"
+						required: {"message": "Este campo não pode estar vazio"}
+						length: {"min": 10, "max": 100}
+						regex: "/asd/"
+			footer.text-left:
+				button.button-3: {"style":"width: 100%;", "html": "RECUPERAR SENHA"}
+				a.text-small: {"html":"Voltar","template":"user/login", "templateTarget": "body"}

@@ -1,0 +1,9 @@
+html
+	head:
+		base: {"href":"#{base}"}
+		title: "CMS"
+		link: {"rel":"stylesheet","type":"text/css","href":"#{}"} #{styles}
+		meta: {"name":"#{name}", "content":"#{content}"} #{meta}
+		script: {"src":"#{}"} #{scripts}
+	body:{"style":"visibility:hidden;"}
+		@user/login

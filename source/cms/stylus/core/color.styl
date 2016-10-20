@@ -1,0 +1,33 @@
+colors = (#d9534f #f0ad4e #5bc0de #337ab7 #5cb85c)
+
+generateColors(lightenAmount = 0)
+		for i in (1...length(colors) + 1)
+			color = colors[i - 1]
+			if lightenAmount != 0
+				color = lighten(color, lightenAmount)
+			+prefix-classes('bg-')
+				&.{i}
+					background-color: color
+			+prefix-classes('text-')
+				&.{i}
+					color: color
+			+prefix-classes('button-')
+				&.{i}
+					background-color: color
+					if lightness(color) > 75%
+						color: #666666
+					else
+						color: #FFFFFF
+
+			+prefix-classes('tag-')
+				&.{i}
+					background-color: lighten(color, 10)
+					border-color: darken(color, 10)
+					border-style: solid
+					border-width: 1px
+					if lightness(color) > 75%
+						color: #666666
+					else
+						color: #FFFFFF
+
+generateColors(0)

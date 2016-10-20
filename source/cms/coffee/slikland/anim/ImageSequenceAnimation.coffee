@@ -1,0 +1,2 @@
+#import slikland.anim.BaseAnimation
+class ImageSequenceAnimation extends BaseAnimation

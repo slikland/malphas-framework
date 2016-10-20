@@ -1,0 +1,24 @@
+modal:
+	card:{"width": "300"}
+		form:{"action":"../api/cms/user/login"}
+			header: {"background": "#455a64"}
+				align:
+					span: {"html":"Login", "align": "bl"}
+			content:
+				field:
+					label: "Email"
+					input: {"type": "text", "validation": "email;required"}
+					validation:
+						email: 
+							message: "Email inválido"
+						required: {"message": "Este campo não pode estar vazio"}
+						length: {"min": 10, "max": 100}
+						regex: "/asd/"
+				field:
+					label: "Senha"
+					input: {"type": "password"}
+					validation:
+						required: {"message": "Este campo não pode estar vazio"}
+			footer.text-right:
+				button.button-3: {"style":"width: 100%;", "html": "ENTRAR"}
+				a.text-small: {"html":"Esqueci minha senha", "template":"user/forgot", "templateTarget": "body"}
