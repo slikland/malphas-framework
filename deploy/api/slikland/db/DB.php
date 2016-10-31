@@ -45,6 +45,11 @@ class DB{
 		$this->mysqli = NULL;
 	}
 
+	public function error()
+	{
+		return $this->mysqli->error;
+	}
+
 	public function initMySQLi()
 	{
 		if(!isset($this->mysqli))

@@ -159,9 +159,8 @@ unless "bind" of Function::
 #
 # Add ECMA262-5 string trim if not supported natively
 #
-unless "trim" of String::
-	String::trim=(char = null)->
-		return @ltrim(char).rtrim(char)
+String::trim=(char = null)->
+	return @ltrim(char).rtrim(char)
 
 String::ltrim=(char = null)->
 	if !char
@@ -281,6 +280,10 @@ unless "some" of Array::
 # 
 Node::on = Node::addEventListener
 Node::off = Node::removeEventListener
+Node::trigger = (event, data) ->
+	e = new Event(event)
+	e.data = data
+	@dispatchEvent(e)
 
 ##------------------------------------------------------------------------------
 #

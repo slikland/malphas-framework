@@ -1,0 +1,7 @@
+card.col-1_2:
+	header: "Adicionar usuário"
+	form: {"action":"../api/cms/user/edit","success":"cms/users"}
+		content:
+			@user/userFormContent 
+		footer.text-right:
+			button.button-5: "Adicionar"

@@ -1,0 +1,5 @@
+h1: 'CMS'
+aside:
+	tag: {"html":"#{user.roleName}"}
+	span: {"html":"#{user.name}"}
+	button.button-1: {"html":"Log out","action":"../api/cms/user/logout"}

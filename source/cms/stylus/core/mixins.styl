@@ -4,9 +4,12 @@ inline-block()
 	display: inline-block
 
 .left
-	float: left
+	float: left !important
 .right
-	float: right
+	float: right !important
+.clear
+	clear: both
+
 .center-content
 	text-align: center
 	&:before
@@ -19,7 +22,6 @@ inline-block()
 		text-align: initial
 		float: none !important
 		vertical-align: middle !important
-		
 .no-select
 	-webkit-touch-callout: none
 	-webkit-user-select: none

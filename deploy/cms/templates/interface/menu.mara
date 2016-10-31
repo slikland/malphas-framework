@@ -1,0 +1,15 @@
+>menuBlock: #{menu}
+hr:
+>menuBlock: #{config}
+
+<menuBlock
+	ul:
+		>menuItem: #{items}
+<menuItem
+	li:
+		(#{path})
+			a: {"href":"#{path}", "html":"#{name}"}
+		(!#{path})
+			a: {"html":"#{name}"}
+	(#{items})
+		>menuBlock: #{}

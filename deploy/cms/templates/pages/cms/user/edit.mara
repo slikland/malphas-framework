@@ -1,0 +1,7 @@
+card.col-1_2: {"service":"../api/cms/user/getUser/#{$0}"}
+	header: "Editar usuário"
+	form: {"action":"../api/cms/user/edit", "success":"refresh"}
+		content:
+			@user/userFormContent 
+		footer.text-right:
+			button.button-5: "Atualizar"

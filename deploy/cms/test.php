@@ -1,30 +1,49 @@
-<?php
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
 
-$fns = get_defined_functions();
-foreach($fns['internal'] as $k=>$fn)
+</body>
+<script type="text/javascript">
+
+function request()
 {
-	$f = '__' . $k;
-	eval('function ' . $f . '(){call_user_func_array("'.$fn.'", func_get_args());}');
-	// print $f . ': ' . $fn . "\n";
+	if(window.XMLHttpRequest)
+	{
+		return new XMLHttpRequest();
+	}
+	else if (window.ActiveXObject)
+	{
+		return new ActiveXObject("MSXML2.XMLHTTP.3.0")
+	}
 }
-$i = 0;
-// foreach($fns as $fn)
+
+var w = 200;
+var h = 200;
+var canvas = document.createElement('canvas');
+canvas.setAttribute('width', w);
+canvas.setAttribute('height', h);
+var context = canvas.getContext('2d');
+context.fillStyle = '#00FF00';
+context.fillRect(0, 0, w, h);
+document.body.appendChild(canvas);
+// var url = canvas.toDataURL('image/jpeg');
+// console.log(url);
+var blob = canvas.toBlob();
+console.log(blob);
+
+// var req = request();
+// function reqLoaded()
 // {
-// 	var_dump($fn);
-// 	// $f = 'function '
-// 	break;	
+// 	console.log(req.ressponse);
 // }
 
-// for()
+// req.onload = reqLoaded;
+// req.open('GET', url, true);
+// req.responseType = 'blob';
+// req.send();
 
-// // var_dump(get_defined_functions());
-// $b = 'var_dump';
-// $a = $b;
-
-// // eval('\x61')
-// print $a;
-// // print \x61;
-__856();
-function _(){
-
-}
+</script>
+</html>

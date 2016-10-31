@@ -1,4 +1,5 @@
 #namespace slikland.mara
+#import slikland.utils.ObjectUtils
 class Block
 	@_INSTRUCTION_RE = /^([\(\#\@\>\<])?([^\:]*?)?(?:(?::)(.*?)(?:\#{([^\#\{\}\'\"]*?)})?)?\s*$/m
 
@@ -10,13 +11,23 @@ class Block
 		5: 'FILE'
 	}
 
+	@_blocks: {}
+
 	@_MARA_ID: 1
 
 	for k, v of @TYPES
 		@TYPES[v] = Number(k)
 
+	@_registerBlock:(block)->
+		@_blocks[block.maraId] = block
+
+	@findBlock:(id)->
+		id = Number(id)
+		return @_blocks[id]
+
 	constructor:(instruction, file)->
 		@_maraId = @constructor._MARA_ID++
+		@constructor._registerBlock(@)
 		@_file = file
 		@_type = null
 		@_instance = null
@@ -120,7 +131,9 @@ class Block
 
 
 	_parseObjectString:(object, data = {}, test = false)->
-		replaceObject = object.replace(/\#\{([^\}\}\#]+)\}/g, '(data[\'$1\'] || \'\')').replace(/\#\{\}/g, '(data || \'\')')
+		glob = slikland.Mara.globals
+		replaceObject = object.replace(/\#\{(\$|\@)([^\}\}\#]+)\}/g, '(glob[\'$1\'][\'$2\'] || \'\')')
+		replaceObject = replaceObject.replace(/\#\{([^\}\}\#]+)\}/g, '(data[\'$1\'] || \'\')').replace(/\#\{\}/g, '(data || \'\')')
 		try
 			object = eval('(function(){return (' + replaceObject + ');})();')
 		if test
@@ -142,25 +155,36 @@ class Block
 
 	_replaceString:(string, data)->
 		@_currentReplaceObjectData = data
+		string = string.replace(/\(glob\[\'(.*?)\'\]\[\'(.*?)\'\]\ \|\| \'\'\)/g, '\#\{$1$2\}')
 		string = string.replace(/\(data\[\'(.*?)\'\]\ \|\| \'\'\)/g, '\#\{$1\}')
 		string = string.replace(/\(data \|\| \'\'\)/g, '\#\{\}')
-		string = string.replace(/\#\{([^\}\}\#]+)?\}/g, @_replaceObject)
+		string = string.replace(/\#\{(\$|\@)?([^\}\}\#]+)?\}/g, @_replaceObject)
 		return string
 
-	_replaceObject:(match, name)=>
+	_replaceObject:(match, symbol, name)=>
 		data = null
-		if name
-			data = @_currentReplaceObjectData?[name]
+		if symbol && symbol.length > 0
+			if name
+				data = ObjectUtils.find(slikland.Mara.globals[symbol], name)
 		else
-			data = @_currentReplaceObjectData
+			if name
+				data = ObjectUtils.find(@_currentReplaceObjectData, name)
+			else
+				data = @_currentReplaceObjectData
+		# if data typeof 'string'
+		# 	data = data.replace(/"/g, '\\"').replace(/'/g, "\\'")
+
 		data ?= ''
 		return data
 
-	render:(data, context = null)->
+	render:(data, context = null, onlyChildren = false)->
 		if !context
 			context = document.createElement('div')
 
-		ret = @['_render_' + @constructor.TYPES[@_type]]?(data, context)
+		if onlyChildren
+			ret = [data, context]
+		else
+			ret = @['_render_' + @constructor.TYPES[@_type]]?(data, context)
 		if ret
 			if ret[1] && ret[1] instanceof Node
 				ret = [ret]
@@ -204,7 +228,9 @@ class Block
 
 				for k, v of content
 					if typeof(k) in ['string', 'number']
-						el.setAttribute(k, v)
+						if v
+							el.setAttribute(k, v)
+				el.setAttribute('mara', @_maraId)
 				if @_id
 					el.setAttribute('id', @_id)
 				if @_classes

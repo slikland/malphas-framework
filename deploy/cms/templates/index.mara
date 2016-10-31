@@ -6,4 +6,3 @@ html
 		meta: {"name":"#{name}", "content":"#{content}"} #{meta}
 		script: {"src":"#{}"} #{scripts}
 	body:{"style":"visibility:hidden;"}
-		@user/login

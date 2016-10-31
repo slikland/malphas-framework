@@ -12,15 +12,8 @@
 #import slikland.core.template.Template
 #import slikland.loader.API
 
-#import cms.core.ServiceController
-#import cms.core.ComponentController
-#import cms.core.ViewController
-#import cms.core.User
-#import cms.core.Resizer
-
+#import cms.core.*
 #import cms.ui.*
-#import cms.components.standalone.StandaloneBase
-#import cms.components.*
 
 #import slikland.mara.Mara
 
@@ -28,10 +21,13 @@ class Main
 	@RENDER_TEMPLATE: 'app_renderTemplate'
 	constructor:()->
 		app.body = new BaseDOM({element: document.body})
-		setTimeout(@_init, 0)
-
 		app.template = new slikland.Mara('templates/')
+		slikland.Mara.setGlobalObject('@', app)
 		app.templateContext = document.body
+		app.user = new User()
+		app.interface = new cms.core.InterfaceController()
+
+		setTimeout(@_init, 0)
 
 		app.on(Main.RENDER_TEMPLATE, @_renderTemplate)
 
@@ -46,10 +42,9 @@ class Main
 		# app.serviceController = ServiceController.getInstance()
 		# app.user = new User()
 
-		# app.router = new NavigationRouter(app.basePath)
-		# app.router.on(NavigationRouter.CHANGE, @_routeChange)
-		# app.router.setup(app.basePath)
-
+		app.router = new NavigationRouter(app.basePath)
+		app.router.on(NavigationRouter.CHANGE, @_routeChange)
+		app.router.setup(app.basePath)
 
 		# app.componentController = ComponentController.getInstance()
 		
@@ -65,9 +60,7 @@ class Main
 		app.body.css('visibility', '')
 
 	_routeChange:(e, data)=>
-		console.log("CHANGE")
-		console.log(data)
-		app.serviceController.call({url: data['path']})
+		app.interface.show()
 	_indexComplete:()=>
 		# console.log(arguments)
 	_error:()=>

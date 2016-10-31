@@ -2,9 +2,10 @@ field
 	font-weight: normal
 	font-size: 1em
 	width: 100%
-	margin-top: 1.2em
-	margin-bottom: 0.4em
+	margin-top: 1em
+	margin-bottom: 0.2em
 	display: inline-block
+	padding: 0.2em
 	label
 		font-weight: 500
 		position: absolute
@@ -14,8 +15,9 @@ field
 		font-size: 1em
 		padding: 0.2em
 		padding-left: 0.4em
-		padding-bottom: 0.3em
+		padding-bottom: 0.6em
 		transition: bottom 0.1s, font-size 0.1s
+		opacity: 0.4
 	input
 		font-family: Roboto
 		// font-weight: 200
@@ -41,6 +43,7 @@ field
 	&.filled
 		label
 			// margin-top: -1.2em
+			opacity: 1
 			font-size: 0.8em
 			bottom: 1.8em
 		input
@@ -58,4 +61,49 @@ field
 		input
 			border-bottom-color: colors[0]
 			
-		
+	&.select
+		label
+			opacity: 1
+			font-size: 0.8em
+			bottom: 1.8em
+			transition: none
+		input
+			border-top-color: rgba(0, 0, 0, 0)
+			border-left-color: rgba(0, 0, 0, 0)
+			border-right-color: rgba(0, 0, 0, 0)
+			border-bottom-color: #CCCCCC
+	&.checkbox, &.radio
+		display: inline
+		label
+			display: inline
+			font-weight: 500
+			position: relative
+			bottom: auto
+			pointer-events: cursor
+			z-index: auto
+			font-size: auto
+			padding: auto
+			padding-left: auto
+			padding-bottom: auto
+			transition: none
+		input
+			font-family: Roboto
+			width: auto
+			display: inline
+			// font-weight: 200
+			font-size: auto
+			border: auto
+			padding: auto
+			padding-bottom: auto
+			padding-left: auto
+			border-bottom: auto
+			background: auto
+			transition: auto
+	toggle.show-password
+		position: absolute
+		right: 0.6em
+		opacity: 0.2
+		cursor: pointer
+		i
+			line-height: 2em
+			

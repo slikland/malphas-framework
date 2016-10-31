@@ -2,111 +2,275 @@ class API extends EventDispatcher
 
 	@COMPLETE: 'apiComplete'
 	@ERROR: 'apiError'
-
-	@ROOT_PATH: ''
+	@_interceptors: []
 
 	@_request:()->
 		if window.XMLHttpRequest then return new XMLHttpRequest()
 		else if window.ActiveXObject then return new ActiveXObject("MSXML2.XMLHTTP.3.0")
 	
-	# data = {
-	# 	url: 'url/to/load'
-	# 	params: {object}
-	# 	method: 'GET' / 'POST'
-	# 	type: 'json'/'text'
-	# 	onComplete: callbackFunction
-	# 	onError: callbackFunction
-	#	headers: {
-	#		Content-type: 'bla'
-	#	}
-	# }
-	# 
-	@call:(params)->
-		if !params
-			return
-		url = params['url']
-		if !url
-			return
-		data = params['data']
-		method = params['method'] || 'POST'
-		onComplete = params['onComplete'] || 'POST'
-		onError = params['onError']
-		type = params['type'] || 'json'
-		headers = params['headers']
-		api = new API(API.ROOT_PATH + url, data, 'POST', type)
+	@call:(url, data = null, onComplete = null, onError = null)->
+		api = new API(url)
+		if url instanceof HTMLElement && url.tagName.toLowerCase() == 'form'
+			url.submit()
+		else if BaseDOM? && url instanceof BaseDOM && url.element.tagName.toLowerCase == 'form'
+			url.submit()
+
 		if onComplete
-			api.on(@COMPLETE, onComplete)
+			api.on(API.COMPLETE, onComplete)
 		if onError
-			api.on(@ERROR, onError)
-		api.load()
+			api.on(API.ERROR, onError)
+		api.submit(data)
 		return api
 
-	constructor: (@url, @params = null, @method = 'POST', @type = 'json', @headers = null) ->
-		@reuse = false
+	@intercept:(regexPattern, callback)->
+		if !(regexPattern instanceof RegExp)
+			regexPattern = new RegExp(regexPattern)
+		i = @_interceptors.length
+		while i-- > 0
+			if @_interceptors[i].regex == regexPattern && @_interceptors[i].callback == callback
+				return
+		@_interceptors.push({regex: regexPattern, callback: callback})
 
-	load:(params = null)=>
-		if params
-			@params = params
+	@unintercept:(regexPattern, callback = null)->
+		i = @_interceptors.length
+		while i-- > 0
+			if @_interceptors[i].regex == regexPattern && (callback && @_interceptors[i].callback == callback)
+				@_interceptors.splice(i, 1)
+
+	@_findInterceptor:(regexPattern, callback)->
+		i = @_interceptors.length
+		interceptors = []
+		while i-- > 0
+			interceptor = @_interceptors[i]
+			if interceptor.regex == regexPattern && interceptor.callback == callback
+				interceptors.push(interceptor)
+		return interceptors
+	@_checkInterceptor:(url, data)->
+		l = @_interceptors.length
+		i = -1
+		while ++i < l
+			interceptor = @_interceptors[i]
+			interceptor.regex.lastIndex = 0
+			if interceptor.regex.test(url)
+				interceptor.callback?(data, url)
+
+
+	# FORM
+	# URL
+	# Object
+
+	constructor: (arg) ->
+		super
+		@TYPES = ['normal', 'json']
+		@_headers = []
+		@_reuse = true
+		@_method = 'POST'
+		@_jsonp = false
+		if arg instanceof HTMLElement && arg.tagName.toLowerCase() == 'form'
+			@_form = arg
+			setTimeout(@_addEventListeners, 0)
+		else if BaseDOM? && arg instanceof BaseDOM && arg.element.tagName.toLowerCase == 'form'
+			@_form = arg
+			setTimeout(@_addEventListeners, 0)
+		else if typeof(arg) == 'string'
+			@_url = arg
+		else
+			throw new Error('The API constructor argument needs to be a URL string or a Form element.')
+
+	@get reuse:()->
+		return @_reuse
+	@set reuse:(value)->
+		@_reuse = Boolean(value)
+
+	@get type:()->
+		return @_type
+	@set type:(value)->
+		if !(type in @constructor.TYPES)
+			throw new Error('API.type can only be: ' + @constructor.TYPES.join(', '))
+		@_type = value
+
+	@get method:()->
+		return @_method
+	@set method:(value)->
+		if !/^(get|post)$/i.test(value)
+			throw new Error('Method can only be either GET or POST')
+		@_method = value.toUpperCase()
+
+	# Not implemented yet
+	@get jsonp:()->
+		throw new Error('Not implemented yet')
+		return @_jsonp
+	@set jsonp:(value)->
+		throw new Error('Not implemented yet')
+		@_jsonp = Boolean(@_jsonp)
+
+	@get data:()->
+		return @_data
+
+	@get requestURL:()->
+		return @_requestURL
+
+	_addEventListeners:()=>
+		if @_form
+			@_form.on('submit', @_submitForm)
+	_submitForm:()=>
+		@submit()
+
+	addHeader:(name, value)->
+		@_headers[name] = value
+	removeHeader:(name)->
+		@_headers[name] = null
+		delete @_headers[name]
+
+	submit:(data = null)=>
+		@_data = data
+		if @_submitting
+			return
+		@_submitting = true
+
+		if data instanceof HTMLElement && data.tagName.toLowerCase() == 'form'
+			@_form = data
+			data = null
+		else if BaseDOM? && data instanceof BaseDOM && data.element.tagName.toLowerCase == 'form'
+			@_form = data
+			data = null
+
+		url = @_url || ''
+		if @_form
+			if @_form.hasAttribute('action')
+				url = @_form.getAttribute('action')
+			if @_form.hasAttribute('enctype')
+				@addHeader('Content-type', @_form.getAttribute('enctype'))
+			if @_form.hasAttribute('method')
+				@method = @_form.getAttribute('method')
+			if @_form.hasAttribute('type') && @_form.getAttribute('type') == 'json'
+				@addHeader('Content-type', 'application/json;charset=UTF-8')
+				data = JSON.stringify(@_parseJSON(@_form))
+				console.log('>>', @_parseJSON(@_form))
+			else
+				data = new FormData(@_form)
+		else
+			if @_type == 'normal'
+				if !data
+					data = new FormData()
+				if data && !(data instanceof FormData)
+					d = new FormData();
+					d.append n, v for n, v of data
+					data = d
+			else if @_type == 'json'
+				@addHeader('Content-type', 'application/json;charset=UTF-8')
+				data = JSON.stringify(data)
+
+
+		getValues = {}
 		urlParams = window.location.search
-		paramObj = {}
 		if urlParams
 			urlParams = urlParams.replace(/^\??/, '').split('&')
-			pc = 0
 			for up in urlParams
 				parts = up.split('=')
 				if parts[0]?.trim().length > 0
-					paramObj[parts[0].trim()] =  parts[1]?.trim()
-					pc++
-		if pc > 0
-			try
-				if !@params
-					@params = {}
-				@params = ObjectUtils.merge(@params, paramObj)
-		if @params instanceof FormData
-			@method = 'POST'
-			formData = @params
-		else
-			if @method == 'POST'
-				formData = new FormData();
-				formData.append n, v for n, v of @params
+					getValues[parts[0].trim()] = parts[1]?.trim()
+
+		getStr = []
+		for k, v of getValues
+			getStr.push(k + '=' + v)
+		getStr = getStr.join('&')
+		if getStr.length > 0
+			if url.indexOf('?') >= 0
+				url += '&' + getStr
 			else
-				formData = []
-				formData.push(n + '=' + v) for n, v of @params
-		@req = API._request()
-		@req.onreadystatechange = @_loaded
-		@req.open(@method, @url, true)
-		if @headers
-			for k, v of @headers
-				@req.setRequestHeader(k, v)
-		@req.send(formData);
-	cancel:->
-		if @req
-			@req.onreadystatechange = null
-			@req.abort()
-		if !@reuse
+				url += '?' + getStr
+		@_requestURL = url
+		@_request = API._request()
+		@_request.onreadystatechange = @_loaded
+		@_request.open(@method, url, true)
+		if @_headers
+			for k, v of @_headers
+				@_request.setRequestHeader(k, v)
+		@_request.send(data)
+		return 
+
+	_parseJSON:(form)->
+		@_parsedElements = []
+		result = @_parseJSONElement(form)
+		return result
+	_parseJSONElement:(element, indent = 0)=>
+		items = element.querySelectorAll('[json-name]')
+		o = {}
+		ind = ''
+		i = indent
+		while i-- > 0
+			ind += ' '
+		addC = 0
+		for item in items
+			if @_parsedElements.indexOf(item) >= 0
+				continue
+			@_parsedElements.push(item)
+
+			name = item.getAttribute('json-name')
+			console.log(ind, item.getAttribute('json-name'))
+			
+			if data = @_parseJSONElement(item, indent + 2)
+				if !o[name]
+					o[name] = []
+				o[name].push(data)
+		inputs = element.querySelectorAll('input,textarea')
+		for input in inputs
+			if @_parsedElements.indexOf(input) >= 0
+				continue
+			@_parsedElements.push(input)
+			value = input.value
+			if input.hasAttribute('type')
+				switch input.getAttribute('type').toLowerCase()
+					when 'radio', 'checkbox'
+						if !o[input.name]
+							o[input.name] = []
+						if !input.checked
+							continue
+			if o[input.name]
+				if !Array.isArray(o[input.name])
+					o[input.name] = [o[input.name]]
+				o[input.name].push(value)
+			else
+				o[input.name] = value
+		console.log(o)
+		return o
+	abort:->
+		@_submitting = false
+		if @_request
+			@_request.onreadystatechange = null
+			@_request.abort()
+		if !@_reuse
 			@off()
 	_loaded:(e)=>
 		if e.currentTarget.readyState == 4
+			@_submitting = false
 			if e.currentTarget.status == 200
-				try
-					data = e.currentTarget.responseText
-					if typeof(@type) == 'function'
-						data = @type(data)
-					else if @type == 'json'
-						data = eval('(' + e.currentTarget.responseText + ')')
-					else
-						try
-							data = eval('(' + e.currentTarget.responseText + ')')
-						catch
-							data = e.currentTarget.responseText
-					if data?.error
-						@trigger(API.ERROR, data)
-					else
-						@trigger(API.COMPLETE, data)
-				catch err
-					console.log(err)
-					@trigger(API.ERROR)
+				response = e.currentTarget.responseText || e.currentTarget.response || ''
+				try 
+					data = eval('(' + response + ')')
+				catch e
+					try
+						data = JSON.stringify(response)
+				if !data
+					data = response
+				else if typeof(data) == 'string'
+					data = response
+				if data?.error
+					return @_loadError(data)
+				else
+					return @_loadSuccess(data)
 			else
-				@trigger(API.ERROR)
-			if !@reuse
+				if e.currentTarget.status == 404
+					return @_loadError({message: ''})
+				else
+					return @_loadError({message: ''})
+			if !@_reuse
 				@off()
+	_loadSuccess:(data = null)->
+		@trigger(API.COMPLETE, data)
+		@constructor._checkInterceptor(@_requestURL, data)
+
+	_loadError:(data = null)->
+		@trigger(API.ERROR, data)
+		@constructor._checkInterceptor(@_requestURL, data)

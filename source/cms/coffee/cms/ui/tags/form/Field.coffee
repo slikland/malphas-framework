@@ -15,13 +15,36 @@ class Field extends cms.ui.Base
 
 		constructor:(element)->
 			super({element: element})
-			@_input = @_element.querySelector('input')
+			@_input = @_element.querySelector('input:not([type="hidden"]),select,textarea')
+			if @_input.tagName.toLowerCase() in ['select', 'textarea']
+				@_input.setAttribute('type', @_input.tagName.toLowerCase())
+			if @_input.hasAttribute('type')
+				@addClass(@_input.getAttribute('type'))
+				switch @_input.getAttribute('type').toLowerCase()
+					when 'password'
+						@_checkPasswordPreview()
 
 			@_input.on('focus', @_focus)
 			@_input.on('blur', @_blur)
 			@_input.on('change', @_change)
 			@_input.on('input', @_change)
 			@_checkFilled()
+		_checkPasswordPreview:()->
+			pp = @find('.show-password')
+			if !pp
+				return
+			@_passwordPreview = pp
+			@_passwordPreview.on('change', @_passwordPreviewChange)
+		_passwordPreviewChange:()=>
+			if @_passwordPreview.selected
+				@_input.setAttribute('type', 'text')
+			else
+				@_input.setAttribute('type', 'password')
+
+		_password:(e)=>
+			@_input.type = 'text'
+			e.preventDefault()
+			e.stopImmediatePropagation()
 
 		_focus:()=>
 			@_focused = true

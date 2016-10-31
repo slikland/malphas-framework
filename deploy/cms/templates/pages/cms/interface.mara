@@ -1,0 +1,46 @@
+h1: "CMS Interface"
+card:
+	form:
+		header:
+			span: "General"
+		content:
+			field:
+				label: "CMS Title"
+				input: {"name":"title"}
+		footer.text-right:
+			button.button-5: 'Salvar'
+card: {"service":"../api/cms/cms/getPages"}
+	form: {"type":"json","action":"../api/cms/cms/updateMenu","success":"reload"}
+		content:
+			card.col-1_2
+				header:
+					span: "Páginas"
+				content: {"draggableContext": "menu_draggable","json-name":"pages"}
+					>pageCard: #{pages}
+			card.col-1_2
+				header:
+					span: "Menu"
+				content: {"draggableContext": "menu_draggable","json-name":"menu"}
+					>pageCard: #{menu}
+			card.col-1_2.right
+				header:
+					span: "Configuração"
+				content: {"draggableContext": "menu_draggable","json-name":"config"}
+					>pageCard: #{config}
+		footer.text-right:
+			button.button-5: 'Salvar'
+
+<pageCard
+	card: {"draggable":"menu_draggable","json-name":"items"}
+		content:
+			div.col-1_3:
+				input: {"placeholder":"#{path}","name":"name","value":"#{name}"}
+				span.text-small: "#{path}"
+				input: {"type":"hidden","name":"path","value":"#{path}"}
+				input: {"type":"hidden","name":"id","value":"#{id}"}
+			div.col-1_2:
+				field: #{roles}
+					input: {"type":"checkbox", "name":"type","value":#{role}}
+					label: {"html":"#{name}"}
+			div.col-1_1: {"draggableContext": "menu_draggable"}
+				>pageCard: #{items}

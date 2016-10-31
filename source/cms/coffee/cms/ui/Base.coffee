@@ -7,8 +7,13 @@ class Base
 	update:()->
 		if !@constructor.SELECTOR
 			return
-		elements = document.body.querySelectorAll(@constructor.SELECTOR)
+		foundElements = document.body.querySelectorAll(@constructor.SELECTOR)
+		elements = []
 
+		for el in foundElements
+			if el.matches('[cloned]')
+				continue
+			elements.push(el)
 
 		i = elements.length
 		addElements = []

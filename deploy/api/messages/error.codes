@@ -1,0 +1,13 @@
+
+
+
+0 //Service messages
+not_logged: ""
+user_not_logged: "Usuário"
+
+100 //user messages
+not_logged: "Usuário não está autenticado"
+login_error: "Email e/ou senha incorreto"
+permission_error: "Usuário não tem permissão para este recurso"
+user_not_found: "Usuário não encontrado"
+user_duplicated_email: "Email já cadastrado"

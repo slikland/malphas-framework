@@ -1,0 +1,23 @@
+card: {"service":"../api/cms/user/getUsers"}
+	header:
+		span: "Usuários"
+		div.right: {"align": "r"}
+			button.button-5.text-small: {"html":"Adicionar", "href":"cms/user/add"}
+	content:
+		>userCard: #{users}
+<userCard
+	card.col-1_3:
+		content: 
+			div.left: {"style":"font-size: 50px;width: 1em; color: #CCCCCC;"}
+				i.fa.fa-user:
+			div.left
+				div: 
+					span: "#{name}"
+					tag: "#{role}"
+				div: "#{email}"
+				div.text-small: "Last login: #{last_login}"
+			div.right:
+				a.text-center: {"style":"width: 1em;display:inline-block;","href":"cms/user/edit/#{id}"}
+					i.fa.fa-pencil-square-o
+				a.text-center.text-1: {"style":"width: 1em;display:inline-block;"}
+					i.fa.fa-trash-o

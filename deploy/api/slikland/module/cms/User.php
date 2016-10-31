@@ -1,11 +1,11 @@
 <?php
 namespace slikland\module\cms;
-
-class User
+class User extends \slikland\core\pattern\Singleton
 {
 	function __construct()
 	{
 		$this->db = db();
+		$this->user = NULL;
 	}
 
 	private function getIP()
@@ -28,14 +28,51 @@ class User
 		return $ipaddress;
 	}
 
-	function create()
+	function checkPermission($permission)
 	{
-
+		$user = $this->getCurrent();
+		if(empty($permission))
+		{
+			if(!$user)
+			{
+				throw new CodedError('permission_error');
+			}
+		}else{
+			if(!in_array($user['role'], $permission))
+			{
+				throw new CodedError('permission_error');
+			}
+		}
 	}
 
-	function edit()
+	function add($name, $email, $password, $role)
 	{
+		$user = $this->getCurrent();
+		if($role < $user['role']) $role = $user['role'];
+		if($this->db->fetch_one('SELECT pk_cms_user FROM cms_user WHERE email LIKE "'.$email.'" AND status = 1;'))
+		{
+			throw new CodedError('user_duplicated_email');
+		}
+		return $this->db->insert('INSERT INTO cms_user (name, email, pass, fk_cms_role) VALUES (?, ?, ?, ?)', array($name, $email, password($password), $role));
+	}
 
+	function edit($id, $name, $email, $password, $role)
+	{
+		$user = $this->getCurrent();
+		if($this->db->fetch_one('SELECT pk_cms_user FROM cms_user WHERE pk_cms_user != '.$id.' AND email LIKE "'.$email.'" AND status = 1;'))
+		{
+			throw new CodedError('user_duplicated_email');
+		}
+		if($role < $user['role']) $role = $user['role'];
+		$fields = array();
+		$fields['name'] = $name;
+		$fields['email'] = $email;
+		if(isset($password) && !empty($password))
+		{
+			$fields['password'] = password($password);
+		}
+		$fields['fk_cms_role'] = $role;
+		return $this->db->updateFields('cms_user', $fields, 'pk_cms_user = ' . $id);
 	}
 
 	function delete()
@@ -48,9 +85,26 @@ class User
 		return $this->db->fetch_one('SELECT cu.pk_cms_user id, cu.fk_cms_role role, cr.name roleName, cu.name name, cu.email email FROM cms_user cu LEFT JOIN cms_role cr ON cu.fk_cms_role = cr.pk_cms_role WHERE pk_cms_user = ' . $id);
 	}
 
+	function getRoles()
+	{
+		$user = $this->getCurrent();
+		return $this->db->fetch_all('SELECT pk_cms_role id, name FROM cms_role WHERE pk_cms_role >= ' . $user['role']);
+	}
+
 	function getList()
 	{
-		// $db = db();
+		$user = $this->getCurrent();
+		$users = $this->db->fetch_all('SELECT 
+	cu.pk_cms_user id, 
+    cu.name name, 
+    cu.email email, 
+    cr.name role,
+    cs.last_login last_login
+FROM cms_user cu 
+LEFT JOIN cms_role cr ON cr.pk_cms_role = cu.fk_cms_role
+LEFT JOIN (SELECT t_cs.fk_cms_user, MAX(t_cs.created) last_login FROM cms_session t_cs GROUP BY t_cs.fk_cms_user) cs ON cs.fk_cms_user = cu.pk_cms_user
+WHERE cu.fk_cms_role >= ' . $user['role']);
+		return $users;
 	}
 
 	function login($email, $pass)
@@ -79,7 +133,22 @@ class User
 
 	function getCurrent()
 	{
-		return $this->getSession();
+		if($this->user)
+		{
+			return $this->user;
+		}else{
+			return $this->getSession();
+		}
+	}
+
+	function getSessionId()
+	{
+		$user = $this->getCurrent();
+		if(!$user)
+		{
+			return NULL;
+		}
+		return uid_decode($user['session']);
 	}
 
 	private function generateSession($id)
@@ -127,6 +196,7 @@ class User
 		if(!$userId)
 		{
 			$this->clearSession();
+			$this->user = NULL;
 		}else
 		{
 			$this->updateSession($_COOKIE['sl_cms_session']);
@@ -149,5 +219,13 @@ class User
 		}
 
 		setcookie('sl_cms_session', '', time()-1, '/', $_SERVER['HTTP_HOST'], SECURE, TRUE);
+		$this->user = NULL;
+	}
+
+
+
+	public function getLog($data)
+	{
+		return $this->db->fetch_all('SELECT * FROM cms_log ORDER BY created DESC;');
 	}
 }

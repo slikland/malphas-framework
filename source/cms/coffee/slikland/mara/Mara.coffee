@@ -3,11 +3,19 @@
 
 #import slikland.utils.Prototypes
 #import slikland.event.EventDispatcher
-#import slikland.net.API
+#import slikland.loader.API
 #import slikland.mara.Block
 #import slikland.mara.Templates
 class Mara extends EventDispatcher
+	@RENDERED: 'mara_rendered'
 	@_rootPath = ''
+
+	@globals = {}
+
+	@setGlobalObject:(name, object)->
+		@globals[name] = object
+	@getGlobal:(name)->
+		return @globals[name]
 
 	@setRootPath:(path)->
 		@_rootPath = path
@@ -28,13 +36,18 @@ class Mara extends EventDispatcher
 	@get children:()->
 		return [].concat(_children)
 
-	render:(file, data, context = null)->
+	isCurrent:(file)->
+		f = @_renderData?.file || @_block?.file || ''
+		return file == f
+
+	render:(file, data = {}, context = null, callback = null)->
 		if context?.element
 			context = context.element
 		@_renderData = {
 			file: file
 			data: data
 			context: context
+			callback: callback
 		}
 		if context
 			context.setAttribute('loading', 'true')
@@ -50,6 +63,7 @@ class Mara extends EventDispatcher
 			@_holdContextToRender(@_renderData.context)
 		items = block.render(@_renderData.data, @_renderData.context)
 		@_block = block
+		@_renderData.callback?(items, @_block)
 	_holdContextToRender:(context)=>
 		context.style.visibility = 'hidden'
 		setTimeout(@_showContext, 2, context)
@@ -62,8 +76,18 @@ class Mara extends EventDispatcher
 		while i-- > 0
 			target.removeChild(children[i])
 
-	update:(data)->
-		@_block.update(data)
+	renderBlock:(element, data)->
+		if !(element instanceof HTMLElement) || !element.getAttribute('mara')
+			return
+		@_resetContext(element)
+		block = slikland.mara.Block.findBlock(element.getAttribute('mara'))
+		block.render(data, element, true)
+
+	# update:(element, data)->
+	# 	block = @_block
+	# 	if element instanceof HTMLElement && element.getAttribute('mara')
+	# 		block = 
+	# 	@_block.update(data)
 
 	find:()->
 

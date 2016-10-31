@@ -40,12 +40,15 @@ class Templates
 	get:(file, callback)->
 		block = @_findInstance(file)
 		if block
-			callback?(block)
+			setTimeout(@_callCallback, 0, callback, block)
 		else
 			@_callbacks.push({file: file, callback: callback})
 			@load(file)
 
-	load:(file, onComplete)->
+	_callCallback:(callback, block)=>
+		callback?(block)
+
+	load:(file)->
 		o = /(.*?)(?:(?:\>)(.*?))?$/.exec(file)
 		file = o[1]
 		file = file.trim()
@@ -59,7 +62,7 @@ class Templates
 			path = file
 		else
 			path = @_rootPath + file
-		API.call({url: path, onComplete: @_fileLoaded, type: 'text', file: file})
+		API.call(path, {file: file}, @_fileLoaded)
 
 	_checkCallbacks:()=>
 		i = @_callbacks.length

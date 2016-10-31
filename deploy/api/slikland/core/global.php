@@ -1,8 +1,15 @@
 <?php
 
-/**
-@class Test
-*/
+if(!function_exists('isAssoc'))
+{
+	function isAssoc($arr)
+	{
+		if (!is_array($arr)) return false;
+		return array_keys($arr) !== range(0, count($arr) - 1);
+	}
+}
+
+
 function execute(){
 	$result = slikland\core\ServiceController::execute();
 }
@@ -157,4 +164,40 @@ function db($host = NULL, $user = NULL, $pass = NULL, $name = NULL, $port = NULL
 	$name = ($name)?$name:((isset($config['db_name']))?$config['db_name']:NULL);
 	$port = ($port)?$port:((isset($config['db_port']))?$config['db_port']:NULL);
 	return \slikland\db\DB::getInstance($host, $user, $pass, $name, $port);
+}
+
+function log_activity($action = '', $description = '', $data = '')
+{
+	$db = @db();
+	if($db)
+	{
+		if(empty($data))
+		{
+			$data = '';
+		}else if(is_array($data))
+		{
+			obfuscatePassword($data);
+			$data = json_encode($data);
+		}
+
+		$userModule = get_module('cms/User');
+		$sessionId = $userModule->getSessionId();
+		@$db->insert('INSERT INTO cms_log (fk_cms_session, action, description, data, created) VALUES (?, ?, ?, ?, NOW());', array($sessionId, $action, $description, $data));
+	}
+}
+
+function obfuscatePassword(&$data)
+{
+	foreach($data as $k=>&$v)
+	{
+		if(is_string($v))
+		{
+			if(preg_match('/((^pass)|(password))/i', $k))
+			{
+				$v = '***';
+			}
+		}elseif (is_array($v)) {
+			obfuscatePassword($v);
+		}
+	}
 }

@@ -94,7 +94,7 @@ class File
 			{
 				if(is_array($ret = static::listDir($filePath, $filter, $excludeRE)))
 				{
-					$fileList += $ret;
+					$fileList = array_merge($fileList, $ret);
 				}
 				continue;
 			}

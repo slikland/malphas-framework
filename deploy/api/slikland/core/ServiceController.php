@@ -21,6 +21,8 @@ class ServiceController
 				$method = $service['method'];
 				$annotations = \slikland\core\AnnotationParser::getAnnotations($class, $method);
 
+				$requestHeaders = getallheaders();
+
 				if(isset($annotations['cmsUser']))
 				{
 
@@ -30,6 +32,13 @@ class ServiceController
 				{
 
 				}
+
+				if(isset($annotations['permission']))
+				{
+					$user = get_module('cms/User');
+					$user->checkPermission($annotations['permission']);
+				}
+
 				$requestMethod = NULL;
 
 				if(isset($annotations['method']))
@@ -42,7 +51,12 @@ class ServiceController
 						$data = $_GET;
 						break;
 					case 'POST':
-						$data = $_POST;
+						if(isset($requestHeaders['Content-Type']) && preg_match('/\/json/i', $requestHeaders['Content-Type']))
+						{
+							$data = array('data'=>json_decode(file_get_contents('php://input'), TRUE));
+						}else{
+							$data = $_POST;
+						}
 						break;
 					default:
 						$data = $_REQUEST;
@@ -73,14 +87,53 @@ class ServiceController
 				}
 
 				$response = $class->$method($data);
+
+				if(isset($annotations['log']))
+				{
+					$annotation = $annotations['log'];
+					$logData = $data;
+					$description = '';
+					$action = $service['path'];
+					if(isAssoc($annotation))
+					{
+						if(isset($annotation['action']))
+						{
+							$action = $annotation['action'];
+						}
+						if(isset($annotation['description']))
+						{
+							$description = $annotation['description'];
+						}
+						if(isset($annotation['data']))
+						{
+							$logData = $annotation['data'];
+						}
+					}else{
+						if(isset($annotation[0]))
+						{
+							$action = $annotation[0];
+						}
+						if(isset($annotation[1]))
+						{
+							$description = $annotation[1];
+						}
+						if(isset($annotation[2]))
+						{
+							$logData = $annotation[2];
+						}
+					}
+
+					log_activity($action, $description, $logData);
+				}
+
 			}
 
 		}catch(\slikland\error\Error $e)
 		{
-			if(DEBUG)
-			{
-				var_dump($e);
-			}
+			// if(DEBUG)
+			// {
+			// 	var_dump($e);
+			// }
 			$response = $e->toObject();
 		}catch(Exception $e)
 		{
@@ -105,10 +158,9 @@ class ServiceController
 		$methodArr = array();
 
 		$path = 'service/';
-		if(preg_match('/^(core|setup|cms\/user)(\/|$)/', $service))
+		if(preg_match('/^(core|setup|cms\/user|cms\/cms)(\/|$)/', $service))
 		{
 			$path = 'slikland/service/';
-			$service = preg_replace('/^core/', '', $service);
 		}
 		while(count($serviceArr) > 0)
 		{

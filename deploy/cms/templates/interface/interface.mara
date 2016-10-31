@@ -1,0 +1,5 @@
+header
+	@interface/header: {"bla":"bla"}
+nav
+	@interface/menu: #{interface}
+main

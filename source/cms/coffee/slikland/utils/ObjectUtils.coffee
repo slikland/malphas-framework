@@ -90,3 +90,28 @@ class ObjectUtils
 				o[names[j]] = item[j]
 			ret[i - 1] = o
 		return ret
+
+	# Key could be in different formats
+	# key.subkey.moresub
+	# /key refer to root (initialObject needs to be set or object will be assumed)
+	@find:(object, key, initialObject = null, debug = false)->
+		if !object
+			return null
+		if /^\//.test(key)
+			key = key.replace(/^\//, '')
+			if !initialObject
+				initialObject = object
+			val = @find(object, key)
+		else
+			keys = key.split('.')
+			val = object[keys[0]]
+			if keys.length > 1 && val
+				keys.shift()
+				key = keys.join('.')
+				val = @find(val, key, debug)
+			else
+				if keys.length > 1
+					val = null
+		if debug
+			console.log('>>>>>', val)
+		return val
