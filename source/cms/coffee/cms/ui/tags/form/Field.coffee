@@ -28,7 +28,7 @@ class Field extends cms.ui.Base
 			@_input.on('blur', @_blur)
 			@_input.on('change', @_change)
 			@_input.on('input', @_change)
-			@_checkFilled()
+			setTimeout(@_checkFilled, 1)
 		_checkPasswordPreview:()->
 			pp = @find('.show-password')
 			if !pp

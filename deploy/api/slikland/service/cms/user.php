@@ -95,9 +95,14 @@ class user
 		return $response;
 	}
 
+	/**
+	@method POST
+	*/
+
 	function getLog($data)
 	{
 		$logs = $this->module->getLog($data);
-		return array('items'=>$logs);
+		$logs['params'] = $data;
+		return $logs;
 	}
 }

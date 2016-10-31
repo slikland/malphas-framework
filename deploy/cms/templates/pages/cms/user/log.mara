@@ -8,28 +8,31 @@ card.col-full:
 			label: "Filtro"
 			group:
 				field:
-					input: {"for":"log_table", "name":"filter", "type":"checkbox"}
+					input: {"for":"log_table", "name":"filter_role", "type":"checkbox", "value":"1"}
 					label: "a"
 				field:
-					input: {"for":"log_table", "name":"filter", "type":"checkbox"}
+					input: {"for":"log_table", "name":"filter_role", "type":"checkbox", "value":"2"}
 					label: "b"
-				input: {"for":"log_table", "name":"filter", "type":"checkbox"}
-				input: {"for":"log_table", "name":"filter", "type":"checkbox"}
+				field:
+					input: {"for":"log_table", "name":"filter_role", "type":"checkbox", "value":"3"}
+					label: "c"
+				field:
+					input: {"for":"log_table", "name":"filter_role", "type":"checkbox", "value":"4"}
+					label: "d"
 		table: {"id":"log_table", "service": "../api/cms/user/getLog"}
 			thead:
 				tr:
-					th: {"sort":"user", "html":"Usuário"}
-					th: "Ação"
-					th: "Descrição"
+					th: {"sort":"name", "html":"Usuário", "width": "1%"}
+					th: {"sort":"action", "html":"Ação"}
+					th: {"sort":"description","html":"Descrição"}
 					th: "Dados"
-					th: {"html":"Data","width":"1%"}
-			tbody:
+					th: {"sort":"created","html":"Data","width":"1%"}
+			tbody.text-small:
 				>logRow: #{items}
-
 <logRow:
 	tr:
-		td: {}
+		td.nowrap: {"html":"#{name}"}
 		td: {"html":"#{action}"}
 		td: {"html":"#{description}"}
-		td.text-small: {"html":""}
-		td.text-small.text-right.nowrap: {"html":"#{created}"}
+		td: {"html":""}
+		td.text-right.nowrap: {"html":"#{created}"}

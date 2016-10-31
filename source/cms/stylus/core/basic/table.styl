@@ -16,10 +16,30 @@ table, .table
 				padding: 0.4em
 				line-height: 2em
 				font-weight: 500
+				@extend .nowrap
+				@extend .no-select
 				&:hover
 					text-shadow: 1px 1px 1px rgba(0,0,0,0.12)
 				&[sort]
 					cursor: pointer
+					.sort
+						display: inline
+						margin-left: 0.4em
+						.icon
+							display: inline
+					&[value]
+						.sort
+							opacity: 0.7
+						.icon
+							@extend .fa-sort-asc
+						&[value^="-"]
+							.icon
+								@extend .fa-sort-desc
+					&:not([value])
+						.sort
+							opacity: 0.2
+						.icon
+							@extend .fa-sort
 					
 	tbody
 		tr

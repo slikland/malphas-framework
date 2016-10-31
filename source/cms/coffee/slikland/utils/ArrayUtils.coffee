@@ -141,3 +141,10 @@ class ArrayUtils
 				index = i
 			i++
 		return index
+	@toArray:(items)->
+		newItems = []
+		if items.length
+			i = items.length
+			while i-- > 0
+				newItems[i] = items[i]
+		return newItems	

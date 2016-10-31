@@ -95,15 +95,17 @@ class User extends \slikland\core\pattern\Singleton
 	{
 		$user = $this->getCurrent();
 		$users = $this->db->fetch_all('SELECT 
-	cu.pk_cms_user id, 
-    cu.name name, 
-    cu.email email, 
-    cr.name role,
-    cs.last_login last_login
-FROM cms_user cu 
-LEFT JOIN cms_role cr ON cr.pk_cms_role = cu.fk_cms_role
-LEFT JOIN (SELECT t_cs.fk_cms_user, MAX(t_cs.created) last_login FROM cms_session t_cs GROUP BY t_cs.fk_cms_user) cs ON cs.fk_cms_user = cu.pk_cms_user
-WHERE cu.fk_cms_role >= ' . $user['role']);
+				cu.pk_cms_user id, 
+				cu.name name, 
+				cu.email email, 
+				cr.name role,
+				cs.last_login last_login
+				FROM cms_user cu 
+			LEFT JOIN cms_role cr ON cr.pk_cms_role = cu.fk_cms_role
+			LEFT JOIN (SELECT t_cs.fk_cms_user, MAX(t_cs.created) last_login FROM cms_session t_cs GROUP BY t_cs.fk_cms_user) cs ON cs.fk_cms_user = cu.pk_cms_user
+			WHERE cu.fk_cms_role >= ' . $user['role'] .'
+			ORDER BY cr.pk_cms_role ASC, cu.name ASC
+		');
 		return $users;
 	}
 
@@ -226,6 +228,26 @@ WHERE cu.fk_cms_role >= ' . $user['role']);
 
 	public function getLog($data)
 	{
-		return $this->db->fetch_all('SELECT * FROM cms_log ORDER BY created DESC;');
+		if(!$data)
+		{
+			$data = array();
+		}
+		$user = $this->getCurrent();
+		if(!isset($data['sort']))
+		{
+			$data['sort'] = '-created';
+		}
+		if(isset($data['search']))
+		{
+			$data['search'] = array('value'=>$data['search'], 'fields'=>'name,action,description,data');
+		}
+		$data['where'] = array();
+		$data['where'][] = 'cu.fk_cms_role >= ' . $user['role'];
+		$log = $this->db->getList('
+			SELECT cu.name name, cl.action, cl.description, cl.data, cl.created FROM cms_log cl
+			LEFT JOIN cms_session cs ON cs.pk_cms_session = cl.fk_cms_session
+			LEFT JOIN cms_user cu ON cu.pk_cms_user = cs.fk_cms_user
+		', $data, NULL);
+		return $log;
 	}
 }

@@ -66,7 +66,7 @@ class Mara extends EventDispatcher
 		@_renderData.callback?(items, @_block)
 	_holdContextToRender:(context)=>
 		context.style.visibility = 'hidden'
-		setTimeout(@_showContext, 2, context)
+		setTimeout(@_showContext, 1, context)
 	_showContext:(context)=>
 		context.style.visibility = ''
 

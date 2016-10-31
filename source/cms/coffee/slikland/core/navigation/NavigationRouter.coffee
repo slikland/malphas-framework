@@ -328,3 +328,43 @@ class NavigationRouter extends EventDispatcher
 		if p_a.route > p_b.route
 			return 1
 		return 0
+	_getParams:()->
+		pathData = @_parsePath(@_currentPath)
+		params = pathData['params']
+		for k, v of params
+			v = decodeURIComponent(v)
+			try
+				decoded = JSON.parse(v)
+				if typeof(decoded) != 'string'
+					v = decoded
+			params[k] = v
+		return params
+	_setParams:(params)->
+		pathData = @_parsePath(@_currentPath)
+		pArr = []
+		for k, v of params
+			try
+				if typeof(v) != 'string'
+					v = JSON.stringify(v)
+			pArr.push(k + '=' + encodeURIComponent(v))
+			params[k] = v
+
+		path = pathData.path
+		if pArr.length > 0
+			path = path + '?' + pArr.join('&')
+		@replace(path)
+
+	getParam:(name)->
+		params = @_getParams()
+		return params[name]
+
+	setParam:(name, value)->
+		params = @_getParams()
+		params[name] = value
+		@_setParams(params)
+
+	removeParam:(name)->
+		params = @_getParams()
+		params[name] = null
+		delete params[name]
+		@_setParams(params)

@@ -1,4 +1,4 @@
-#namespace cms.ui.tag.sattributes
+#namespace cms.ui.tag.attributes
 class Draggable extends cms.ui.Base
 	@SELECTOR: '[draggable]'
 	_update:(data)->

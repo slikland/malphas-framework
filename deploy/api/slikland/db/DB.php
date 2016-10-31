@@ -298,7 +298,7 @@ class DB{
 
 	public function getList($query, $params, $array = false)
 	{
-		$numItems = 10;
+		$numItems = 20;
 		$index = 0;
 		if(isset($params['pagination']))
 		{
@@ -313,7 +313,7 @@ class DB{
 			$fields = $params['search']['fields'];
 			if(!is_array($fields))
 			{
-				$fields = array($fields);
+				$fields = explode(',', $fields);
 			}
 			// $fields = implode(' OR ', $fields);
 			$value = $params['search']['value'];
@@ -378,15 +378,26 @@ class DB{
 			}
 		}
 
+		if(isset($params['where']))
+		{
+			$filters = array();
+			if(is_array($params['where']))
+			{
+				$where[] = implode(' AND ', $params['where']);
+			}else if(is_string($params['where']))
+			{
+				$where[] = $params['where'];
+			}
+		}
+
 		$orders = array();
 		if(isset($params['sort']))
 		{
 			$sorts = $params['sort'];
 			if(!is_array($sorts))
 			{
-				$sorts = array($sorts);
+				$sorts = explode(',', $sorts);
 			}
-
 			foreach($sorts as $sort)
 			{
 				$dir = 'ASC';
@@ -434,8 +445,7 @@ class DB{
 			$query = preg_replace('/^\\s*SELECT/', 'SELECT SQL_CALC_FOUND_ROWS', $query);
 		}
 
-
-		$resource = $this->query($query, $params);
+		$resource = $this->query($query);
 		$response = array();
 		if($array)
 		{

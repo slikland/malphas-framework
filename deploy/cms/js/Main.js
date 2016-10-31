@@ -4,7 +4,7 @@ __hasProp={}.hasOwnProperty,
 __indexOf=[].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
 __extends=function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) Object.defineProperty(child, key, Object.getOwnPropertyDescriptor(parent, key)); } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 function __addNamespace(scope, obj){for(k in obj){if(!scope[k]) scope[k] = {};__addNamespace(scope[k], obj[k])}};
-__addNamespace(this, {"cms":{"ui":{"attributes":{},"tag":{"sattributes":{}},"tags":{"form":{}}},"core":{}},"slikland":{"mara":{}}});
+__addNamespace(this, {"cms":{"ui":{"attributes":{},"tag":{"attributes":{}},"tags":{"form":{}}},"core":{}},"slikland":{"mara":{}}});
 cms.ui.Base = (function() {
   function Base() {
     this._instances = [];
@@ -1298,6 +1298,61 @@ NavigationRouter = (function(_super) {
     }
     return 0;
   };
+  NavigationRouter.prototype._getParams = function() {
+    var decoded, k, params, pathData, v;
+    pathData = this._parsePath(this._currentPath);
+    params = pathData['params'];
+    for (k in params) {
+      v = params[k];
+      v = decodeURIComponent(v);
+      try {
+        decoded = JSON.parse(v);
+        if (typeof decoded !== 'string') {
+          v = decoded;
+        }
+      } catch (_error) {}
+      params[k] = v;
+    }
+    return params;
+  };
+  NavigationRouter.prototype._setParams = function(params) {
+    var k, pArr, path, pathData, v;
+    pathData = this._parsePath(this._currentPath);
+    pArr = [];
+    for (k in params) {
+      v = params[k];
+      try {
+        if (typeof v !== 'string') {
+          v = JSON.stringify(v);
+        }
+      } catch (_error) {}
+      pArr.push(k + '=' + encodeURIComponent(v));
+      params[k] = v;
+    }
+    path = pathData.path;
+    if (pArr.length > 0) {
+      path = path + '?' + pArr.join('&');
+    }
+    return this.replace(path);
+  };
+  NavigationRouter.prototype.getParam = function(name) {
+    var params;
+    params = this._getParams();
+    return params[name];
+  };
+  NavigationRouter.prototype.setParam = function(name, value) {
+    var params;
+    params = this._getParams();
+    params[name] = value;
+    return this._setParams(params);
+  };
+  NavigationRouter.prototype.removeParam = function(name) {
+    var params;
+    params = this._getParams();
+    params[name] = null;
+    delete params[name];
+    return this._setParams(params);
+  };
   return NavigationRouter;
 })(EventDispatcher);
 var ObjectUtils;
@@ -1625,6 +1680,17 @@ ArrayUtils = (function() {
       i++;
     }
     return index;
+  };
+  ArrayUtils.toArray = function(items) {
+    var i, newItems;
+    newItems = [];
+    if (items.length) {
+      i = items.length;
+      while (i-- > 0) {
+        newItems[i] = items[i];
+      }
+    }
+    return newItems;
   };
   return ArrayUtils;
 })();
@@ -4192,6 +4258,7 @@ API = (function(_super) {
     this._reuse = true;
     this._method = 'POST';
     this._jsonp = false;
+    this._type = 'normal';
     if (arg instanceof HTMLElement && arg.tagName.toLowerCase() === 'form') {
       this._form = arg;
       setTimeout(this._addEventListeners, 0);
@@ -4308,7 +4375,6 @@ API = (function(_super) {
       if (this._form.hasAttribute('type') && this._form.getAttribute('type') === 'json') {
         this.addHeader('Content-type', 'application/json;charset=UTF-8');
         data = JSON.stringify(this._parseJSON(this._form));
-        console.log('>>', this._parseJSON(this._form));
       } else {
         data = new FormData(this._form);
       }
@@ -4394,7 +4460,6 @@ API = (function(_super) {
       }
       this._parsedElements.push(item);
       name = item.getAttribute('json-name');
-      console.log(ind, item.getAttribute('json-name'));
       if (data = this._parseJSONElement(item, indent + 2)) {
         if (!o[name]) {
           o[name] = [];
@@ -4431,7 +4496,6 @@ API = (function(_super) {
         o[input.name] = value;
       }
     }
-    console.log(o);
     return o;
   };
   API.prototype.abort = function() {
@@ -4969,7 +5033,7 @@ cms.ui.attributes.Size = (function(_super) {
   return Size;
 })(cms.ui.Base);
 var __hasProp = {}.hasOwnProperty;
-cms.ui.tag.sattributes.Service = (function(_super) {
+cms.ui.tag.attributes.Service = (function(_super) {
   var Plugin;
   __extends(Service, _super);
   function Service() {
@@ -5002,35 +5066,104 @@ cms.ui.tag.sattributes.Service = (function(_super) {
     __extends(Plugin, _super1);
     Plugin._destroyPlugin = function(item) {};
     function Plugin(element) {
+      this._sortByOrder = __bind(this._sortByOrder, this);
       this._serviceLoaded = __bind(this._serviceLoaded, this);
       this._parseData = __bind(this._parseData, this);
       this._loadService = __bind(this._loadService, this);
+      this._update = __bind(this._update, this);
       Plugin.__super__.constructor.call(this, {
         element: element
       });
-      setTimeout(this._loadService, 1);
+      this._element.on('update', this._update);
+      this._loadServiceTimeout = setTimeout(this._loadService, 1);
     }
+    Plugin.prototype._update = function() {
+      clearTimeout(this._loadServiceTimeout);
+      return this._loadServiceTimeout = setTimeout(this._loadService, 300);
+    };
     Plugin.prototype._loadService = function() {
       var data;
+      clearTimeout(this._loadServiceTimeout);
       data = this._parseData();
-      return API.call(this._element.getAttribute('service'), null, this._serviceLoaded);
+      return API.call(this._element.getAttribute('service'), data, this._serviceLoaded);
     };
     Plugin.prototype._parseData = function() {
-      var id, items;
+      var i, id, item, items, multiple, name, paramSet, params, sort, sortValues, value, _i, _len, _ref, _ref1;
+      params = app.router.getParam(this.attr('id'));
       if (this.attr('id')) {
         id = this.attr('id');
-        return items = document.querySelectorAll('[for=' + id + ']');
+        params = {};
+        paramSet = false;
+        items = document.querySelectorAll('[for=' + id + ']');
+        for (_i = 0, _len = items.length; _i < _len; _i++) {
+          item = items[_i];
+          multiple = false;
+          name = item.getAttribute('name');
+          value = item.value;
+          switch (item.tagName.toLowerCase()) {
+            case 'input':
+              if ((_ref = item.getAttribute('type')) === 'checkbox') {
+                multiple = true;
+              }
+              if ((_ref1 = item.getAttribute('type')) === 'checkbox' || _ref1 === 'radio') {
+                if (!item.checked) {
+                  value = null;
+                }
+              }
+              break;
+            default:
+              if (item.hasAttribute('sort')) {
+                continue;
+              }
+          }
+          if (value) {
+            paramSet = true;
+            if (multiple) {
+              if (!params[name]) {
+                params[name] = [];
+              }
+              params[name].push(value);
+            } else {
+              params[name] = value;
+            }
+          }
+        }
+        sort = ArrayUtils.toArray(this._element.querySelectorAll('[sort][value]'));
+        if (sort.length > 0) {
+          sort.sort(this._sortByOrder);
+          sortValues = [];
+          i = sort.length;
+          while (i-- > 0) {
+            sortValues[i] = sort[i].value;
+          }
+          paramSet = true;
+          params['sort'] = sortValues;
+        }
+        if (paramSet) {
+          app.router.setParam(id, params);
+        } else {
+          app.router.removeParam(id);
+        }
       }
+      return params;
     };
     Plugin.prototype._serviceLoaded = function(e, data) {
       return app.template.renderBlock(this._element, data);
+    };
+    Plugin.prototype._sortByOrder = function(a, b) {
+      if (a.sortOrder < b.sortOrder) {
+        return -1;
+      } else if (a.sortOrder > b.sortOrder) {
+        return 1;
+      }
+      return 0;
     };
     return Plugin;
   })(BaseDOM);
   return Service;
 })(cms.ui.Base);
 var __hasProp = {}.hasOwnProperty;
-cms.ui.tag.sattributes.Href = (function(_super) {
+cms.ui.tag.attributes.Href = (function(_super) {
   var Plugin;
   __extends(Href, _super);
   function Href() {
@@ -5099,7 +5232,7 @@ cms.ui.attributes.Focus = (function(_super) {
   return Focus;
 })(cms.ui.Base);
 var __hasProp = {}.hasOwnProperty;
-cms.ui.tag.sattributes.Draggable = (function(_super) {
+cms.ui.tag.attributes.Draggable = (function(_super) {
   var Plugin;
   __extends(Draggable, _super);
   function Draggable() {
@@ -5525,7 +5658,7 @@ cms.ui.attributes.Background = (function(_super) {
   return Background;
 })(cms.ui.Base);
 var __hasProp = {}.hasOwnProperty;
-cms.ui.tag.sattributes.Action = (function(_super) {
+cms.ui.tag.attributes.Action = (function(_super) {
   var Plugin;
   __extends(Action, _super);
   function Action() {
@@ -5835,7 +5968,7 @@ cms.ui.tags.form.Field = (function(_super) {
       this._input.on('blur', this._blur);
       this._input.on('change', this._change);
       this._input.on('input', this._change);
-      this._checkFilled();
+      setTimeout(this._checkFilled, 1);
     }
     Plugin.prototype._checkPasswordPreview = function() {
       var pp;
@@ -6094,7 +6227,7 @@ Blocker = (function(_super) {
   return Blocker;
 })(BaseDOM);
 var __hasProp = {}.hasOwnProperty;
-cms.ui.tag.sattributes.Sort = (function(_super) {
+cms.ui.tag.attributes.Sort = (function(_super) {
   var Plugin;
   __extends(Sort, _super);
   function Sort() {
@@ -6125,15 +6258,206 @@ cms.ui.tag.sattributes.Sort = (function(_super) {
     __extends(Plugin, _super1);
     Plugin._destroyPlugin = function(item) {};
     function Plugin(element) {
+      this._sortByOrder = __bind(this._sortByOrder, this);
       this._click = __bind(this._click, this);
+      this._update = __bind(this._update, this);
+      this._resetOthers = __bind(this._resetOthers, this);
+      this._parseParam = __bind(this._parseParam, this);
       Plugin.__super__.constructor.call(this, {
         element: element
       });
+      this._name = this.attr('sort');
+      this._element.setAttribute('name', 'sort');
+      this._sortButton = document.createElement('span');
+      this._sortButton.className = 'sort';
+      this._icon = document.createElement('i');
+      this._icon.className = 'fa icon';
+      this._sortButton.appendChild(this._icon);
+      this._sortOrder = document.createElement('sup');
+      this._sortButton.appendChild(this._sortOrder);
+      if (this.attr('for')) {
+        this._target = document.querySelector('#' + this.attr('for'));
+      } else {
+        this._target = this.findParents('[service]');
+      }
+      this._parseParam();
+      this._element.on('click', this._click);
+      this._element.on('update', this._update);
+      this.appendChild(this._sortButton);
     }
-    Plugin.prototype._click = function(e) {};
+    Plugin.prototype._parseParam = function() {
+      var data, index, targetId;
+      if ((targetId = this._target.getAttribute('id'))) {
+        data = app.router.getParam(targetId);
+        if (!data) {
+          return;
+        }
+        if (data['sort']) {
+          data = [].concat(data['sort']);
+          if ((index = data.indexOf(this._name)) >= 0) {
+            if (data.length > 1) {
+              this._element.sortOrder = index;
+            }
+            this._element.value = this._name;
+          } else if ((index = data.indexOf('-' + this._name)) >= 0) {
+            if (data.length > 1) {
+              this._element.sortOrder = index;
+            }
+            this._element.value = '-' + this._name;
+          }
+        }
+        this._element.setAttribute('for', targetId);
+        return this._update();
+      }
+    };
+    Plugin.prototype._resetOthers = function() {
+      var i, items, _results;
+      items = this._target.querySelectorAll('[sort]');
+      i = items.length;
+      _results = [];
+      while (i-- > 0) {
+        items[i].sortOrder = null;
+        delete items[i].sortOrder;
+        if (items[i] === this._element) {
+          continue;
+        }
+        _results.push(items[i].value = null);
+      }
+      return _results;
+    };
+    Plugin.prototype._updateAll = function() {
+      var i, items, _results;
+      items = this._target.querySelectorAll('[sort]');
+      i = items.length;
+      _results = [];
+      while (i-- > 0) {
+        _results.push(items[i].trigger('update'));
+      }
+      return _results;
+    };
+    Plugin.prototype._update = function() {
+      if (!this._element.value) {
+        this._element.removeAttribute('value');
+      } else {
+        this._element.setAttribute('value', this._element.value);
+      }
+      if (!isNaN(this._element.sortOrder)) {
+        this._element.setAttribute('sortOrder', this._element.sortOrder);
+        return this._sortOrder.innerHTML = this._element.sortOrder;
+      } else {
+        this._element.removeAttribute('sortOrder');
+        return this._sortOrder.innerHTML = '';
+      }
+    };
+    Plugin.prototype._click = function(e) {
+      var i, index, items, value;
+      value = this._element.value;
+      if (value && !(/^\-/.test(value))) {
+        value = '-' + this._name;
+      } else {
+        value = this._name;
+      }
+      if (e.metaKey) {
+        items = ArrayUtils.toArray(this._target.querySelectorAll('[sort][value]'));
+        items.sort(this._sortByOrder);
+        index = items.length;
+        i = items.length;
+        while (i-- > 0) {
+          items[i].sortOrder = i;
+          if (items[i] === this._element) {
+            index = i;
+          }
+        }
+        this._element.sortOrder = index;
+      } else {
+        this._resetOthers();
+      }
+      this._element.value = value;
+      this._updateAll();
+      return this._target.trigger('update');
+    };
+    Plugin.prototype._sortByOrder = function(a, b) {
+      if (a.sortOrder < b.sortOrder) {
+        return -1;
+      } else if (a.sortOrder > b.sortOrder) {
+        return 1;
+      }
+      return 0;
+    };
     return Plugin;
   })(BaseDOM);
   return Sort;
+})(cms.ui.Base);
+var __hasProp = {}.hasOwnProperty;
+cms.ui.tag.attributes.For = (function(_super) {
+  var Plugin;
+  __extends(For, _super);
+  function For() {
+    return For.__super__.constructor.apply(this, arguments);
+  }
+  For.SELECTOR = '[for]';
+  For.prototype._update = function(data) {
+    var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
+    _ref = data.add;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      item = _ref[_i];
+      if (item.hasAttribute('sort')) {
+        continue;
+      }
+      this._plugins[item] = new Plugin(item);
+    }
+    _ref1 = data.remove;
+    _results = [];
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      item = _ref1[_j];
+      p = this._plugins[item];
+      if (p) {
+        _results.push(typeof p.destroy === "function" ? p.destroy() : void 0);
+      } else {
+        _results.push(void 0);
+      }
+    }
+    return _results;
+  };
+  Plugin = (function(_super1) {
+    __extends(Plugin, _super1);
+    Plugin._destroyPlugin = function(item) {};
+    function Plugin(element) {
+      this._change = __bind(this._change, this);
+      Plugin.__super__.constructor.call(this, {
+        element: element
+      });
+      this._target = document.querySelector('#' + this.attr('for'));
+      this._setItemValue();
+      this._element.on('change', this._change);
+      this._element.on('input', this._change);
+    }
+    Plugin.prototype._setItemValue = function() {
+      var data, id, name, _ref, _ref1, _ref2;
+      id = this._element.getAttribute('for');
+      data = app.router.getParam(id);
+      if (!data) {
+        return;
+      }
+      name = this._element.getAttribute('name');
+      if (name && data[name]) {
+        data = data[name];
+        if (this._element.tagName.toLowerCase() === 'input' && ((_ref = (_ref1 = this._element.getAttribute('type')) != null ? _ref1.toLowerCase() : void 0) === 'checkbox' || _ref === 'radio')) {
+          if (_ref2 = this._element.value, __indexOf.call(data, _ref2) >= 0) {
+            return this._element.checked = true;
+          }
+        } else {
+          return this._element.value = data;
+        }
+      }
+    };
+    Plugin.prototype._change = function() {
+      var _ref;
+      return (_ref = this._target) != null ? _ref.trigger('update') : void 0;
+    };
+    return Plugin;
+  })(BaseDOM);
+  return For;
 })(cms.ui.Base);
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 slikland.mara.Block = (function() {
@@ -6803,7 +7127,7 @@ slikland.Mara = (function(_super) {
   };
   Mara.prototype._holdContextToRender = function(context) {
     context.style.visibility = 'hidden';
-    return setTimeout(this._showContext, 2, context);
+    return setTimeout(this._showContext, 1, context);
   };
   Mara.prototype._showContext = function(context) {
     return context.style.visibility = '';

@@ -15,7 +15,7 @@ card: {"service":"../api/cms/user/getUsers"}
 					span: "#{name}"
 					tag: "#{role}"
 				div: "#{email}"
-				div.text-small: "Last login: #{last_login}"
+				div.text-small: "Último acesso: #{last_login}"
 			div.right:
 				a.text-center: {"style":"width: 1em;display:inline-block;","href":"cms/user/edit/#{id}"}
 					i.fa.fa-pencil-square-o

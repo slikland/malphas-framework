@@ -1,4 +1,4 @@
-#namespace cms.ui.tag.sattributes
+#namespace cms.ui.tag.attributes
 class Href extends cms.ui.Base
 	@SELECTOR: '[href]'
 	_update:(data)->

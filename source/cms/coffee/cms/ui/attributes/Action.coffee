@@ -1,4 +1,4 @@
-#namespace cms.ui.tag.sattributes
+#namespace cms.ui.tag.attributes
 class Action extends cms.ui.Base
 	@SELECTOR: ':not(form)[action]'
 	_update:(data)->

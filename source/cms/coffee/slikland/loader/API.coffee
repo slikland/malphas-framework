@@ -66,6 +66,7 @@ class API extends EventDispatcher
 		@_reuse = true
 		@_method = 'POST'
 		@_jsonp = false
+		@_type = 'normal'
 		if arg instanceof HTMLElement && arg.tagName.toLowerCase() == 'form'
 			@_form = arg
 			setTimeout(@_addEventListeners, 0)
@@ -146,10 +147,10 @@ class API extends EventDispatcher
 			if @_form.hasAttribute('type') && @_form.getAttribute('type') == 'json'
 				@addHeader('Content-type', 'application/json;charset=UTF-8')
 				data = JSON.stringify(@_parseJSON(@_form))
-				console.log('>>', @_parseJSON(@_form))
 			else
 				data = new FormData(@_form)
 		else
+
 			if @_type == 'normal'
 				if !data
 					data = new FormData()
@@ -208,7 +209,6 @@ class API extends EventDispatcher
 			@_parsedElements.push(item)
 
 			name = item.getAttribute('json-name')
-			console.log(ind, item.getAttribute('json-name'))
 			
 			if data = @_parseJSONElement(item, indent + 2)
 				if !o[name]
@@ -233,7 +233,6 @@ class API extends EventDispatcher
 				o[input.name].push(value)
 			else
 				o[input.name] = value
-		console.log(o)
 		return o
 	abort:->
 		@_submitting = false
