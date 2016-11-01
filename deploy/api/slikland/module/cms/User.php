@@ -91,10 +91,26 @@ class User extends \slikland\core\pattern\Singleton
 		return $this->db->fetch_all('SELECT pk_cms_role id, name FROM cms_role WHERE pk_cms_role >= ' . $user['role']);
 	}
 
-	function getList()
+	function getList($data)
 	{
+		if(!$data)
+		{
+			$data = array();
+		}
 		$user = $this->getCurrent();
-		$users = $this->db->fetch_all('SELECT 
+		if(!isset($data['sort']))
+		{
+			$data['sort'] = '-role,name';
+		}
+
+		if(isset($data['search']))
+		{
+			$data['search'] = array('value'=>$data['search'], 'fields'=>'cu.name,cu.email');
+		}
+		$data['where'] = array();
+		$data['where'][] = 'cu.fk_cms_role >= ' . $user['role'];
+		$list = $this->db->getList('
+			SELECT 
 				cu.pk_cms_user id, 
 				cu.name name, 
 				cu.email email, 
@@ -103,10 +119,8 @@ class User extends \slikland\core\pattern\Singleton
 				FROM cms_user cu 
 			LEFT JOIN cms_role cr ON cr.pk_cms_role = cu.fk_cms_role
 			LEFT JOIN (SELECT t_cs.fk_cms_user, MAX(t_cs.created) last_login FROM cms_session t_cs GROUP BY t_cs.fk_cms_user) cs ON cs.fk_cms_user = cu.pk_cms_user
-			WHERE cu.fk_cms_role >= ' . $user['role'] .'
-			ORDER BY cr.pk_cms_role ASC, cu.name ASC
-		');
-		return $users;
+		', $data, 0);
+		return $list;
 	}
 
 	function login($email, $pass)
@@ -237,6 +251,7 @@ class User extends \slikland\core\pattern\Singleton
 		{
 			$data['sort'] = '-created';
 		}
+
 		if(isset($data['search']))
 		{
 			$data['search'] = array('value'=>$data['search'], 'fields'=>'name,action,description,data');
@@ -244,7 +259,7 @@ class User extends \slikland\core\pattern\Singleton
 		$data['where'] = array();
 		$data['where'][] = 'cu.fk_cms_role >= ' . $user['role'];
 		$log = $this->db->getList('
-			SELECT cu.name name, cl.action, cl.description, cl.data, cl.created FROM cms_log cl
+			SELECT cu.name name, cl.action, cl.description, cl.data, cl.created, cu.fk_cms_role role FROM cms_log cl
 			LEFT JOIN cms_session cs ON cs.pk_cms_session = cl.fk_cms_session
 			LEFT JOIN cms_user cu ON cu.pk_cms_user = cs.fk_cms_user
 		', $data, NULL);

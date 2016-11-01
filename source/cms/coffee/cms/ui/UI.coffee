@@ -6,6 +6,8 @@ class UI
 		setTimeout(@_registerUIs, 0)
 
 	@set _dirty:(value)->
+		@_updateInstances()
+		return
 		if !value
 			return
 		clearTimeout(@_dirtyTimeout)

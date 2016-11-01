@@ -73,6 +73,12 @@ class Mara extends EventDispatcher
 	_resetContext:(target)->
 		children = target.childNodes
 		i = children.length
+		items = []
+		while i-- > 0
+			items[i] = children[i]
+		setTimeout(@_removeChildren, 0, target, items)
+	_removeChildren:(target, children)=>
+		i = children.length
 		while i-- > 0
 			target.removeChild(children[i])
 

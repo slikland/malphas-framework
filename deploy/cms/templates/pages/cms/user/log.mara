@@ -1,6 +1,7 @@
 card.col-full: 
 	header: "Log de atividade"
 	content:
+		pagination: {"for":"log_table", "numItems": "20"}
 		field: 
 			label: "Busca"
 			input: {"for":"log_table", "name":"search"}
@@ -8,16 +9,16 @@ card.col-full:
 			label: "Filtro"
 			group:
 				field:
-					input: {"for":"log_table", "name":"filter_role", "type":"checkbox", "value":"1"}
+					input: {"for":"log_table", "name":"filter_fk_cms_role", "type":"checkbox", "value":"1"}
 					label: "a"
 				field:
-					input: {"for":"log_table", "name":"filter_role", "type":"checkbox", "value":"2"}
+					input: {"for":"log_table", "name":"filter_fk_cms_role", "type":"checkbox", "value":"2"}
 					label: "b"
 				field:
-					input: {"for":"log_table", "name":"filter_role", "type":"checkbox", "value":"3"}
+					input: {"for":"log_table", "name":"filter_fk_cms_role", "type":"checkbox", "value":"3"}
 					label: "c"
 				field:
-					input: {"for":"log_table", "name":"filter_role", "type":"checkbox", "value":"4"}
+					input: {"for":"log_table", "name":"filter_fk_cms_role", "type":"checkbox", "value":"4"}
 					label: "d"
 		table: {"id":"log_table", "service": "../api/cms/user/getLog"}
 			thead:

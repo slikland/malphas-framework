@@ -70,9 +70,11 @@ class user
 		return $user;
 	}
 
-	function getUsers()
+	function getUsers($data)
 	{
-		return array('users'=>$this->module->getList());
+		$list = $this->module->getList($data);
+		$list['params'] = $data;
+		return $list;
 	}
 
 	function getRoles()
@@ -101,8 +103,8 @@ class user
 
 	function getLog($data)
 	{
-		$logs = $this->module->getLog($data);
-		$logs['params'] = $data;
-		return $logs;
+		$list = $this->module->getLog($data);
+		$list['params'] = $data;
+		return $list;
 	}
 }

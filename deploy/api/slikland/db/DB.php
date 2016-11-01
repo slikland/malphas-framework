@@ -296,9 +296,12 @@ class DB{
 		return $response;
 	}
 
-	public function getList($query, $params, $array = false)
+	public function getList($query, $params, $numItems = 20, $array = false)
 	{
-		$numItems = 20;
+		if(is_null($numItems))
+		{
+			$numItems = 20;
+		}
 		$index = 0;
 		if(isset($params['pagination']))
 		{
@@ -350,9 +353,21 @@ class DB{
 			}
 		}
 
+		$filters = array();
+		foreach($params as $k=>$v)
+		{
+			if(preg_match('/^filter_(.+)$/', $k, $filterName))
+			{
+				if(is_array($v)){
+					$filters[] = $filterName[1] . ' IN("' . implode('", "', $v) . '")';
+				}else{
+					$filters[] = $filterName[1] . ' = "' . $v . '"';
+				}
+			}
+
+		}
 		if(isset($params['filter']))
 		{
-			$filters = array();
 			foreach($params['filter'] as $filter)
 			{
 				if(!isset($filter['fields']))
@@ -372,10 +387,10 @@ class DB{
 					$filters[] = $fields . ' = "' . $value . '"';
 				}
 			}
-			if(count($filters) > 0)
-			{
-				$where[] = implode(' AND ', $filters);
-			}
+		}
+		if(count($filters) > 0)
+		{
+			$where[] = implode(' AND ', $filters);
 		}
 
 		if(isset($params['where']))
@@ -435,8 +450,10 @@ class DB{
 		{
 			$query[] = 'ORDER BY ' . implode(', ', $orders);
 		}
-
-		$query[] = 'LIMIT ' . $index .', ' . $numItems;
+		if($numItems > 0)
+		{
+			$query[] = 'LIMIT ' . $index .', ' . $numItems;
+		}
 
 		$query = implode(' ', $query);
 

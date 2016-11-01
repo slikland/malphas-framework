@@ -73,6 +73,12 @@ class Service extends cms.ui.Base
 
 		_serviceLoaded:(e, data)=>
 			app.template.renderBlock(@_element, data)
+			if @attr('id')
+				id = @attr('id')
+				items = document.querySelectorAll('[for=' + id + ']')
+				i = items.length
+				while i-- > 0
+					items[i].trigger('update', data)
 		_sortByOrder:(a, b)=>
 			if a.sortOrder < b.sortOrder
 				return -1

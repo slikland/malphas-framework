@@ -1,4 +1,5 @@
 #namespace cms.ui.tag.attributes
+#import slikland.utils.MouseUtils
 class Draggable extends cms.ui.Base
 	@SELECTOR: '[draggable]'
 	_update:(data)->
@@ -211,13 +212,9 @@ class Draggable extends cms.ui.Base
 			@_drop()
 
 		_moveCloned:(e)=>
-			pos = @_getMousePos(e)
+			pos = MouseUtils.getMousePos(e)
 			bounds = @_cloned.parentNode.getBoundingClientRect()
 			x = pos[0] - bounds.left - @_elOffset.x
 			y = pos[1] - bounds.top - @_elOffset.y
 			@_cloned.style.left = x + 'px'
 			@_cloned.style.top = y + 'px'
-		_getMousePos:(e)->
-			x = e.pageX || e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft
-			y = e.pageY || e.clientY + document.body.scrollTop + document.documentElement.scrollTop
-			return [x, y]

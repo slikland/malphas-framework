@@ -5148,7 +5148,18 @@ cms.ui.tag.attributes.Service = (function(_super) {
       return params;
     };
     Plugin.prototype._serviceLoaded = function(e, data) {
-      return app.template.renderBlock(this._element, data);
+      var i, id, items, _results;
+      app.template.renderBlock(this._element, data);
+      if (this.attr('id')) {
+        id = this.attr('id');
+        items = document.querySelectorAll('[for=' + id + ']');
+        i = items.length;
+        _results = [];
+        while (i-- > 0) {
+          _results.push(items[i].trigger('update', data));
+        }
+        return _results;
+      }
     };
     Plugin.prototype._sortByOrder = function(a, b) {
       if (a.sortOrder < b.sortOrder) {
@@ -5231,6 +5242,29 @@ cms.ui.attributes.Focus = (function(_super) {
   };
   return Focus;
 })(cms.ui.Base);
+var MouseUtils;
+MouseUtils = (function() {
+  function MouseUtils() {}
+  MouseUtils.getMousePos = function(e, global) {
+    var x, y;
+    if (global == null) {
+      global = true;
+    }
+    x = e.pageX || e.clientX;
+    y = e.pageX || e.clientX;
+    if (global) {
+      x += document.body.scrollLeft + document.documentElement.scrollLeft;
+      y += document.body.scrollTop + document.documentElement.scrollTop;
+    }
+    return [x, y];
+  };
+  MouseUtils.toGlobal = function(x, y) {
+    x += document.body.scrollLeft + document.documentElement.scrollLeft;
+    y += document.body.scrollTop + document.documentElement.scrollTop;
+    return [x, y];
+  };
+  return MouseUtils;
+})();
 var __hasProp = {}.hasOwnProperty;
 cms.ui.tag.attributes.Draggable = (function(_super) {
   var Plugin;
@@ -5533,18 +5567,12 @@ cms.ui.tag.attributes.Draggable = (function(_super) {
     };
     Plugin.prototype._moveCloned = function(e) {
       var bounds, pos, x, y;
-      pos = this._getMousePos(e);
+      pos = MouseUtils.getMousePos(e);
       bounds = this._cloned.parentNode.getBoundingClientRect();
       x = pos[0] - bounds.left - this._elOffset.x;
       y = pos[1] - bounds.top - this._elOffset.y;
       this._cloned.style.left = x + 'px';
       return this._cloned.style.top = y + 'px';
-    };
-    Plugin.prototype._getMousePos = function(e) {
-      var x, y;
-      x = e.pageX || e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-      y = e.pageY || e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
-      return [x, y];
     };
     return Plugin;
   })(BaseDOM);
@@ -5763,6 +5791,9 @@ cms.ui.tags.form.Toggle = (function(_super) {
     });
     Plugin.set({
       selected: function(value) {
+        if (value === this._selected) {
+          return;
+        }
         this._selected = value;
         this._element.setAttribute('selected', value);
         this._element.selected = value;
@@ -5773,9 +5804,13 @@ cms.ui.tags.form.Toggle = (function(_super) {
       }
     });
     Plugin.prototype._toggle = function() {
-      return this.selected = !this._selected;
+      this.selected = !this._selected;
+      return this._input.trigger('change');
     };
-    Plugin.prototype._update = function() {
+    Plugin.prototype._update = function(e) {
+      if (e == null) {
+        e = null;
+      }
       if (this._input) {
         return this.selected = this._input.checked;
       }
@@ -5924,7 +5959,11 @@ cms.ui.tags.form.Field = (function(_super) {
     _ref = data.add;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       item = _ref[_i];
-      this._plugins[item] = new Plugin(item);
+      if (Plugin._checkPlugin(item)) {
+        this._plugins[item] = new Plugin(item);
+      } else {
+        item.className = 'filled';
+      }
     }
     _ref1 = data.remove;
     _results = [];
@@ -5942,6 +5981,14 @@ cms.ui.tags.form.Field = (function(_super) {
   Plugin = (function(_super1) {
     __extends(Plugin, _super1);
     Plugin._destroyPlugin = function(item) {};
+    Plugin._checkPlugin = function(item) {
+      var input;
+      input = item.querySelector('input:not([type="hidden"]),select,textarea');
+      if (input.findParents('field') !== item) {
+        return false;
+      }
+      return true;
+    };
     function Plugin(element) {
       this._checkFilled = __bind(this._checkFilled, this);
       this._change = __bind(this._change, this);
@@ -5949,25 +5996,35 @@ cms.ui.tags.form.Field = (function(_super) {
       this._focus = __bind(this._focus, this);
       this._password = __bind(this._password, this);
       this._passwordPreviewChange = __bind(this._passwordPreviewChange, this);
-      var _ref;
+      var _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8;
       Plugin.__super__.constructor.call(this, {
         element: element
       });
       this._input = this._element.querySelector('input:not([type="hidden"]),select,textarea');
-      if ((_ref = this._input.tagName.toLowerCase()) === 'select' || _ref === 'textarea') {
-        this._input.setAttribute('type', this._input.tagName.toLowerCase());
+      if ((_ref = (_ref1 = this._input) != null ? _ref1.tagName.toLowerCase() : void 0) === 'select' || _ref === 'textarea') {
+        if ((_ref2 = this._input) != null) {
+          _ref2.setAttribute('type', (_ref3 = this._input) != null ? _ref3.tagName.toLowerCase() : void 0);
+        }
       }
-      if (this._input.hasAttribute('type')) {
+      if ((_ref4 = this._input) != null ? _ref4.hasAttribute('type') : void 0) {
         this.addClass(this._input.getAttribute('type'));
         switch (this._input.getAttribute('type').toLowerCase()) {
           case 'password':
             this._checkPasswordPreview();
         }
       }
-      this._input.on('focus', this._focus);
-      this._input.on('blur', this._blur);
-      this._input.on('change', this._change);
-      this._input.on('input', this._change);
+      if ((_ref5 = this._input) != null) {
+        _ref5.on('focus', this._focus);
+      }
+      if ((_ref6 = this._input) != null) {
+        _ref6.on('blur', this._blur);
+      }
+      if ((_ref7 = this._input) != null) {
+        _ref7.on('change', this._change);
+      }
+      if ((_ref8 = this._input) != null) {
+        _ref8.on('input', this._change);
+      }
       setTimeout(this._checkFilled, 1);
     }
     Plugin.prototype._checkPasswordPreview = function() {
@@ -5977,17 +6034,21 @@ cms.ui.tags.form.Field = (function(_super) {
         return;
       }
       this._passwordPreview = pp;
-      return this._passwordPreview.on('change', this._passwordPreviewChange);
+      return this._passwordPreview.off('change', this._passwordPreviewChange);
     };
     Plugin.prototype._passwordPreviewChange = function() {
+      var _ref, _ref1;
       if (this._passwordPreview.selected) {
-        return this._input.setAttribute('type', 'text');
+        return (_ref = this._input) != null ? _ref.setAttribute('type', 'text') : void 0;
       } else {
-        return this._input.setAttribute('type', 'password');
+        return (_ref1 = this._input) != null ? _ref1.setAttribute('type', 'password') : void 0;
       }
     };
     Plugin.prototype._password = function(e) {
-      this._input.type = 'text';
+      var _ref;
+      if ((_ref = this._input) != null) {
+        _ref.type = 'text';
+      }
       e.preventDefault();
       return e.stopImmediatePropagation();
     };
@@ -6003,15 +6064,15 @@ cms.ui.tags.form.Field = (function(_super) {
       return this._checkFilled();
     };
     Plugin.prototype._checkFilled = function() {
-      var v;
+      var v, _ref, _ref1;
       if (this._focused) {
         this.addClass('filled');
         return;
       }
-      v = this._input.value.trim();
+      v = (_ref = this._input) != null ? _ref.value.trim() : void 0;
       if (v.length === 0) {
         this.removeClass('filled');
-        return this._input.value = v;
+        return (_ref1 = this._input) != null ? _ref1.value = v : void 0;
       } else {
         return this.addClass('filled');
       }
@@ -6032,6 +6093,8 @@ cms.ui.UI = (function() {
   }
   UI.set({
     _dirty: function(value) {
+      this._updateInstances();
+      return;
       if (!value) {
         return;
       }
@@ -6444,7 +6507,8 @@ cms.ui.tag.attributes.For = (function(_super) {
         data = data[name];
         if (this._element.tagName.toLowerCase() === 'input' && ((_ref = (_ref1 = this._element.getAttribute('type')) != null ? _ref1.toLowerCase() : void 0) === 'checkbox' || _ref === 'radio')) {
           if (_ref2 = this._element.value, __indexOf.call(data, _ref2) >= 0) {
-            return this._element.checked = true;
+            this._element.checked = true;
+            return this._element.trigger('change');
           }
         } else {
           return this._element.value = data;
@@ -6458,6 +6522,257 @@ cms.ui.tag.attributes.For = (function(_super) {
     return Plugin;
   })(BaseDOM);
   return For;
+})(cms.ui.Base);
+var __hasProp = {}.hasOwnProperty;
+cms.ui.tags.form.Checkbox = (function(_super) {
+  __extends(Checkbox, _super);
+  function Checkbox() {
+    return Checkbox.__super__.constructor.apply(this, arguments);
+  }
+  Checkbox.SELECTOR = 'input[type="checkbox"]';
+  Checkbox.prototype._update = function(data) {
+    var item, _i, _len, _ref, _results;
+    _ref = data.add;
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      item = _ref[_i];
+      _results.push(this._buildCheckbox(item));
+    }
+    return _results;
+  };
+  Checkbox.prototype._buildCheckbox = function(item) {
+    var child, children, def, i, label, parent, selected, toggle, _i, _len;
+    toggle = document.createElement('toggle');
+    def = document.createElement('default');
+    selected = document.createElement('selected');
+    i = document.createElement('i');
+    i.className = 'fa fa-square-o';
+    def.appendChild(i);
+    i = document.createElement('i');
+    i.className = 'fa fa-check-square-o';
+    selected.appendChild(i);
+    toggle.append(def);
+    toggle.append(selected);
+    parent = item.parentNode;
+    if (item.parentNode.tagName.toLowerCase() === 'field') {
+      children = ArrayUtils.toArray(parent.children);
+      for (_i = 0, _len = children.length; _i < _len; _i++) {
+        child = children[_i];
+        toggle.appendChild(child);
+      }
+      return parent.appendChild(toggle);
+    } else if (label = item.parentNode.querySelector('label')) {
+      toggle.appendChild(label);
+      parent.insertBefore(toggle, item);
+      return toggle.appendChild(item);
+    }
+  };
+  return Checkbox;
+})(cms.ui.Base);
+var __hasProp = {}.hasOwnProperty;
+cms.ui.tags.Pagination = (function(_super) {
+  var Plugin;
+  __extends(Pagination, _super);
+  function Pagination() {
+    return Pagination.__super__.constructor.apply(this, arguments);
+  }
+  Pagination.SELECTOR = 'pagination';
+  Pagination.prototype._update = function(data) {
+    var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
+    _ref = data.add;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      item = _ref[_i];
+      this._plugins[item] = new Plugin(item);
+    }
+    _ref1 = data.remove;
+    _results = [];
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      item = _ref1[_j];
+      p = this._plugins[item];
+      if (p) {
+        _results.push(typeof p.destroy === "function" ? p.destroy() : void 0);
+      } else {
+        _results.push(void 0);
+      }
+    }
+    return _results;
+  };
+  Plugin = (function(_super1) {
+    __extends(Plugin, _super1);
+    Plugin._destroyPlugin = function(item) {};
+    function Plugin(element) {
+      this._update = __bind(this._update, this);
+      this._getClosest = __bind(this._getClosest, this);
+      this._mouseMove = __bind(this._mouseMove, this);
+      this._startPageSeek = __bind(this._startPageSeek, this);
+      this._stopPageSeek = __bind(this._stopPageSeek, this);
+      this._mouseUp = __bind(this._mouseUp, this);
+      this._pageMouseDown = __bind(this._pageMouseDown, this);
+      Plugin.__super__.constructor.call(this, {
+        element: element
+      });
+      this._element.on('update', this._update);
+      this._pages = [];
+      this._pageWrapper = new BaseDOM({
+        element: 'div',
+        className: 'wrapper'
+      });
+      this._pageContainer = new BaseDOM({
+        element: 'div',
+        className: 'page-container'
+      });
+      this._shadowLeft = new BaseDOM({
+        element: 'span',
+        className: 'shadow-left'
+      });
+      this._shadowRight = new BaseDOM({
+        element: 'span',
+        className: 'shadow-right'
+      });
+      this._first = new BaseDOM({
+        element: 'a',
+        className: 'arrow first'
+      });
+      this._prev = new BaseDOM({
+        element: 'a',
+        className: 'arrow prev'
+      });
+      this._next = new BaseDOM({
+        element: 'a',
+        className: 'arrow next'
+      });
+      this._last = new BaseDOM({
+        element: 'a',
+        className: 'arrow last'
+      });
+      this._first.html = '<i />';
+      this._prev.html = '<i />';
+      this._next.html = '<i />';
+      this._last.html = '<i />';
+      this._pageWrapper.appendChild(this._pageContainer);
+      this._pageWrapper.appendChild(this._shadowLeft);
+      this._pageWrapper.appendChild(this._shadowRight);
+      this.appendChild(this._first);
+      this.appendChild(this._prev);
+      this.appendChild(this._pageWrapper);
+      this.appendChild(this._next);
+      this.appendChild(this._last);
+      this._pageContainer.element.on('mousedown', this._pageMouseDown);
+    }
+    Plugin.prototype._pageMouseDown = function(e) {
+      this._seeking = false;
+      this._mousePos = null;
+      window.addEventListener('mouseup', this._mouseUp);
+      window.addEventListener('mousemove', this._mouseMove);
+      this._pageSeekTimeout = setTimeout(this._startPageSeek, 100);
+      return e.preventDefault();
+    };
+    Plugin.prototype._mouseUp = function() {
+      this._stopPageSeek();
+      return clearTimeout(this._pageSeekTimeout);
+    };
+    Plugin.prototype._stopPageSeek = function() {
+      window.removeEventListener('mousemove', this._mouseMove);
+      window.removeEventListener('mouseup', this._mouseUp);
+      this.removeClass('seeking');
+      return this._seeking = true;
+    };
+    Plugin.prototype._startPageSeek = function() {
+      this.addClass('seeking');
+      return this._seeking = true;
+    };
+    Plugin.prototype._mouseMove = function(e) {
+      var bounds, cX, dx, ePos, pX, pw, px, sl, w, x;
+      this._prevPos = this._mousePos;
+      this._mousePos = MouseUtils.getMousePos(e, false);
+      if (!this._seeking) {
+        return;
+      }
+      if (!this._prevPos) {
+        return;
+      }
+      bounds = this._pageWrapper.getBounds();
+      ePos = MouseUtils.toGlobal(bounds.left, bounds.top);
+      pX = (this._prevPos[0] - ePos[0]) / bounds.width;
+      cX = (this._mousePos[0] - ePos[0]) / bounds.width;
+      if (pX < 0) {
+        pX = 0;
+      } else if (pX > 1) {
+        pX = 1;
+      }
+      if (cX < 0) {
+        cX = 0;
+      } else if (cX > 1) {
+        cX = 1;
+      }
+      x = pX;
+      dx = (cX - pX) * bounds.width;
+      sl = this._pageContainer.element.scrollLeft;
+      pw = this._pageContainer.element.scrollWidth;
+      if (dx > 0) {
+        x = 1 - x;
+        w = pw - sl - bounds.width * x;
+      } else {
+        w = sl + bounds.width * x;
+      }
+      dx /= bounds.width * x;
+      px = sl + dx * w;
+      if (px < 0) {
+        px = 0;
+      } else if (px > pw - bounds.width) {
+        px = pw - bounds.width;
+      }
+      this._pageContainer.element.scrollLeft += dx * w;
+      return this._getClosest();
+    };
+    Plugin.prototype._getClosest = function() {
+      var b, closestItem, cx, d, dx, i, item, pBounds, pPos, pos;
+      pos = [].concat(this._mousePos);
+      pBounds = this._pageWrapper.getBounds();
+      pPos = MouseUtils.toGlobal(pBounds.left, pBounds.top);
+      pos = [pos[0] - pPos[0], pos[1] - pPos[1]];
+      i = this._pages.length;
+      d = Number.MAX_VALUE;
+      closestItem = null;
+      while (i-- > 0) {
+        item = this._pages[i];
+        b = item.getBoundingClientRect();
+        cx = (b.right + b.left) * 0.5 - pBounds.left;
+        dx = cx - pos[0];
+        dx *= dx;
+        item.className = '';
+        if (dx < d) {
+          d = dx;
+          closestItem = item;
+        }
+      }
+      if (closestItem) {
+        return closestItem.className = 'hover';
+      }
+    };
+    Plugin.prototype._update = function(e) {
+      var data, i, l, page, _results;
+      data = e.data;
+      if (!data || (data.total == null) || (data.numItems == null)) {
+        return;
+      }
+      this._pageContainer.removeAll();
+      this._pages.length = 0;
+      l = data.total / data.numItems;
+      l = 100;
+      i = -1;
+      _results = [];
+      while (++i < l) {
+        page = document.createElement('a');
+        page.innerHTML = i + 1;
+        this._pageContainer.appendChild(page);
+        _results.push(this._pages[i] = page);
+      }
+      return _results;
+    };
+    return Plugin;
+  })(BaseDOM);
+  return Pagination;
 })(cms.ui.Base);
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 slikland.mara.Block = (function() {
@@ -7059,6 +7374,7 @@ slikland.Mara = (function(_super) {
     if (rootPath == null) {
       rootPath = null;
     }
+    this._removeChildren = __bind(this._removeChildren, this);
     this._showContext = __bind(this._showContext, this);
     this._holdContextToRender = __bind(this._holdContextToRender, this);
     this._templateLoaded = __bind(this._templateLoaded, this);
@@ -7133,8 +7449,17 @@ slikland.Mara = (function(_super) {
     return context.style.visibility = '';
   };
   Mara.prototype._resetContext = function(target) {
-    var children, i, _results;
+    var children, i, items;
     children = target.childNodes;
+    i = children.length;
+    items = [];
+    while (i-- > 0) {
+      items[i] = children[i];
+    }
+    return setTimeout(this._removeChildren, 0, target, items);
+  };
+  Mara.prototype._removeChildren = function(target, children) {
+    var i, _results;
     i = children.length;
     _results = [];
     while (i-- > 0) {

@@ -1,14 +1,18 @@
-card: {"service":"../api/cms/user/getUsers"}
+card: 
 	header:
 		span: "Usuários"
 		div.right: {"align": "r"}
 			button.button-5.text-small: {"html":"Adicionar", "href":"cms/user/add"}
 	content:
-		>userCard: #{users}
+		field: 
+			label: "Busca"
+			input: {"for":"user_list", "name":"search"}
+		group: {"service":"../api/cms/user/getUsers", "id":"user_list"}
+			>userCard: #{items}
 <userCard
 	card.col-1_3:
 		content: 
-			div.left: {"style":"font-size: 50px;width: 1em; color: #CCCCCC;"}
+			div.left: {"style":"font-size: 50px;color: #CCCCCC;"}
 				i.fa.fa-user:
 			div.left
 				div: 
@@ -21,3 +25,14 @@ card: {"service":"../api/cms/user/getUsers"}
 					i.fa.fa-pencil-square-o
 				a.text-center.text-1: {"style":"width: 1em;display:inline-block;"}
 					i.fa.fa-trash-o
+card: 
+	header:
+		span: "Usuários"
+		div.right: {"align": "r"}
+			button.button-5.text-small: {"html":"Adicionar", "href":"cms/user/add"}
+	content:
+		field: 
+			label: "Busca"
+			input: {"for":"user_list1", "name":"search"}
+		group: {"service":"../api/cms/user/getUsers", "id":"user_list1"}
+			>userCard: #{items}

@@ -27,6 +27,8 @@ class Toggle extends cms.ui.Base
 			return @_selected
 
 		@set selected:(value)->
+			if value == @_selected
+				return
 			@_selected = value
 			@_element.setAttribute('selected', value)
 			@_element.selected = value
@@ -35,6 +37,8 @@ class Toggle extends cms.ui.Base
 			@_element.trigger('change')
 		_toggle:()=>
 			@selected = !@_selected
-		_update:()=>
+			@_input.trigger('change')
+		_update:(e = null)=>
 			if @_input
 				@selected = @_input.checked
+

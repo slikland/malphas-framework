@@ -1,9 +1,16 @@
 toggle
+	cursor: pointer
+	@extend .no-select
+	i.fa
+		vertical-align: middle
+		
 	&[selected="true"],&[selected="1"]
+		opacity: 1
 		default
 			display: none
 	&:not([selected="true"]):not([selected="1"])
+		opacity: 0.8
 		selected
 			display: none
 	input
-		display: none
+		display: none !important

@@ -32,8 +32,8 @@ class For extends cms.ui.Base
 				if @_element.tagName.toLowerCase() == 'input' && @_element.getAttribute('type')?.toLowerCase() in ['checkbox','radio']
 					if @_element.value in data
 						@_element.checked = true
+						@_element.trigger('change')
 				else
 					@_element.value = data
 		_change:()=>
-
 			@_target?.trigger('update')
