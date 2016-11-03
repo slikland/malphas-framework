@@ -23,16 +23,11 @@ card:
 			div.right:
 				a.text-center: {"style":"width: 1em;display:inline-block;","href":"cms/user/edit/#{id}"}
 					i.fa.fa-pencil-square-o
-				a.text-center.text-1: {"style":"width: 1em;display:inline-block;"}
-					i.fa.fa-trash-o
-card: 
-	header:
-		span: "Usuários"
-		div.right: {"align": "r"}
-			button.button-5.text-small: {"html":"Adicionar", "href":"cms/user/add"}
-	content:
-		field: 
-			label: "Busca"
-			input: {"for":"user_list1", "name":"search"}
-		group: {"service":"../api/cms/user/getUsers", "id":"user_list1"}
-			>userCard: #{items}
+					tooltip: "Editar usuário"
+				(#{@user.data.id} == #{id})
+					a.text-center.text-3: {"style":"width: 1em;display:inline-block;"}
+						i.fa.fa-user
+				(#{@user.data.id} != #{id})
+					a.text-center.text-1: {"style":"width: 1em;display:inline-block;","confirm":"Deseja realmente remover este usuário?","action":"../api/cms/user/remove/#{id}","success":"refresh"}
+						i.fa.fa-user-times
+						tooltip: "Remover usuário"

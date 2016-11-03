@@ -132,7 +132,7 @@ class Block
 
 	_parseObjectString:(object, data = {}, test = false)->
 		glob = slikland.Mara.globals
-		replaceObject = object.replace(/\#\{(\$|\@)([^\}\}\#]+)\}/g, '(glob[\'$1\'][\'$2\'] || \'\')')
+		replaceObject = object.replace(/\#\{(\$|\@)([^\}\}\#]+)\}/g, '(glob[\'$1\']\.$2 || \'\')')
 		replaceObject = replaceObject.replace(/\#\{([^\}\}\#]+)\}/g, '(data[\'$1\'] || \'\')').replace(/\#\{\}/g, '(data || \'\')')
 		try
 			object = eval('(function(){return (' + replaceObject + ');})();')
@@ -155,7 +155,7 @@ class Block
 
 	_replaceString:(string, data)->
 		@_currentReplaceObjectData = data
-		string = string.replace(/\(glob\[\'(.*?)\'\]\[\'(.*?)\'\]\ \|\| \'\'\)/g, '\#\{$1$2\}')
+		string = string.replace(/\(glob\[\'(.*?)\'\]\.([^\s]+) \|\| \'\'\)/g, '\#\{$1$2\}')
 		string = string.replace(/\(data\[\'(.*?)\'\]\ \|\| \'\'\)/g, '\#\{$1\}')
 		string = string.replace(/\(data \|\| \'\'\)/g, '\#\{\}')
 		string = string.replace(/\#\{(\$|\@)?([^\}\}\#]+)?\}/g, @_replaceObject)

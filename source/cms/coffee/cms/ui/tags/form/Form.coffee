@@ -17,7 +17,7 @@ class Form extends cms.ui.Base
 
 		constructor:(element)->
 			super({element: element})
-			setTimeout(@_addListeners, 1)
+			setTimeout(@_addListeners, 10)
 		_addListeners:()=>
 			@_api = new API(@_element)
 			@_api.on(API.COMPLETE, @_apiComplete)
@@ -27,6 +27,7 @@ class Form extends cms.ui.Base
 		_change:()=>
 			@_clearMessage()
 		_submit:(e)=>
+			console.log(e.defaultPrevented)
 			if e.defaultPrevented
 				e.stopImmediatePropagation()
 				return
@@ -42,7 +43,7 @@ class Form extends cms.ui.Base
 					when 'reload'
 						window.location.reload()
 					else
-						app.interface.show(success)
+						app.router.goto(success)
 
 		_apiError:(e, data)=>
 			@_showMessage(data?.message)

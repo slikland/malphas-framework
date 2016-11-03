@@ -1,0 +1,43 @@
+tooltip
+	position: absolute
+	display: none
+	font-size: 0.7em
+	z-index: 10000
+	white-space: nowrap
+	padding: 0.4em
+	background-color: #00FF00
+	font-weight: 500
+	border-radius: 2px
+	pointer-events: none
+
+	left: 50%
+	transform: translateX(-50%)
+	bottom: 100%
+
+	&.show
+		display: block
+	
+	&[align="t"]
+		top: auto
+		right: auto
+		left: 50%
+		transform: translateX(-50%)
+		bottom: 100%
+	&[align="b"]
+		bottom: auto
+		right: auto
+		left: 50%
+		transform: translateX(-50%)
+		top: 100%
+	&[align="l"]
+		bottom: auto
+		left: auto
+		top: 50%
+		transform: translateY(-50%)
+		right: 100%
+	&[align="t"]
+		bottom: auto
+		right: auto
+		top: 50%
+		transform: translateY(-50%)
+		left: 100%

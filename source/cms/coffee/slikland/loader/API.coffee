@@ -69,10 +69,10 @@ class API extends EventDispatcher
 		@_type = 'normal'
 		if arg instanceof HTMLElement && arg.tagName.toLowerCase() == 'form'
 			@_form = arg
-			setTimeout(@_addEventListeners, 0)
+			setTimeout(@_addEventListeners, 10)
 		else if BaseDOM? && arg instanceof BaseDOM && arg.element.tagName.toLowerCase == 'form'
 			@_form = arg
-			setTimeout(@_addEventListeners, 0)
+			setTimeout(@_addEventListeners, 10)
 		else if typeof(arg) == 'string'
 			@_url = arg
 		else
@@ -114,7 +114,7 @@ class API extends EventDispatcher
 	_addEventListeners:()=>
 		if @_form
 			@_form.on('submit', @_submitForm)
-	_submitForm:()=>
+	_submitForm:(e)=>
 		@submit()
 
 	addHeader:(name, value)->

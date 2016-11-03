@@ -45,6 +45,11 @@ class User extends \slikland\core\pattern\Singleton
 		}
 	}
 
+	function getRoleChecksum($id, $role)
+	{
+		return password($id . '_' . $role, 'role');
+	}
+
 	function add($name, $email, $password, $role)
 	{
 		$user = $this->getCurrent();
@@ -53,7 +58,19 @@ class User extends \slikland\core\pattern\Singleton
 		{
 			throw new CodedError('user_duplicated_email');
 		}
-		return $this->db->insert('INSERT INTO cms_user (name, email, pass, fk_cms_role) VALUES (?, ?, ?, ?)', array($name, $email, password($password), $role));
+
+		try{
+			$this->db->query('LOCK TABLES cms_user write');
+			$nextID = $this->db->nextId('cms_user');
+			$checksum = $this->getRoleChecksum($nextID, $role);
+			$insertID = $this->db->insert('INSERT INTO cms_user (pk_cms_user, name, email, pass, fk_cms_role, checksum) VALUES (?, ?, ?, ?, ?)', array($nextID, $name, $email, password($password, $nextID), $role, $checksum));
+		}catch(\Exception $e)
+		{
+
+		}
+		$this->db->query('UNLOCK TABLES;');
+
+		return $insertID;
 	}
 
 	function edit($id, $name, $email, $password, $role)
@@ -69,20 +86,25 @@ class User extends \slikland\core\pattern\Singleton
 		$fields['email'] = $email;
 		if(isset($password) && !empty($password))
 		{
-			$fields['password'] = password($password);
+			$fields['pass'] = password($password, $id);
 		}
 		$fields['fk_cms_role'] = $role;
+		$fields['checksum'] = $this->getRoleChecksum($id, $role);
 		return $this->db->updateFields('cms_user', $fields, 'pk_cms_user = ' . $id);
 	}
 
-	function delete()
+	function remove($id)
 	{
-
+		$currentUser = $this->getCurrent();
+		$userToRemove = $this->get($id);
+		if($currentUser['role'] > $userToRemove['role']) throw new CodedError('permission_error');
+		if($currentUser['id'] == $userToRemove['id']) throw new CodedError('permission_error');
+		return $this->db->query('UPDATE cms_user SET status = 2 WHERE pk_cms_user = ?', array($id));
 	}
 
 	function get($id)
 	{
-		return $this->db->fetch_one('SELECT cu.pk_cms_user id, cu.fk_cms_role role, cr.name roleName, cu.name name, cu.email email FROM cms_user cu LEFT JOIN cms_role cr ON cu.fk_cms_role = cr.pk_cms_role WHERE pk_cms_user = ' . $id);
+		return $this->db->fetch_one('SELECT cu.pk_cms_user id, cu.fk_cms_role role, cr.name roleName, cu.name name, cu.email email FROM cms_user cu LEFT JOIN cms_role cr ON cu.fk_cms_role = cr.pk_cms_role WHERE status = 1 AND pk_cms_user = ' . $id);
 	}
 
 	function getRoles()
@@ -103,12 +125,14 @@ class User extends \slikland\core\pattern\Singleton
 			$data['sort'] = '-role,name';
 		}
 
+		$data['order'] = 'IF(cu.pk_cms_user = '.$user['id'].',0,1)';
 		if(isset($data['search']))
 		{
 			$data['search'] = array('value'=>$data['search'], 'fields'=>'cu.name,cu.email');
 		}
 		$data['where'] = array();
 		$data['where'][] = 'cu.fk_cms_role >= ' . $user['role'];
+		$data['where'][] = 'cu.status = 1';
 		$list = $this->db->getList('
 			SELECT 
 				cu.pk_cms_user id, 
@@ -125,8 +149,14 @@ class User extends \slikland\core\pattern\Singleton
 
 	function login($email, $pass)
 	{
-		$pass = password($pass);
-		$id = $this->db->fetch_value('SELECT pk_cms_user FROM cms_user WHERE email LIKE \''.$email.'\' AND pass LIKE \''.$pass.'\' AND status = 1');
+		$id = NULL;
+		$user = $this->db->fetch_one('SELECT pk_cms_user id, fk_cms_role role FROM cms_user WHERE email = ? AND status = ?', array($email, 1));
+		if($user)
+		{
+			$pass = password($pass, $user['id']);
+			$checksum = $this->getRoleChecksum($user['id'], $user['role']);
+			$id = $this->db->fetch_value('SELECT pk_cms_user FROM cms_user WHERE email LIKE ? AND pass LIKE ? AND status = ? AND checksum = ?', array($email, $pass, 1, $checksum));
+		}
 		$user = FALSE;
 		if($id)
 		{
@@ -205,8 +235,12 @@ class User extends \slikland\core\pattern\Singleton
 		{
 			$id = uid_decode($_COOKIE['sl_cms_session']);
 			if(is_int($id)){
-				$session = $this->db->fetch_one("SELECT fk_cms_user id, pk_cms_session session FROM cms_session cs LEFT JOIN cms_user cu ON cu.pk_cms_user = cs.fk_cms_user WHERE cu.status = 1 AND cs.pk_cms_session = '{$id}' AND cs.status = 1 AND cs.updated > CURRENT_TIMESTAMP - " . CMS_SESSION_TIMEOUT);
-				$userId = $session['id'];
+				$session = $this->db->fetch_one("SELECT fk_cms_user id, pk_cms_session session, cu.fk_cms_role role, cu.checksum checksum FROM cms_session cs LEFT JOIN cms_user cu ON cu.pk_cms_user = cs.fk_cms_user WHERE cu.status = 1 AND cs.pk_cms_session = '{$id}' AND cs.status = 1 AND cs.updated > CURRENT_TIMESTAMP - " . CMS_SESSION_TIMEOUT);
+				$checksum = $this->getRoleChecksum($session['id'], $session['role']);
+				if($checksum == $session['checksum'])
+				{
+					$userId = $session['id'];
+				}
 			}
 		}
 		if(!$userId)

@@ -94,6 +94,7 @@ class Validation extends cms.ui.Base
 				@_field.removeClass('invalid')
 				@_field.addClass('valid')
 				@_hideMessage()
+			console.log(">>", valid)
 			return valid
 		_showMessage:(message)->
 			messageField = @_field.find('.validation-message')

@@ -98,6 +98,30 @@ class user
 	}
 
 	/**
+	@log Remoção de usuário
+	*/
+	function remove($data)
+	{
+		$response = FALSE;
+		$id = NULL;
+		if(isset($data))
+		{
+			if(isset($data['id']) && !empty($data['id']))
+			{
+				$id = $data['id'];
+			}else if(isset($data[0]) && !empty($data[0]))
+			{
+				$id = $data[0];
+			}
+		}
+		if($id)
+		{
+			$response = $this->module->remove($id);
+		}
+		return $response;
+	}
+
+	/**
 	@method POST
 	*/
 
@@ -106,5 +130,14 @@ class user
 		$list = $this->module->getLog($data);
 		$list['params'] = $data;
 		return $list;
+	}
+
+	function test()
+	{
+		$db = db();
+		$db->query('UPDATE cms_user SET email = ? WHERE pk_cms_user = ?', array('test', '3'));
+		$a = $db->fetch_all('SELECT * FROM cms_user WHERE pk_cms_user = ?', array("3"));
+		var_dump($a);
+		var_dump($db->query("SELECT * FROM cms_user WHERE pk_cms_user = ?;", array('1')));
 	}
 }

@@ -114,7 +114,12 @@ class DB{
 						$type .= 's';
 					}else if(is_numeric($param))
 					{
-						$type .= 'd';
+						if(is_int($param))
+						{
+							$type .= 'i';
+						}else{
+							$type .= 'd';
+						}
 					}else
 					{
 						$type .= 's';
@@ -127,8 +132,13 @@ class DB{
 			{
 				$values[$k] = &$values[$k];
 			}
-			call_user_func_array(array($statement, 'bind_param'), $values);
+			
+			$a = call_user_func_array(array($statement, 'bind_param'), $values);
 			$statement->execute();
+			if($result = $statement->get_result())
+			{
+				return $result;
+			}
 			return $statement;
 		}
 	}
@@ -296,6 +306,12 @@ class DB{
 		return $response;
 	}
 
+	public function nextId($table)
+	{
+		$query = 'SELECT `AUTO_INCREMENT` FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = "'.$this->name.'" AND TABLE_NAME = "'.$table.'"';
+		return $this->fetch_value($query);
+	}
+
 	public function getList($query, $params, $numItems = 20, $array = false)
 	{
 		if(is_null($numItems))
@@ -406,6 +422,16 @@ class DB{
 		}
 
 		$orders = array();
+		if(isset($params['order']))
+		{
+			if(is_string($params['order']))
+			{
+				$orders[] = $params['order'];
+			}else if (is_array($params['order']))
+			{
+				$orders = array_merge($orders, $params['order']);
+			}
+		}
 		if(isset($params['sort']))
 		{
 			$sorts = $params['sort'];

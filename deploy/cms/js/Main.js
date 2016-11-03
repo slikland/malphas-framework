@@ -4261,10 +4261,10 @@ API = (function(_super) {
     this._type = 'normal';
     if (arg instanceof HTMLElement && arg.tagName.toLowerCase() === 'form') {
       this._form = arg;
-      setTimeout(this._addEventListeners, 0);
+      setTimeout(this._addEventListeners, 10);
     } else if ((typeof BaseDOM !== "undefined" && BaseDOM !== null) && arg instanceof BaseDOM && arg.element.tagName.toLowerCase === 'form') {
       this._form = arg;
-      setTimeout(this._addEventListeners, 0);
+      setTimeout(this._addEventListeners, 10);
     } else if (typeof arg === 'string') {
       this._url = arg;
     } else {
@@ -4334,7 +4334,7 @@ API = (function(_super) {
       return this._form.on('submit', this._submitForm);
     }
   };
-  API.prototype._submitForm = function() {
+  API.prototype._submitForm = function(e) {
     return this.submit();
   };
   API.prototype.addHeader = function(name, value) {
@@ -4916,6 +4916,7 @@ cms.ui.attributes.Validation = (function(_super) {
         this._field.addClass('valid');
         this._hideMessage();
       }
+      console.log(">>", valid);
       return valid;
     };
     Plugin.prototype._showMessage = function(message) {
@@ -4996,6 +4997,168 @@ cms.ui.attributes.Template = (function(_super) {
     return Plugin;
   })(BaseDOM);
   return Template;
+})(cms.ui.Base);
+var __hasProp = {}.hasOwnProperty;
+cms.ui.tag.attributes.Sort = (function(_super) {
+  var Plugin;
+  __extends(Sort, _super);
+  function Sort() {
+    return Sort.__super__.constructor.apply(this, arguments);
+  }
+  Sort.SELECTOR = '[sort]';
+  Sort.prototype._update = function(data) {
+    var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
+    _ref = data.add;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      item = _ref[_i];
+      this._plugins[item] = new Plugin(item);
+    }
+    _ref1 = data.remove;
+    _results = [];
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      item = _ref1[_j];
+      p = this._plugins[item];
+      if (p) {
+        _results.push(typeof p.destroy === "function" ? p.destroy() : void 0);
+      } else {
+        _results.push(void 0);
+      }
+    }
+    return _results;
+  };
+  Plugin = (function(_super1) {
+    __extends(Plugin, _super1);
+    Plugin._destroyPlugin = function(item) {};
+    function Plugin(element) {
+      this._sortByOrder = __bind(this._sortByOrder, this);
+      this._click = __bind(this._click, this);
+      this._update = __bind(this._update, this);
+      this._resetOthers = __bind(this._resetOthers, this);
+      this._parseParam = __bind(this._parseParam, this);
+      Plugin.__super__.constructor.call(this, {
+        element: element
+      });
+      this._name = this.attr('sort');
+      this._element.setAttribute('name', 'sort');
+      this._sortButton = document.createElement('span');
+      this._sortButton.className = 'sort';
+      this._icon = document.createElement('i');
+      this._icon.className = 'fa icon';
+      this._sortButton.appendChild(this._icon);
+      this._sortOrder = document.createElement('sup');
+      this._sortButton.appendChild(this._sortOrder);
+      if (this.attr('for')) {
+        this._target = document.querySelector('#' + this.attr('for'));
+      } else {
+        this._target = this.findParents('[service]');
+      }
+      this._parseParam();
+      this._element.on('click', this._click);
+      this._element.on('update', this._update);
+      this.appendChild(this._sortButton);
+    }
+    Plugin.prototype._parseParam = function() {
+      var data, index, targetId;
+      if ((targetId = this._target.getAttribute('id'))) {
+        data = app.router.getParam(targetId);
+        if (!data) {
+          return;
+        }
+        if (data['sort']) {
+          data = [].concat(data['sort']);
+          if ((index = data.indexOf(this._name)) >= 0) {
+            if (data.length > 1) {
+              this._element.sortOrder = index;
+            }
+            this._element.value = this._name;
+          } else if ((index = data.indexOf('-' + this._name)) >= 0) {
+            if (data.length > 1) {
+              this._element.sortOrder = index;
+            }
+            this._element.value = '-' + this._name;
+          }
+        }
+        this._element.setAttribute('for', targetId);
+        return this._update();
+      }
+    };
+    Plugin.prototype._resetOthers = function() {
+      var i, items, _results;
+      items = this._target.querySelectorAll('[sort]');
+      i = items.length;
+      _results = [];
+      while (i-- > 0) {
+        items[i].sortOrder = null;
+        delete items[i].sortOrder;
+        if (items[i] === this._element) {
+          continue;
+        }
+        _results.push(items[i].value = null);
+      }
+      return _results;
+    };
+    Plugin.prototype._updateAll = function() {
+      var i, items, _results;
+      items = this._target.querySelectorAll('[sort]');
+      i = items.length;
+      _results = [];
+      while (i-- > 0) {
+        _results.push(items[i].trigger('update'));
+      }
+      return _results;
+    };
+    Plugin.prototype._update = function() {
+      if (!this._element.value) {
+        this._element.removeAttribute('value');
+      } else {
+        this._element.setAttribute('value', this._element.value);
+      }
+      if (!isNaN(this._element.sortOrder)) {
+        this._element.setAttribute('sortOrder', this._element.sortOrder);
+        return this._sortOrder.innerHTML = this._element.sortOrder;
+      } else {
+        this._element.removeAttribute('sortOrder');
+        return this._sortOrder.innerHTML = '';
+      }
+    };
+    Plugin.prototype._click = function(e) {
+      var i, index, items, value;
+      value = this._element.value;
+      if (value && !(/^\-/.test(value))) {
+        value = '-' + this._name;
+      } else {
+        value = this._name;
+      }
+      if (e.metaKey) {
+        items = ArrayUtils.toArray(this._target.querySelectorAll('[sort][value]'));
+        items.sort(this._sortByOrder);
+        index = items.length;
+        i = items.length;
+        while (i-- > 0) {
+          items[i].sortOrder = i;
+          if (items[i] === this._element) {
+            index = i;
+          }
+        }
+        this._element.sortOrder = index;
+      } else {
+        this._resetOthers();
+      }
+      this._element.value = value;
+      this._updateAll();
+      return this._target.trigger('update');
+    };
+    Plugin.prototype._sortByOrder = function(a, b) {
+      if (a.sortOrder < b.sortOrder) {
+        return -1;
+      } else if (a.sortOrder > b.sortOrder) {
+        return 1;
+      }
+      return 0;
+    };
+    return Plugin;
+  })(BaseDOM);
+  return Sort;
 })(cms.ui.Base);
 var __hasProp = {}.hasOwnProperty;
 cms.ui.attributes.Size = (function(_super) {
@@ -5221,6 +5384,78 @@ cms.ui.tag.attributes.Href = (function(_super) {
     return Plugin;
   })(BaseDOM);
   return Href;
+})(cms.ui.Base);
+var __hasProp = {}.hasOwnProperty;
+cms.ui.tag.attributes.For = (function(_super) {
+  var Plugin;
+  __extends(For, _super);
+  function For() {
+    return For.__super__.constructor.apply(this, arguments);
+  }
+  For.SELECTOR = '[for]';
+  For.prototype._update = function(data) {
+    var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
+    _ref = data.add;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      item = _ref[_i];
+      if (item.hasAttribute('sort')) {
+        continue;
+      }
+      this._plugins[item] = new Plugin(item);
+    }
+    _ref1 = data.remove;
+    _results = [];
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      item = _ref1[_j];
+      p = this._plugins[item];
+      if (p) {
+        _results.push(typeof p.destroy === "function" ? p.destroy() : void 0);
+      } else {
+        _results.push(void 0);
+      }
+    }
+    return _results;
+  };
+  Plugin = (function(_super1) {
+    __extends(Plugin, _super1);
+    Plugin._destroyPlugin = function(item) {};
+    function Plugin(element) {
+      this._change = __bind(this._change, this);
+      Plugin.__super__.constructor.call(this, {
+        element: element
+      });
+      this._target = document.querySelector('#' + this.attr('for'));
+      this._setItemValue();
+      this._element.on('change', this._change);
+      this._element.on('input', this._change);
+    }
+    Plugin.prototype._setItemValue = function() {
+      var data, id, name, _ref, _ref1, _ref2;
+      id = this._element.getAttribute('for');
+      data = app.router.getParam(id);
+      if (!data) {
+        return;
+      }
+      name = this._element.getAttribute('name');
+      if (name && data[name]) {
+        data = data[name];
+        if (this._element.tagName.toLowerCase() === 'input' && ((_ref = (_ref1 = this._element.getAttribute('type')) != null ? _ref1.toLowerCase() : void 0) === 'checkbox' || _ref === 'radio')) {
+          if (_ref2 = this._element.value, __indexOf.call(data, _ref2) >= 0) {
+            this._element.checked = true;
+            return this._element.trigger('change');
+          }
+        } else {
+          return this._element.value = data;
+        }
+      }
+    };
+    Plugin.prototype._change = function() {
+      var _ref;
+      return (_ref = this._target) != null ? _ref.trigger('update') : void 0;
+    };
+    return Plugin;
+  })(BaseDOM);
+  return For;
 })(cms.ui.Base);
 var __hasProp = {}.hasOwnProperty;
 cms.ui.attributes.Focus = (function(_super) {
@@ -5722,6 +5957,7 @@ cms.ui.tag.attributes.Action = (function(_super) {
     __extends(Plugin, _super1);
     Plugin._destroyPlugin = function(item) {};
     function Plugin(element) {
+      this._apiComplete = __bind(this._apiComplete, this);
       this._click = __bind(this._click, this);
       Plugin.__super__.constructor.call(this, {
         element: element
@@ -5729,9 +5965,23 @@ cms.ui.tag.attributes.Action = (function(_super) {
       this._element.on('click', this._click);
     }
     Plugin.prototype._click = function(e) {
-      API.call(this._element.getAttribute('action'));
+      API.call(this._element.getAttribute('action'), null, this._apiComplete);
       e.preventDefault();
       return e.stopImmediatePropagation();
+    };
+    Plugin.prototype._apiComplete = function() {
+      var success;
+      success = this.attr('success');
+      if (success && success.length > 0) {
+        switch (success) {
+          case 'refresh':
+            return app["interface"].show();
+          case 'reload':
+            return window.location.reload();
+          default:
+            return app["interface"].show(success);
+        }
+      }
     };
     return Plugin;
   })(BaseDOM);
@@ -5869,7 +6119,7 @@ cms.ui.tags.form.Form = (function(_super) {
       Plugin.__super__.constructor.call(this, {
         element: element
       });
-      setTimeout(this._addListeners, 1);
+      setTimeout(this._addListeners, 10);
     }
     Plugin.prototype._addListeners = function() {
       this._api = new API(this._element);
@@ -5882,6 +6132,7 @@ cms.ui.tags.form.Form = (function(_super) {
       return this._clearMessage();
     };
     Plugin.prototype._submit = function(e) {
+      console.log(e.defaultPrevented);
       if (e.defaultPrevented) {
         e.stopImmediatePropagation();
         return;
@@ -5899,7 +6150,7 @@ cms.ui.tags.form.Form = (function(_super) {
           case 'reload':
             return window.location.reload();
           default:
-            return app["interface"].show(success);
+            return app.router.goto(success);
         }
       }
     };
@@ -6080,448 +6331,6 @@ cms.ui.tags.form.Field = (function(_super) {
     return Plugin;
   })(BaseDOM);
   return Field;
-})(cms.ui.Base);
-var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-cms.ui.UI = (function() {
-  function UI() {
-    this._updateInstances = __bind(this._updateInstances, this);
-    this._domChanged = __bind(this._domChanged, this);
-    this._initListeners = __bind(this._initListeners, this);
-    this._registerUIs = __bind(this._registerUIs, this);
-    this._instances = [];
-    setTimeout(this._registerUIs, 0);
-  }
-  UI.set({
-    _dirty: function(value) {
-      this._updateInstances();
-      return;
-      if (!value) {
-        return;
-      }
-      clearTimeout(this._dirtyTimeout);
-      return this._dirtyTimeout = setTimeout(this._updateInstances, 0);
-    }
-  });
-  UI.prototype._registerUIs = function() {
-    this._parseUIs(cms.ui, true);
-    return this._initListeners();
-  };
-  UI.prototype._parseUIs = function(classes, onlyChild) {
-    var c, n, _results;
-    if (onlyChild == null) {
-      onlyChild = false;
-    }
-    _results = [];
-    for (n in classes) {
-      c = classes[n];
-      if (c instanceof Function) {
-        if (!onlyChild) {
-          _results.push(this._instances.push(new c()));
-        } else {
-          _results.push(void 0);
-        }
-      } else {
-        _results.push(this._parseUIs(c));
-      }
-    }
-    return _results;
-  };
-  UI.prototype._initListeners = function() {
-    if (MutationObserver) {
-      this._mutationObserver = new MutationObserver(this._domChanged);
-      this._mutationObserver.observe(document.body, {
-        childList: true,
-        subtree: true
-      });
-    } else {
-      target.addEventListener('DOMSubtreeModified', this._domChanged);
-    }
-    return this._domChanged();
-  };
-  UI.prototype._domChanged = function() {
-    return this._dirty = true;
-  };
-  UI.prototype._updateInstances = function() {
-    var i, _results;
-    i = this._instances.length;
-    _results = [];
-    while (i-- > 0) {
-      _results.push(this._instances[i].update());
-    }
-    return _results;
-  };
-  new UI();
-  return UI;
-})();
-var Notification;
-Notification = (function(_super) {
-  var NotificationItem;
-  __extends(Notification, _super);
-  Notification.DEFAULT_TIMEOUT = 8;
-  function Notification() {
-    this._hideNotification = __bind(this._hideNotification, this);
-    this._showNotification = __bind(this._showNotification, this);
-    this.showNotification = __bind(this.showNotification, this);
-    this.showNotifications = __bind(this.showNotifications, this);
-    Notification.__super__.constructor.apply(this, arguments);
-  }
-  Notification.prototype.destroy = function() {};
-  Notification.prototype.showNotifications = function(items) {
-    var i, item, _i, _len, _results;
-    items = [].concat(items);
-    i = items.length;
-    _results = [];
-    for (_i = 0, _len = items.length; _i < _len; _i++) {
-      item = items[_i];
-      if (item['delay'] != null) {
-        _results.push(setTimeout(this.showNotification, item['delay'] * 1000, item));
-      } else {
-        _results.push(this.showNotification(item));
-      }
-    }
-    return _results;
-  };
-  Notification.prototype.showNotification = function(item) {
-    var target;
-    target = document.querySelector('notification');
-    if (!target) {
-      target = document.body;
-    }
-    if (!target.getInstance()) {
-      target = new BaseDOM({
-        element: target
-      });
-    } else {
-      target = target.getInstance();
-    }
-    item = new NotificationItem(item);
-    return target.appendChildAt(item);
-  };
-  Notification.prototype._showNotification = function(e, data) {
-    return data = [].concat(data);
-  };
-  Notification.prototype._hideNotification = function(e, data) {};
-  NotificationItem = (function(_super1) {
-    __extends(NotificationItem, _super1);
-    function NotificationItem(data) {
-      this._closeClick = __bind(this._closeClick, this);
-      this._hideNotification = __bind(this._hideNotification, this);
-      NotificationItem.__super__.constructor.call(this, {
-        element: 'div',
-        className: 'notification-item show-down'
-      });
-      if (data['message']) {
-        this.text = data['message'];
-      }
-      if (data['type']) {
-        this.addClass('p' + data['type']);
-      }
-      this.timeout = Notification.DEFAULT_TIMEOUT;
-      if (data['timeout']) {
-        this.timeout = Number(data['timeout']);
-      }
-      if (this.timeout > 0) {
-        this._closeTimeout = setTimeout(this._hideNotification, this.timeout * 1000);
-      }
-      this.closeBtn = new BaseDOM({
-        element: 'i',
-        className: 'closeBtn fa fa-close'
-      });
-      this.closeBtn.element.on('click', this._closeClick);
-      this.appendChild(this.closeBtn);
-    }
-    NotificationItem.prototype._hideNotification = function() {
-      return this._hide();
-    };
-    NotificationItem.prototype._hide = function() {
-      clearTimeout(this._closeTimeout);
-      this.element.parentNode.removeChild(this.element);
-      return typeof this.destroy === "function" ? this.destroy() : void 0;
-    };
-    NotificationItem.prototype._closeClick = function(e) {
-      return this._hide();
-    };
-    return NotificationItem;
-  })(BaseDOM);
-  return Notification;
-})(EventDispatcher);
-var Blocker;
-Blocker = (function(_super) {
-  __extends(Blocker, _super);
-  function Blocker() {
-    this._transitionEnd = __bind(this._transitionEnd, this);
-    Blocker.__super__.constructor.call(this, {
-      element: 'div',
-      className: 'blocker'
-    });
-    this.css({
-      display: 'none'
-    });
-    this.element.on('transitionend', this._transitionEnd);
-    this.element.on('moztransitionend', this._transitionEnd);
-    this.element.on('otransitionend', this._transitionEnd);
-    this.element.on('webkittransitionend', this._transitionEnd);
-    this._showing = false;
-  }
-  Blocker.prototype.show = function(showLoader) {
-    if (showLoader == null) {
-      showLoader = true;
-    }
-    this._showing = true;
-    if (!this.element.parentNode) {
-      document.body.appendChild(this.element);
-    }
-    this.css({
-      display: 'block'
-    });
-    return this.addClass('show');
-  };
-  Blocker.prototype.hide = function() {
-    this._showing = false;
-    return this.removeClass('show');
-  };
-  Blocker.prototype._transitionEnd = function() {
-    if (!this._showing) {
-      return this.css({
-        display: 'none'
-      });
-    }
-  };
-  return Blocker;
-})(BaseDOM);
-var __hasProp = {}.hasOwnProperty;
-cms.ui.tag.attributes.Sort = (function(_super) {
-  var Plugin;
-  __extends(Sort, _super);
-  function Sort() {
-    return Sort.__super__.constructor.apply(this, arguments);
-  }
-  Sort.SELECTOR = '[sort]';
-  Sort.prototype._update = function(data) {
-    var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
-    _ref = data.add;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      item = _ref[_i];
-      this._plugins[item] = new Plugin(item);
-    }
-    _ref1 = data.remove;
-    _results = [];
-    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-      item = _ref1[_j];
-      p = this._plugins[item];
-      if (p) {
-        _results.push(typeof p.destroy === "function" ? p.destroy() : void 0);
-      } else {
-        _results.push(void 0);
-      }
-    }
-    return _results;
-  };
-  Plugin = (function(_super1) {
-    __extends(Plugin, _super1);
-    Plugin._destroyPlugin = function(item) {};
-    function Plugin(element) {
-      this._sortByOrder = __bind(this._sortByOrder, this);
-      this._click = __bind(this._click, this);
-      this._update = __bind(this._update, this);
-      this._resetOthers = __bind(this._resetOthers, this);
-      this._parseParam = __bind(this._parseParam, this);
-      Plugin.__super__.constructor.call(this, {
-        element: element
-      });
-      this._name = this.attr('sort');
-      this._element.setAttribute('name', 'sort');
-      this._sortButton = document.createElement('span');
-      this._sortButton.className = 'sort';
-      this._icon = document.createElement('i');
-      this._icon.className = 'fa icon';
-      this._sortButton.appendChild(this._icon);
-      this._sortOrder = document.createElement('sup');
-      this._sortButton.appendChild(this._sortOrder);
-      if (this.attr('for')) {
-        this._target = document.querySelector('#' + this.attr('for'));
-      } else {
-        this._target = this.findParents('[service]');
-      }
-      this._parseParam();
-      this._element.on('click', this._click);
-      this._element.on('update', this._update);
-      this.appendChild(this._sortButton);
-    }
-    Plugin.prototype._parseParam = function() {
-      var data, index, targetId;
-      if ((targetId = this._target.getAttribute('id'))) {
-        data = app.router.getParam(targetId);
-        if (!data) {
-          return;
-        }
-        if (data['sort']) {
-          data = [].concat(data['sort']);
-          if ((index = data.indexOf(this._name)) >= 0) {
-            if (data.length > 1) {
-              this._element.sortOrder = index;
-            }
-            this._element.value = this._name;
-          } else if ((index = data.indexOf('-' + this._name)) >= 0) {
-            if (data.length > 1) {
-              this._element.sortOrder = index;
-            }
-            this._element.value = '-' + this._name;
-          }
-        }
-        this._element.setAttribute('for', targetId);
-        return this._update();
-      }
-    };
-    Plugin.prototype._resetOthers = function() {
-      var i, items, _results;
-      items = this._target.querySelectorAll('[sort]');
-      i = items.length;
-      _results = [];
-      while (i-- > 0) {
-        items[i].sortOrder = null;
-        delete items[i].sortOrder;
-        if (items[i] === this._element) {
-          continue;
-        }
-        _results.push(items[i].value = null);
-      }
-      return _results;
-    };
-    Plugin.prototype._updateAll = function() {
-      var i, items, _results;
-      items = this._target.querySelectorAll('[sort]');
-      i = items.length;
-      _results = [];
-      while (i-- > 0) {
-        _results.push(items[i].trigger('update'));
-      }
-      return _results;
-    };
-    Plugin.prototype._update = function() {
-      if (!this._element.value) {
-        this._element.removeAttribute('value');
-      } else {
-        this._element.setAttribute('value', this._element.value);
-      }
-      if (!isNaN(this._element.sortOrder)) {
-        this._element.setAttribute('sortOrder', this._element.sortOrder);
-        return this._sortOrder.innerHTML = this._element.sortOrder;
-      } else {
-        this._element.removeAttribute('sortOrder');
-        return this._sortOrder.innerHTML = '';
-      }
-    };
-    Plugin.prototype._click = function(e) {
-      var i, index, items, value;
-      value = this._element.value;
-      if (value && !(/^\-/.test(value))) {
-        value = '-' + this._name;
-      } else {
-        value = this._name;
-      }
-      if (e.metaKey) {
-        items = ArrayUtils.toArray(this._target.querySelectorAll('[sort][value]'));
-        items.sort(this._sortByOrder);
-        index = items.length;
-        i = items.length;
-        while (i-- > 0) {
-          items[i].sortOrder = i;
-          if (items[i] === this._element) {
-            index = i;
-          }
-        }
-        this._element.sortOrder = index;
-      } else {
-        this._resetOthers();
-      }
-      this._element.value = value;
-      this._updateAll();
-      return this._target.trigger('update');
-    };
-    Plugin.prototype._sortByOrder = function(a, b) {
-      if (a.sortOrder < b.sortOrder) {
-        return -1;
-      } else if (a.sortOrder > b.sortOrder) {
-        return 1;
-      }
-      return 0;
-    };
-    return Plugin;
-  })(BaseDOM);
-  return Sort;
-})(cms.ui.Base);
-var __hasProp = {}.hasOwnProperty;
-cms.ui.tag.attributes.For = (function(_super) {
-  var Plugin;
-  __extends(For, _super);
-  function For() {
-    return For.__super__.constructor.apply(this, arguments);
-  }
-  For.SELECTOR = '[for]';
-  For.prototype._update = function(data) {
-    var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
-    _ref = data.add;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      item = _ref[_i];
-      if (item.hasAttribute('sort')) {
-        continue;
-      }
-      this._plugins[item] = new Plugin(item);
-    }
-    _ref1 = data.remove;
-    _results = [];
-    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-      item = _ref1[_j];
-      p = this._plugins[item];
-      if (p) {
-        _results.push(typeof p.destroy === "function" ? p.destroy() : void 0);
-      } else {
-        _results.push(void 0);
-      }
-    }
-    return _results;
-  };
-  Plugin = (function(_super1) {
-    __extends(Plugin, _super1);
-    Plugin._destroyPlugin = function(item) {};
-    function Plugin(element) {
-      this._change = __bind(this._change, this);
-      Plugin.__super__.constructor.call(this, {
-        element: element
-      });
-      this._target = document.querySelector('#' + this.attr('for'));
-      this._setItemValue();
-      this._element.on('change', this._change);
-      this._element.on('input', this._change);
-    }
-    Plugin.prototype._setItemValue = function() {
-      var data, id, name, _ref, _ref1, _ref2;
-      id = this._element.getAttribute('for');
-      data = app.router.getParam(id);
-      if (!data) {
-        return;
-      }
-      name = this._element.getAttribute('name');
-      if (name && data[name]) {
-        data = data[name];
-        if (this._element.tagName.toLowerCase() === 'input' && ((_ref = (_ref1 = this._element.getAttribute('type')) != null ? _ref1.toLowerCase() : void 0) === 'checkbox' || _ref === 'radio')) {
-          if (_ref2 = this._element.value, __indexOf.call(data, _ref2) >= 0) {
-            this._element.checked = true;
-            return this._element.trigger('change');
-          }
-        } else {
-          return this._element.value = data;
-        }
-      }
-    };
-    Plugin.prototype._change = function() {
-      var _ref;
-      return (_ref = this._target) != null ? _ref.trigger('update') : void 0;
-    };
-    return Plugin;
-  })(BaseDOM);
-  return For;
 })(cms.ui.Base);
 var __hasProp = {}.hasOwnProperty;
 cms.ui.tags.form.Checkbox = (function(_super) {
@@ -6775,6 +6584,315 @@ cms.ui.tags.Pagination = (function(_super) {
   return Pagination;
 })(cms.ui.Base);
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+cms.ui.UI = (function() {
+  function UI() {
+    this._updateInstances = __bind(this._updateInstances, this);
+    this._domChanged = __bind(this._domChanged, this);
+    this._initListeners = __bind(this._initListeners, this);
+    this._registerUIs = __bind(this._registerUIs, this);
+    this._instances = [];
+    setTimeout(this._registerUIs, 0);
+  }
+  UI.set({
+    _dirty: function(value) {
+      this._updateInstances();
+      return;
+      if (!value) {
+        return;
+      }
+      clearTimeout(this._dirtyTimeout);
+      return this._dirtyTimeout = setTimeout(this._updateInstances, 0);
+    }
+  });
+  UI.prototype._registerUIs = function() {
+    this._parseUIs(cms.ui, true);
+    return this._initListeners();
+  };
+  UI.prototype._parseUIs = function(classes, onlyChild) {
+    var c, n, _results;
+    if (onlyChild == null) {
+      onlyChild = false;
+    }
+    _results = [];
+    for (n in classes) {
+      c = classes[n];
+      if (c instanceof Function) {
+        if (!onlyChild) {
+          _results.push(this._instances.push(new c()));
+        } else {
+          _results.push(void 0);
+        }
+      } else {
+        _results.push(this._parseUIs(c));
+      }
+    }
+    return _results;
+  };
+  UI.prototype._initListeners = function() {
+    if (MutationObserver) {
+      this._mutationObserver = new MutationObserver(this._domChanged);
+      this._mutationObserver.observe(document.body, {
+        childList: true,
+        subtree: true
+      });
+    } else {
+      target.addEventListener('DOMSubtreeModified', this._domChanged);
+    }
+    return this._domChanged();
+  };
+  UI.prototype._domChanged = function() {
+    return this._dirty = true;
+  };
+  UI.prototype._updateInstances = function() {
+    var i, _results;
+    i = this._instances.length;
+    _results = [];
+    while (i-- > 0) {
+      _results.push(this._instances[i].update());
+    }
+    return _results;
+  };
+  new UI();
+  return UI;
+})();
+var Notification;
+Notification = (function(_super) {
+  var NotificationItem;
+  __extends(Notification, _super);
+  Notification.DEFAULT_TIMEOUT = 8;
+  function Notification() {
+    this._hideNotification = __bind(this._hideNotification, this);
+    this._showNotification = __bind(this._showNotification, this);
+    this.showNotification = __bind(this.showNotification, this);
+    this.showNotifications = __bind(this.showNotifications, this);
+    Notification.__super__.constructor.apply(this, arguments);
+  }
+  Notification.prototype.destroy = function() {};
+  Notification.prototype.showNotifications = function(items) {
+    var i, item, _i, _len, _results;
+    items = [].concat(items);
+    i = items.length;
+    _results = [];
+    for (_i = 0, _len = items.length; _i < _len; _i++) {
+      item = items[_i];
+      if (item['delay'] != null) {
+        _results.push(setTimeout(this.showNotification, item['delay'] * 1000, item));
+      } else {
+        _results.push(this.showNotification(item));
+      }
+    }
+    return _results;
+  };
+  Notification.prototype.showNotification = function(item) {
+    var target;
+    target = document.querySelector('notification');
+    if (!target) {
+      target = document.body;
+    }
+    if (!target.getInstance()) {
+      target = new BaseDOM({
+        element: target
+      });
+    } else {
+      target = target.getInstance();
+    }
+    item = new NotificationItem(item);
+    return target.appendChildAt(item);
+  };
+  Notification.prototype._showNotification = function(e, data) {
+    return data = [].concat(data);
+  };
+  Notification.prototype._hideNotification = function(e, data) {};
+  NotificationItem = (function(_super1) {
+    __extends(NotificationItem, _super1);
+    function NotificationItem(data) {
+      this._closeClick = __bind(this._closeClick, this);
+      this._hideNotification = __bind(this._hideNotification, this);
+      NotificationItem.__super__.constructor.call(this, {
+        element: 'div',
+        className: 'notification-item show-down'
+      });
+      if (data['message']) {
+        this.text = data['message'];
+      }
+      if (data['type']) {
+        this.addClass('p' + data['type']);
+      }
+      this.timeout = Notification.DEFAULT_TIMEOUT;
+      if (data['timeout']) {
+        this.timeout = Number(data['timeout']);
+      }
+      if (this.timeout > 0) {
+        this._closeTimeout = setTimeout(this._hideNotification, this.timeout * 1000);
+      }
+      this.closeBtn = new BaseDOM({
+        element: 'i',
+        className: 'closeBtn fa fa-close'
+      });
+      this.closeBtn.element.on('click', this._closeClick);
+      this.appendChild(this.closeBtn);
+    }
+    NotificationItem.prototype._hideNotification = function() {
+      return this._hide();
+    };
+    NotificationItem.prototype._hide = function() {
+      clearTimeout(this._closeTimeout);
+      this.element.parentNode.removeChild(this.element);
+      return typeof this.destroy === "function" ? this.destroy() : void 0;
+    };
+    NotificationItem.prototype._closeClick = function(e) {
+      return this._hide();
+    };
+    return NotificationItem;
+  })(BaseDOM);
+  return Notification;
+})(EventDispatcher);
+var Blocker;
+Blocker = (function(_super) {
+  __extends(Blocker, _super);
+  function Blocker() {
+    this._transitionEnd = __bind(this._transitionEnd, this);
+    Blocker.__super__.constructor.call(this, {
+      element: 'div',
+      className: 'blocker'
+    });
+    this.css({
+      display: 'none'
+    });
+    this.element.on('transitionend', this._transitionEnd);
+    this.element.on('moztransitionend', this._transitionEnd);
+    this.element.on('otransitionend', this._transitionEnd);
+    this.element.on('webkittransitionend', this._transitionEnd);
+    this._showing = false;
+  }
+  Blocker.prototype.show = function(showLoader) {
+    if (showLoader == null) {
+      showLoader = true;
+    }
+    this._showing = true;
+    if (!this.element.parentNode) {
+      document.body.appendChild(this.element);
+    }
+    this.css({
+      display: 'block'
+    });
+    return this.addClass('show');
+  };
+  Blocker.prototype.hide = function() {
+    this._showing = false;
+    return this.removeClass('show');
+  };
+  Blocker.prototype._transitionEnd = function() {
+    if (!this._showing) {
+      return this.css({
+        display: 'none'
+      });
+    }
+  };
+  return Blocker;
+})(BaseDOM);
+var __hasProp = {}.hasOwnProperty;
+cms.ui.tag.attributes.Confirm = (function(_super) {
+  var Plugin;
+  __extends(Confirm, _super);
+  function Confirm() {
+    return Confirm.__super__.constructor.apply(this, arguments);
+  }
+  Confirm.SELECTOR = '[confirm]';
+  Confirm.prototype._update = function(data) {
+    var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
+    _ref = data.add;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      item = _ref[_i];
+      this._plugins[item] = new Plugin(item);
+    }
+    _ref1 = data.remove;
+    _results = [];
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      item = _ref1[_j];
+      p = this._plugins[item];
+      if (p) {
+        _results.push(typeof p.destroy === "function" ? p.destroy() : void 0);
+      } else {
+        _results.push(void 0);
+      }
+    }
+    return _results;
+  };
+  Plugin = (function(_super1) {
+    __extends(Plugin, _super1);
+    Plugin._destroyPlugin = function(item) {};
+    function Plugin(element) {
+      this._click = __bind(this._click, this);
+      Plugin.__super__.constructor.call(this, {
+        element: element
+      });
+      this._element.on('click', this._click);
+    }
+    Plugin.prototype._click = function(e) {
+      var message;
+      message = this.attr('confirm');
+      if (!window.confirm(message)) {
+        e.preventDefault();
+        return e.stopImmediatePropagation();
+      }
+    };
+    return Plugin;
+  })(BaseDOM);
+  return Confirm;
+})(cms.ui.Base);
+var __hasProp = {}.hasOwnProperty;
+cms.ui.tags.Tooltip = (function(_super) {
+  var Plugin;
+  __extends(Tooltip, _super);
+  function Tooltip() {
+    return Tooltip.__super__.constructor.apply(this, arguments);
+  }
+  Tooltip.SELECTOR = 'tooltip';
+  Tooltip.prototype._update = function(data) {
+    var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
+    _ref = data.add;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      item = _ref[_i];
+      this._plugins[item] = new Plugin(item);
+    }
+    _ref1 = data.remove;
+    _results = [];
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      item = _ref1[_j];
+      p = this._plugins[item];
+      if (p) {
+        _results.push(typeof p.destroy === "function" ? p.destroy() : void 0);
+      } else {
+        _results.push(void 0);
+      }
+    }
+    return _results;
+  };
+  Plugin = (function(_super1) {
+    __extends(Plugin, _super1);
+    Plugin._destroyPlugin = function(item) {};
+    function Plugin(element) {
+      this._out = __bind(this._out, this);
+      this._over = __bind(this._over, this);
+      Plugin.__super__.constructor.call(this, {
+        element: element
+      });
+      this._parent = element.parentNode;
+      this._parent.on('mouseover', this._over);
+      this._parent.on('mouseout', this._out);
+    }
+    Plugin.prototype._over = function() {
+      return this.addClass('show');
+    };
+    Plugin.prototype._out = function() {
+      return this.removeClass('show');
+    };
+    return Plugin;
+  })(BaseDOM);
+  return Tooltip;
+})(cms.ui.Base);
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 slikland.mara.Block = (function() {
   var k, v, _ref;
   Block._INSTRUCTION_RE = /^([\(\#\@\>\<])?([^\:]*?)?(?:(?::)(.*?)(?:\#{([^\#\{\}\'\"]*?)})?)?\s*$/m;
@@ -6944,7 +7062,7 @@ slikland.mara.Block = (function() {
       test = false;
     }
     glob = slikland.Mara.globals;
-    replaceObject = object.replace(/\#\{(\$|\@)([^\}\}\#]+)\}/g, '(glob[\'$1\'][\'$2\'] || \'\')');
+    replaceObject = object.replace(/\#\{(\$|\@)([^\}\}\#]+)\}/g, '(glob[\'$1\']\.$2 || \'\')');
     replaceObject = replaceObject.replace(/\#\{([^\}\}\#]+)\}/g, '(data[\'$1\'] || \'\')').replace(/\#\{\}/g, '(data || \'\')');
     try {
       object = eval('(function(){return (' + replaceObject + ');})();');
@@ -6977,7 +7095,7 @@ slikland.mara.Block = (function() {
   };
   Block.prototype._replaceString = function(string, data) {
     this._currentReplaceObjectData = data;
-    string = string.replace(/\(glob\[\'(.*?)\'\]\[\'(.*?)\'\]\ \|\| \'\'\)/g, '\#\{$1$2\}');
+    string = string.replace(/\(glob\[\'(.*?)\'\]\.([^\s]+) \|\| \'\'\)/g, '\#\{$1$2\}');
     string = string.replace(/\(data\[\'(.*?)\'\]\ \|\| \'\'\)/g, '\#\{$1\}');
     string = string.replace(/\(data \|\| \'\'\)/g, '\#\{\}');
     string = string.replace(/\#\{(\$|\@)?([^\}\}\#]+)?\}/g, this._replaceObject);

@@ -35,8 +35,12 @@ group:
 			selected:
 				i.fa.fa-eye-slash
 		validation:
-			regex: {"pattern": "/^((?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\!\\@\\£\\#\\$\\%\\^\\&\\*\\.\\?])[A-Za-z\\d\\!\\@\\£\\#\\$\\%\\^\\&\\*\\.\\?]{8,20})?$/"}
-				message: "A senha deve conter letras minúsculas, maiúsculas, números e símbolos"
+			(#{id})
+				regex: {"pattern": "/^((?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\!\\@\\£\\#\\$\\%\\^\\&\\*\\.\\?])[A-Za-z\\d\\!\\@\\£\\#\\$\\%\\^\\&\\*\\.\\?]{8,20})?$/"}
+					message: "A senha deve conter letras minúsculas, maiúsculas, números e símbolos"
+			(!#{id})
+				regex: {"pattern": "/^((?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\!\\@\\£\\#\\$\\%\\^\\&\\*\\.\\?])[A-Za-z\\d\\!\\@\\£\\#\\$\\%\\^\\&\\*\\.\\?]{8,20})$/"}
+					message: "A senha deve conter letras minúsculas, maiúsculas, números e símbolos"
 	field.col-1_2:
 		label: "Confirmação da senha"
 		input: {"type":"password", "name":"password_confirmation"}
