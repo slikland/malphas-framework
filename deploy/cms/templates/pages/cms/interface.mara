@@ -8,7 +8,7 @@ card:
 				label: "CMS Title"
 				input: {"name":"title"}
 		footer.text-right:
-			button.button-5: 'Salvar'
+			button: 'Salvar'
 card: {"service":"../api/cms/cms/getPages"}
 	form: {"type":"json","action":"../api/cms/cms/updateMenu","success":"reload"}
 		content:
@@ -28,7 +28,7 @@ card: {"service":"../api/cms/cms/getPages"}
 				content: {"draggableContext": "menu_draggable","json-name":"config"}
 					>pageCard: #{config}
 		footer.text-right:
-			button.button-5: 'Salvar'
+			button: 'Salvar'
 
 <pageCard
 	card: {"draggable":"menu_draggable","json-name":"items"}

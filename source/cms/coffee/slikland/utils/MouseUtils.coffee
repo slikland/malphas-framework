@@ -1,7 +1,7 @@
 class MouseUtils
 	@getMousePos:(e, global = true)->
 		x = e.pageX || e.clientX
-		y = e.pageX || e.clientX
+		y = e.pageY || e.clientY
 		if global
 			x += document.body.scrollLeft + document.documentElement.scrollLeft
 			y += document.body.scrollTop + document.documentElement.scrollTop

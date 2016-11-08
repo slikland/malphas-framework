@@ -3,6 +3,7 @@ html
 		base: {"href":"#{base}"}
 		title: "CMS"
 		link: {"rel":"stylesheet","type":"text/css","href":"#{}"} #{styles}
+		style: {"html":"#{style}"}
 		meta: {"name":"#{name}", "content":"#{content}"} #{meta}
 		script: {"src":"#{}"} #{scripts}
 	body:{"style":"visibility:hidden;"}

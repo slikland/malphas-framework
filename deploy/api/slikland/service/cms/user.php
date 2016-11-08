@@ -42,9 +42,10 @@ class user
 				$id = $data[0];
 			}
 		}
+		$currentUser = $this->module->getCurrent();
 		if(!$id)
 		{
-			$user = $this->module->getCurrent();
+			$user = $currentUser;
 			if(!$user)
 			{
 				throw new CodedError('not_logged');
@@ -54,6 +55,10 @@ class user
 			if(!$user)
 			{
 				throw new CodedError('user_not_found');
+			}
+			if($user['role'] < $currentUser['role'])
+			{
+				throw new CodedError('permission_error');
 			}
 			$roles = $this->module->getRoles();
 			foreach($roles as &$role)

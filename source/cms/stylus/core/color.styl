@@ -1,3 +1,33 @@
+.bg-primary
+	background-color: _color_primary
+	color: _color_text_primary
+.bg-secondary
+	background-color: _color_secondary
+	color: _color_text_secondary
+.bg-primary-dark
+	background-color: _color_primary_dark
+	color: _color_text_primary_dark
+.bg-secondary-dark
+	background-color: _color_secondary_dark
+	color: _color_text_secondary_dark
+.bg-primary-light
+	background-color: _color_primary_light
+	color: _color_text_primary_light
+.bg-secondary-light
+	background-color: _color_secondary_light
+	color: _color_text_secondary_light
+.color-primary
+	color: _color_text_primary
+.color-secondary
+	color: _color_text_secondary
+.color-primary-dark
+	color: _color_text_primary_dark
+.color-secondary-dark
+	color: _color_text_secondary_dark
+.color-primary-light
+	color: _color_text_primary_light
+.color-secondary-light
+	color: _color_text_secondary_light
 colors = (#d9534f #f0ad4e #5bc0de #337ab7 #5cb85c)
 
 generateColors(lightenAmount = 0)
@@ -12,7 +42,7 @@ generateColors(lightenAmount = 0)
 				&.{i}
 					color: color
 			+prefix-classes('button-')
-				&.{i}
+				&.{i}, &.{i}[type=fab]
 					background-color: color
 					if lightness(color) > 75%
 						color: #666666

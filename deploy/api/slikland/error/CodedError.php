@@ -74,5 +74,3 @@ class CodedError extends \slikland\error\Error
 		return $response;
 	}
 }
-
-?>

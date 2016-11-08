@@ -319,10 +319,13 @@ class DB{
 			$numItems = 20;
 		}
 		$index = 0;
-		if(isset($params['pagination']))
+		if(isset($params['_index']))
 		{
-			$numItems = $params['pagination']['numItems'];
-			$index = $params['pagination']['index'];
+			$index = $params['_index'];
+		}
+		if(isset($params['_numItems']))
+		{
+			$numItems = $params['_numItems'];
 		}
 		$query = array($query);
 		$where = array();
@@ -509,4 +512,3 @@ class DB{
 		return array('items'=>$response, 'total'=>$total, 'index'=>$index, 'numItems'=>$numItems);
 	}
 }
-?>

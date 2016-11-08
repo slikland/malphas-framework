@@ -261,7 +261,7 @@ class KTObject
 		delete params['onUpdate']
 		delete params['onInit']
 		for p of params
-			if @target.hasOwnProperty(p)
+			if @target.hasOwnProperty(p) || @target[p]?
 				@params.push(p)
 				@endValues.push(Number(params[p]))
 				@distances.push(0)

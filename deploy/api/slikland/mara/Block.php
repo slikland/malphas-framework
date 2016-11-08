@@ -283,6 +283,7 @@ class Block
 		{
 			$object = $this->_replaceString($object, $data);
 			$newObj = json_decode($object, TRUE);
+
 			if($newObj)
 			{
 				$object = $newObj;
@@ -346,6 +347,13 @@ class Block
 		if(!$data)
 		{
 			$data = '';
+		}
+		if(is_string($data))
+		{
+			$data = preg_replace('/\\\/', '\\\\\\\\', $data);
+			$data = preg_replace('/"/', '\\"', $data);
+			$data = preg_replace('/(\n|\r)/', '\\n', $data);
+			$data = preg_replace('/\t/', '\\t', $data);
 		}
 		return $data;
 	}

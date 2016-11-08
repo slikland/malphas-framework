@@ -1,1 +1,4 @@
-h1: "INDEX!"
+card.col-1_2:
+	a:{"href":"cms/users"}
+		header.bg-primary: "Usuários"
+	content: "Usuários"

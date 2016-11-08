@@ -2,6 +2,7 @@
 #import slikland.utils.Prototypes
 #import slikland.core.App
 #import slikland.core.navigation.NavigationRouter
+#import slikland.anim.KTween
 
 #import slikland.utils.ObjectUtils
 #import slikland.utils.StringUtils

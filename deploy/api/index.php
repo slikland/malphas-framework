@@ -18,6 +18,7 @@ define('DEBUG', $debug);
 include_once('config.php');
 include_once('slikland/AutoLoader.php');
 include('slikland/core/ServiceController.php');
+class_alias('\slikland\core\Setting', 'Setting');
 class_alias('\slikland\error\Error', 'Error');
 class_alias('\slikland\error\CodedError', 'CodedError');
 

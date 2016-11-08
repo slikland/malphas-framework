@@ -20,7 +20,8 @@ Node::removeChild = (node) ->
 	if node instanceof BaseDOM
 		el = node.element
 		node.parent = @
-	Node::__removeChild__.call(@, el)
+	try
+		@__removeChild__.call(@, el)
 Element::matches = Element::matches || Element::webkitMatchesSelector || Element::mozMatchesSelector || Element::msMatchesSelector || Element::oMatchesSelector
 Node::findParents = (query) ->
 	if @parentNode?.matches?

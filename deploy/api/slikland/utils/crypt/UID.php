@@ -67,4 +67,3 @@ class UID
 		return $value;
 	}
 }
-?>

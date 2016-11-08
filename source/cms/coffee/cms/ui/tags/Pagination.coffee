@@ -16,7 +16,10 @@ class Pagination extends cms.ui.Base
 
 		constructor:(element)->
 			super({element: element})
+			@_page = 0
 			@_element.on('update', @_update)
+
+			@_target = document.querySelector('#' + @attr('for'))
 
 			@_pages = []
 
@@ -29,6 +32,12 @@ class Pagination extends cms.ui.Base
 			@_prev = new BaseDOM({element: 'a', className: 'arrow prev'})
 			@_next = new BaseDOM({element: 'a', className: 'arrow next'})
 			@_last = new BaseDOM({element: 'a', className: 'arrow last'})
+
+			@_first.element.on('click', @_firstClick)
+			@_prev.element.on('click', @_prevClick)
+			@_next.element.on('click', @_nextClick)
+			@_last.element.on('click', @_lastClick)
+
 			@_first.html = '<i />'
 			@_prev.html = '<i />'
 			@_next.html = '<i />'
@@ -47,25 +56,137 @@ class Pagination extends cms.ui.Base
 			@appendChild(@_last)
 			
 			@_pageContainer.element.on('mousedown', @_pageMouseDown)
+
+			@_setItemValue()
+
+
+		@get page:()->
+			return @_page
+		@set page:(value)->
+			if value >= @_total - 1
+				value = @_total - 1
+				@_last.attr('disabled', '1')
+				@_next.attr('disabled', '1')
+			else
+				@_last.element.removeAttribute('disabled')
+				@_next.element.removeAttribute('disabled')
+			if value <= 0
+				value = 0
+				@_first.attr('disabled', '1')
+				@_prev.attr('disabled', '1')
+			else
+				@_first.element.removeAttribute('disabled')
+				@_prev.element.removeAttribute('disabled')
+			changed = false
+			if @_page != value
+				changed = true
+			@_page = value
+			@_element.index = @_page * @_numItems
+			@_element.numItems = @_numItems
+			KTween.remove(@)
+			page = @_pages[@_page]
+			if !page
+				return
+
+			i = @_pages.length
+			while i-- > 0
+				if i == @_page
+					@_pages[i].className = 'hover'
+				else
+					@_pages[i].className = ''
+
+			pBounds = @_pageContainer.getBounds()
+			bounds = page.getBoundingClientRect()
+			sl = @_pageContainer.element.scrollLeft
+			p = (bounds.right + bounds.left) * 0.5 - pBounds.left + sl - pBounds.width * 0.25
+			p = p / (@_pageContainer.element.scrollWidth - pBounds.width * 0.5)
+			if p < 0
+				p = 0
+			else if p > 1
+				p = 1
+
+			sl = @_pageContainer.element.scrollLeft
+			sw = @_pageContainer.element.scrollWidth
+			if sw - pBounds.width < 1
+				@_shadowLeft.css('width', 0)
+				@_shadowRight.css('width', 0)
+			else
+				@_shadowLeft.css('width', (p * 2) + 'em')
+				@_shadowRight.css('width', ((1 - p) * 2) + 'em')
+
+			KTween.tween(@, {scrollPosition: p, onUpdate: @_test}, 'easeInOutQuart', 0.3)
+			if changed
+				@_target?.trigger('update')
+
+		@get total:()->
+			return @_total
+
+		@get scrollPosition:()->
+			return @_pageContainer.element.scrollLeft / (@_pageContainer.element.scrollWidth - @_pageContainer.getBounds().width)
+		@set scrollPosition:(value)->
+			@_pageContainer.element.scrollLeft = (@_pageContainer.element.scrollWidth - @_pageContainer.getBounds().width) * value
+
+		_setItemValue:()->
+			id = @_element.getAttribute('for')
+			data = app.router.getParam(id)
+			if !data
+				return
+			if @attr('numItems')
+				@_numItems = @attr('numItems')
+			else if data['_numItems']
+				@_numItems = data['_numItems']
+			if data['_index']
+				@page = @_page = data['_index'] / @_numItems
+		_firstClick:()=>
+			@page = 0
+
+		_prevClick:()=>
+			@page -= 1
+
+		_nextClick:()=>
+			@page += 1
+
+		_lastClick:()=>
+			@page = @total - 1
+
 		_pageMouseDown:(e)=>
 			@_seeking = false
-			@_mousePos = null
+			@_mousePos = MouseUtils.getMousePos(e)
 			window.addEventListener('mouseup', @_mouseUp)
 			window.addEventListener('mousemove', @_mouseMove)
-			@_pageSeekTimeout = setTimeout(@_startPageSeek, 100)
+			window.addEventListener('keydown', @_keyDown)
+			@_startPageSeek(e)
 			e.preventDefault()
+		_keyDown:(e)=>
+			if e.keyCode == 27
+				@_cancelSeek()
 		_mouseUp:()=>
-			@_stopPageSeek()
 			clearTimeout(@_pageSeekTimeout)
+			@_stopPageSeek()
+		_cancelSeek:()=>
+			window.removeEventListener('mousemove', @_mouseMove)
+			window.removeEventListener('mouseup', @_mouseUp)
+			window.removeEventListener('keydown', @_keyDown)
+			@removeClass('seeking')
+			@_seeking = true
+			@page = @_page
+
 		_stopPageSeek:()=>
 			window.removeEventListener('mousemove', @_mouseMove)
 			window.removeEventListener('mouseup', @_mouseUp)
+			window.removeEventListener('keydown', @_keyDown)
 			@removeClass('seeking')
 			@_seeking = true
+			if @_closestItem
+				@page = @_closestItem.index
 
-		_startPageSeek:()=>
-			@addClass('seeking')
+		_startPageSeek:(e)=>
+			@_pageSeekTimeout = setTimeout(@_setSeeking, 100)
 			@_seeking = true
+			@_mouseMove(e)
+		_setSeeking:()=>
+			@addClass('seeking')
+
 		_mouseMove:(e)=>
 			@_prevPos = @_mousePos
 			@_mousePos = MouseUtils.getMousePos(e, false)
@@ -103,6 +224,7 @@ class Pagination extends cms.ui.Base
 				px = pw - bounds.width
 
 			@_pageContainer.element.scrollLeft += dx * w
+
 			@_getClosest()
 		_getClosest:()=>
 			pos = [].concat(@_mousePos)
@@ -124,7 +246,7 @@ class Pagination extends cms.ui.Base
 					closestItem = item
 			if closestItem
 				closestItem.className = 'hover'
-
+				@_closestItem = closestItem
 
 		_update:(e)=>
 			data = e.data
@@ -134,12 +256,21 @@ class Pagination extends cms.ui.Base
 			@_pageContainer.removeAll()
 			@_pages.length = 0
 
+			l = Math.ceil(data.total / data.numItems)
+			@_total = l
+			@_numItems = data.numItems
+			if @_total == 0
+				@css('display', 'none')
+			else
+				@css('display', '')
 
-			l = data.total / data.numItems
-			l = 100
 			i = -1
 			while ++i < l
 				page = document.createElement('a')
 				page.innerHTML = (i + 1)
+				page.index = i
 				@_pageContainer.appendChild(page)
 				@_pages[i] = page
+
+
+			@page = @_page = Math.floor(data.index / data.numItems)

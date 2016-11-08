@@ -18,6 +18,8 @@ class Action extends cms.ui.Base
 
 		constructor:(element)->
 			super({element: element})
+			setTimeout(@_addEventListener, 1)
+		_addEventListener:()=>
 			@_element.on('click', @_click)
 		_click:(e)=>
 			API.call(@_element.getAttribute('action'), null, @_apiComplete)

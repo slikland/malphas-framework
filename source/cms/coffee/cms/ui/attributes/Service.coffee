@@ -44,6 +44,12 @@ class Service extends cms.ui.Base
 							if item.getAttribute('type') in ['checkbox','radio']
 								if !item.checked
 									value = null
+						when 'pagination'
+							if item.index
+								paramSet = true
+								params['_index'] = item.index
+							if item.numItems
+								params['_numItems'] = item.numItems
 						else
 							if item.hasAttribute('sort')
 								continue

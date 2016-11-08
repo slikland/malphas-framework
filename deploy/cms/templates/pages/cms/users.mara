@@ -1,8 +1,9 @@
-card: 
-	header:
+button: {"type":"fab", "on":"card1", "href":"cms/user/add", "position": "TR"}
+	i.fa.fa-plus:
+	tooltip: {"html":"Adicionar usuário","align":"b"}
+card#card1: 
+	header: 
 		span: "Usuários"
-		div.right: {"align": "r"}
-			button.button-5.text-small: {"html":"Adicionar", "href":"cms/user/add"}
 	content:
 		field: 
 			label: "Busca"

@@ -18,5 +18,3 @@ class Error extends \Exception
 		return $response;
 	}
 }
-
-?>

@@ -4,7 +4,7 @@ __hasProp={}.hasOwnProperty,
 __indexOf=[].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
 __extends=function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) Object.defineProperty(child, key, Object.getOwnPropertyDescriptor(parent, key)); } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 function __addNamespace(scope, obj){for(k in obj){if(!scope[k]) scope[k] = {};__addNamespace(scope[k], obj[k])}};
-__addNamespace(this, {"cms":{"ui":{"attributes":{},"tag":{"attributes":{}},"tags":{"form":{}}},"core":{}},"slikland":{"mara":{}}});
+__addNamespace(this, {"cms":{"ui":{"attributes":{},"tag":{"attributes":{}},"tags":{"form":{},"interface":{}}},"core":{}},"slikland":{"mara":{}}});
 cms.ui.Base = (function() {
   function Base() {
     this._instances = [];
@@ -1355,6 +1355,565 @@ NavigationRouter = (function(_super) {
   };
   return NavigationRouter;
 })(EventDispatcher);
+var KTObject, KTween;
+KTween = (function() {
+  function KTween() {}
+  KTween.tweenTypes = {};
+  KTween.numValues = 100;
+  KTween.inited = false;
+  KTween.items = [];
+  KTween.queued = [];
+  KTween.numQueued = 0;
+  KTween.numItems = 0;
+  KTween.index = 0;
+  KTween.div = 1 / 0xFFFFFF;
+  KTween.init = function(timeout) {
+    this.timeout = timeout != null ? timeout : 1000 / 60;
+    if (this.inited) {
+      return;
+    }
+    this.initTime = new Date().getTime();
+    setInterval(this.update, this.timeout);
+    return this.inited = true;
+  };
+  KTween.update = function() {
+    var ap, comp, diffs, distances, initValues, ko, l, lj, p, params, t, tar, tim, values, _results;
+    t = new Date().getTime() - KTween.initTime;
+    l = KTween.numQueued;
+    while (l-- > 0) {
+      if (KTween.queued[l].initTime <= t) {
+        KTween.numQueued--;
+        KTween.numItems++;
+        KTween.queued[l].init();
+        KTween.items.push(KTween.queued.splice(l, 1)[0]);
+      }
+    }
+    l = KTween.numItems;
+    _results = [];
+    while (l-- > 0) {
+      comp = false;
+      ko = KTween.items[l];
+      if (!ko) {
+        continue;
+      }
+      tar = ko.target;
+      tim = (t - ko.initTime) * ko.iDuration;
+      if (tim < 0) {
+        tim = 0;
+      }
+      if (tim > 1) {
+        tim = 1;
+      }
+      values = KTween.tweenTypes[ko.transition][0];
+      diffs = KTween.tweenTypes[ko.transition][1];
+      p = tim * KTween.numValues;
+      ap = p >> 0;
+      p = (values[ap] + diffs[ap] * (p - ap)) * KTween.div;
+      lj = ko.numParams;
+      params = ko.params;
+      distances = ko.distances;
+      initValues = ko.initValues;
+      while (lj-- > 0) {
+        tar[params[lj]] = distances[lj] * p + initValues[lj];
+      }
+      if (ko.onUpdate) {
+        params = ko.onUpdateParams;
+        ko.onUpdate.apply(ko.target, params);
+      }
+      if (tim === 1) {
+        KTween.numItems--;
+        KTween.items.splice(l, 1);
+        if (ko.onComplete && ko.onComplete !== void 0) {
+          params = ko.onCompleteParams;
+          if (!params) {
+            params = [];
+          }
+          _results.push(ko.onComplete.apply(ko.target, params));
+        } else {
+          _results.push(void 0);
+        }
+      } else {
+        _results.push(void 0);
+      }
+    }
+    return _results;
+  };
+  KTween.tween = function(target, params, transition, time, delay) {
+    var ko, t;
+    if (transition == null) {
+      transition = "linear";
+    }
+    if (time == null) {
+      time = 0;
+    }
+    if (delay == null) {
+      delay = 0;
+    }
+    if (!this.inited) {
+      this.init();
+    }
+    if (!this.tweenTypes[transition]) {
+      this.populateEasing(transition);
+    }
+    t = ((new Date().getTime() - this.initTime) + delay * 1000) >> 0;
+    ko = new KTObject(this.index++, target, t, (time * 1000) >> 0, params, transition);
+    if (delay === 0) {
+      ko.init();
+      this.numItems++;
+      return this.items.push(ko);
+    } else {
+      this.numQueued++;
+      return this.queued.push(ko);
+    }
+  };
+  KTween.populateEasing = function(transition) {
+    var diffs, f, i, l, lp, p, values, _i;
+    if ((f = KTween[transition])) {
+      values = [];
+      diffs = [];
+      l = this.numValues;
+      for (i = _i = 0; 0 <= l ? _i < l : _i > l; i = 0 <= l ? ++_i : --_i) {
+        p = values[i] = (f(i, 0, 0xFFFFFF, l) + 0.5) >> 0;
+        if (i > 0) {
+          diffs[i - 1] = p - lp;
+        }
+        lp = p;
+      }
+      values[l] = 0xFFFFFF;
+      values[l + 1] = 0;
+      diffs[l - 1] = 0xFFFFFF - lp;
+      diffs[l] = 0;
+      return this.tweenTypes[transition] = [values, diffs];
+    }
+  };
+  KTween.tweenSequence = function(target, onComplete, sequence, onCompleteParams) {
+    var d, o, t, tr;
+    if (onCompleteParams == null) {
+      onCompleteParams = null;
+    }
+    if (!target) {
+      return;
+    }
+    if (!sequence) {
+      return;
+    }
+    if (sequence.length === 0) {
+      if (onComplete) {
+        onComplete.apply(target, onCompleteParams);
+      }
+      return;
+    }
+    o = sequence.shift();
+    tr = 'linear';
+    if (o['transition']) {
+      tr = o['transition'];
+    }
+    t = 0;
+    if (o['time']) {
+      t = o['time'];
+    }
+    d = 0;
+    if (o['delay']) {
+      d = o['delay'];
+    }
+    return this.tween(target, o, tr, t, d, tweenSequence, [target, onComplete, sequence, onCompleteParams]);
+  };
+  KTween.remove = function(target, parameter) {
+    var l, q, _results;
+    if (parameter == null) {
+      parameter = null;
+    }
+    l = this.numQueued;
+    while (l-- > 0) {
+      q = this.queued[l];
+      if (q.target === target) {
+        if (q.remove(parameter)) {
+          this.numQueued--;
+          this.queued.splice(l, 1);
+        }
+      }
+    }
+    l = this.numItems;
+    _results = [];
+    while (l-- > 0) {
+      q = this.items[l];
+      if (q.target === target) {
+        if (q.remove(parameter)) {
+          this.numItems--;
+          _results.push(this.items.splice(l, 1));
+        } else {
+          _results.push(void 0);
+        }
+      } else {
+        _results.push(void 0);
+      }
+    }
+    return _results;
+  };
+  KTween.getByTime = function(type, time, duration) {
+    var ap, p, p1, p2, values;
+    values = this.tweenTypes[type];
+    p = (time / duration) * this.numValues;
+    ap = p >> 0;
+    p1 = values[ap];
+    p2 = values[ap + 1];
+    return (p2 - p1) * (p - ap) + p1;
+  };
+  KTween.getByPosition = function(type, position) {
+    var ap, diffs, values;
+    if (!this.inited) {
+      this.init();
+    }
+    if (!this.tweenTypes[type]) {
+      this.populateEasing(type);
+    }
+    values = this.tweenTypes[type][0];
+    diffs = this.tweenTypes[type][1];
+    position *= this.numValues;
+    ap = position >> 0;
+    return (values[ap] + diffs[ap] * (position - ap)) * this.div;
+  };
+  KTween.linear = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    return c * t / d + b;
+  };
+  KTween.easeInQuad = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    return c * (t /= d) * t + b;
+  };
+  KTween.easeOutQuad = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    return -c * (t /= d) * (t - 2) + b;
+  };
+  KTween.easeInOutQuad = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    if ((t /= d / 2) < 1) {
+      return c / 2 * t * t + b;
+    }
+    return -c / 2 * ((--t) * (t - 2) - 1) + b;
+  };
+  KTween.easeOutInQuad = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    if (t < d / 2) {
+      return this.easeOutQuad(t * 2, b, c / 2, d, p_params);
+    }
+    return this.easeInQuad((t * 2) - d, b + c / 2, c / 2, d, p_params);
+  };
+  KTween.easeInCubic = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    return c * (t /= d) * t * t + b;
+  };
+  KTween.easeOutCubic = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    return c * ((t = t / d - 1) * t * t + 1) + b;
+  };
+  KTween.easeInOutCubic = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    if ((t /= d / 2) < 1) {
+      return c / 2 * t * t * t + b;
+    }
+    return c / 2 * ((t -= 2) * t * t + 2) + b;
+  };
+  KTween.easeOutInCubic = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    if (t < d / 2) {
+      return this.easeOutCubic(t * 2, b, c / 2, d, p_params);
+    }
+    return this.easeInCubic((t * 2) - d, b + c / 2, c / 2, d, p_params);
+  };
+  KTween.easeInQuart = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    return c * (t /= d) * t * t * t + b;
+  };
+  KTween.easeOutQuart = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    return -c * ((t = t / d - 1) * t * t * t - 1) + b;
+  };
+  KTween.easeInOutQuart = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    if ((t /= d / 2) < 1) {
+      return c / 2 * t * t * t * t + b;
+    }
+    return -c / 2 * ((t -= 2) * t * t * t - 2) + b;
+  };
+  KTween.easeOutInQuart = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    if (t < d / 2) {
+      return this.easeOutQuart(t * 2, b, c / 2, d, p_params);
+    }
+    return this.easeInQuart((t * 2) - d, b + c / 2, c / 2, d, p_params);
+  };
+  KTween.easeInQuint = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    return c * (t /= d) * t * t * t * t + b;
+  };
+  KTween.easeOutQuint = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
+  };
+  KTween.easeInOutQuint = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    if ((t /= d / 2) < 1) {
+      return c / 2 * t * t * t * t * t + b;
+    }
+    return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
+  };
+  KTween.easeOutInQuint = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    if (t < d / 2) {
+      return this.easeOutQuint(t * 2, b, c / 2, d, p_params);
+    }
+    return this.easeInQuint((t * 2) - d, b + c / 2, c / 2, d, p_params);
+  };
+  KTween.easeInSine = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+  };
+  KTween.easeOutSine = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    return c * Math.sin(t / d * (Math.PI / 2)) + b;
+  };
+  KTween.easeInOutSine = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    return -c / 2 * (Math.cos(Math.PI * t / d) - 1) + b;
+  };
+  KTween.easeOutInSine = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    if (t < d / 2) {
+      return this.easeOutSine(t * 2, b, c / 2, d, p_params);
+    }
+    return this.easeInSine((t * 2) - d, b + c / 2, c / 2, d, p_params);
+  };
+  KTween.easeInExpo = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    if (t === 0) {
+      return b;
+    }
+    return c * Math.pow(2, 10 * (t / d - 1)) + b - c * 0.001;
+  };
+  KTween.easeOutExpo = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    if (t === d) {
+      return b + c;
+    }
+    return c * 1.001 * (-Math.pow(2, -10 * t / d) + 1) + b;
+  };
+  KTween.easeInOutExpo = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    if (t === 0) {
+      return b;
+    }
+    if (t === d) {
+      return b + c;
+    }
+    if ((t /= d / 2) < 1) {
+      return c / 2 * Math.pow(2, 10 * (t - 1)) + b - c * 0.0005;
+    }
+    return c / 2 * 1.0005 * (-Math.pow(2, -10 * --t) + 2) + b;
+  };
+  KTween.easeOutInExpo = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    if (t < d / 2) {
+      return this.easeOutExpo(t * 2, b, c / 2, d, p_params);
+    }
+    return this.easeInExpo((t * 2) - d, b + c / 2, c / 2, d, p_params);
+  };
+  KTween.easeInCirc = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
+  };
+  KTween.easeOutCirc = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
+  };
+  KTween.easeInOutCirc = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    if ((t /= d / 2) < 1) {
+      return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
+    }
+    return c / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
+  };
+  KTween.easeOutInCirc = function(t, b, c, d, p_params) {
+    if (p_params == null) {
+      p_params = null;
+    }
+    if (t < d / 2) {
+      return this.easeOutCirc(t * 2, b, c / 2, d, p_params);
+    }
+    return this.easeInCirc((t * 2) - d, b + c / 2, c / 2, d, p_params);
+  };
+  KTween.easeInBack = function(time, begin, change, duration, overshoot) {
+    if (overshoot == null) {
+      overshoot = 1.70158;
+    }
+    return change * (time /= duration) * time * ((overshoot + 1) * time - overshoot) + begin;
+  };
+  KTween.easeOutBack = function(time, begin, change, duration, overshoot) {
+    if (overshoot == null) {
+      overshoot = 1.70158;
+    }
+    return change * ((time = time / duration - 1) * time * ((overshoot + 1) * time + overshoot) + 1) + begin;
+  };
+  KTween.easeInOutBack = function(time, begin, change, duration, overshoot) {
+    if (overshoot == null) {
+      overshoot = 1.70158;
+    }
+    if ((time = time / (duration / 2)) < 1) {
+      return change / 2 * (time * time * (((overshoot *= 1.525) + 1) * time - overshoot)) + begin;
+    } else {
+      return change / 2 * ((time -= 2) * time * (((overshoot *= 1.525) + 1) * time + overshoot) + 2) + begin;
+    }
+  };
+  return KTween;
+})();
+KTObject = (function() {
+  function KTObject(id, target, initTime, duration, params, transition) {
+    var p;
+    this.id = id;
+    this.target = target;
+    this.initTime = initTime;
+    this.duration = duration;
+    this.transition = transition;
+    this.iDuration = 1 / this.duration;
+    this.params = [];
+    this.endValues = [];
+    this.distances = [];
+    this.initValues = [];
+    this.numParams = 0;
+    this.onComplete = params['onComplete'];
+    this.onCompleteParams = params['onCompleteParams'];
+    this.onUpdate = params['onUpdate'];
+    this.onUpdateParams = params['onUpdateParams'];
+    this.onInit = params['onInit'];
+    delete params['onComplete'];
+    delete params['onCompleteParams'];
+    delete params['onUpdate'];
+    delete params['onInit'];
+    for (p in params) {
+      if (this.target.hasOwnProperty(p) || (this.target[p] != null)) {
+        this.params.push(p);
+        this.endValues.push(Number(params[p]));
+        this.distances.push(0);
+        this.initValues.push(0);
+        this.numParams++;
+      }
+    }
+  }
+  KTObject.prototype.remove = function(parameter) {
+    var disp, l;
+    if (parameter == null) {
+      parameter = null;
+    }
+    disp = true;
+    if (parameter) {
+      l = this.numParams;
+      while (l-- > 0) {
+        if (this.params[l] === parameter) {
+          this.params.splice(l, 1);
+          this.endValues.splice(l, 1);
+          this.distances.splice(l, 1);
+          this.initValues.splice(l, 1);
+          this.numParams--;
+        }
+      }
+      disp = numParams <= 0;
+    }
+    if (disp) {
+      this.dispose();
+      return true;
+    }
+    return false;
+  };
+  KTObject.prototype.dispose = function() {
+    this.target = null;
+    this.transition = null;
+    this.onComplete = null;
+    this.onCompleteParams = null;
+    this.params = null;
+    this.endValues = null;
+    this.distances = null;
+    this.initValues = null;
+    delete this.target;
+    delete this.transition;
+    delete this.onComplete;
+    delete this.onCompleteParams;
+    delete this.params;
+    delete this.endValues;
+    delete this.distances;
+    return delete this.initValues;
+  };
+  KTObject.prototype.init = function() {
+    var l, p, _results;
+    if (this.onInit) {
+      this.onInit.apply(this.target);
+    }
+    l = this.numParams;
+    _results = [];
+    while (l-- >= 0) {
+      p = this.initValues[l] = Number(this.target[this.params[l]]);
+      _results.push(this.distances[l] = this.endValues[l] - p);
+    }
+    return _results;
+  };
+  return KTObject;
+})();
+window.KTween = KTween;
 var ObjectUtils;
 ObjectUtils = (function() {
   function ObjectUtils() {}
@@ -2657,7 +3216,9 @@ Node.prototype.removeChild = function(node) {
     el = node.element;
     node.parent = this;
   }
-  return Node.prototype.__removeChild__.call(this, el);
+  try {
+    return this.__removeChild__.call(this, el);
+  } catch (_error) {}
 };
 Element.prototype.matches = Element.prototype.matches || Element.prototype.webkitMatchesSelector || Element.prototype.mozMatchesSelector || Element.prototype.msMatchesSelector || Element.prototype.oMatchesSelector;
 Node.prototype.findParents = function(query) {
@@ -4735,7 +5296,6 @@ cms.core.InterfaceController = (function() {
     var iData;
     this._availPages = data.pages;
     this._availPages.sort(this._sortPages);
-    console.log(this._availPages);
     iData = {
       user: app.user.data,
       "interface": data
@@ -5274,6 +5834,15 @@ cms.ui.tag.attributes.Service = (function(_super) {
                 }
               }
               break;
+            case 'pagination':
+              if (item.index) {
+                paramSet = true;
+                params['_index'] = item.index;
+              }
+              if (item.numItems) {
+                params['_numItems'] = item.numItems;
+              }
+              break;
             default:
               if (item.hasAttribute('sort')) {
                 continue;
@@ -5477,6 +6046,117 @@ cms.ui.attributes.Focus = (function(_super) {
   };
   return Focus;
 })(cms.ui.Base);
+var __hasProp = {}.hasOwnProperty;
+cms.ui.tag.attributes.FAB = (function(_super) {
+  var Plugin;
+  __extends(FAB, _super);
+  function FAB() {
+    return FAB.__super__.constructor.apply(this, arguments);
+  }
+  FAB.SELECTOR = 'button[type="fab"]';
+  FAB.prototype._update = function(data) {
+    var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
+    _ref = data.add;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      item = _ref[_i];
+      this._plugins[item] = new Plugin(item);
+    }
+    _ref1 = data.remove;
+    _results = [];
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      item = _ref1[_j];
+      p = this._plugins[item];
+      if (p) {
+        _results.push(typeof p.destroy === "function" ? p.destroy() : void 0);
+      } else {
+        _results.push(void 0);
+      }
+    }
+    return _results;
+  };
+  Plugin = (function(_super1) {
+    __extends(Plugin, _super1);
+    Plugin._destroyPlugin = function(item) {};
+    function Plugin(element) {
+      this._checkPosition = __bind(this._checkPosition, this);
+      this._scroll = __bind(this._scroll, this);
+      this.destroy = __bind(this.destroy, this);
+      Plugin.__super__.constructor.call(this, {
+        element: element
+      });
+      if (this.attr('on')) {
+        this._target = document.querySelector('#' + this.attr('on'));
+        this._position = 'TR';
+        if (this.attr('position')) {
+          this._position = this.attr('position');
+        }
+        this._checkPosition();
+      }
+    }
+    Plugin.prototype.destroy = function() {
+      Plugin.__super__.destroy.apply(this, arguments);
+      this._target = null;
+      return window.cancelAnimationFrame(this._checkPositionTicker);
+    };
+    Plugin.prototype._scroll = function() {
+      return console.log('scroll');
+    };
+    Plugin.prototype._checkPosition = function() {
+      var bBounds, bounds, l, pBounds, t;
+      if (!this._target || !this._element.parentNode) {
+        return;
+      }
+      this._checkPositionTicker = window.requestAnimationFrame(this._checkPosition);
+      bounds = this._getTargetBounds(this._target);
+      pBounds = this._element.parentNode.getBoundingClientRect();
+      bBounds = this.getBounds();
+      t = bounds.top + bBounds.height * 0.25;
+      l = bounds.left;
+      if (bounds.bottom < bBounds.height * 1.5) {
+        t = bounds.bottom - bBounds.height * 1.25;
+      } else if (t < bBounds.height * 0.25) {
+        t = bBounds.height * 0.25;
+      }
+      t += pBounds.top;
+      if (bounds.right < bBounds.width * 1.25) {
+        l = bounds.bottom - bBounds.width * 1.25;
+      } else if (l < 0) {
+        l = 0;
+      }
+      l += pBounds.left + bounds.width - bBounds.width * 1.25;
+      return this.css({
+        'top': t + 'px',
+        left: l + 'px'
+      });
+    };
+    Plugin.prototype._getTargetBounds = function(target) {
+      var bounds, boundsObj, k, tbounds, v;
+      if (target == null) {
+        target = null;
+      }
+      boundsObj = {};
+      bounds = target.getBoundingClientRect();
+      for (k in bounds) {
+        v = bounds[k];
+        boundsObj[k] = v;
+      }
+      if (this._element.parentNode) {
+        tbounds = this._element.parentNode.getBoundingClientRect();
+      }
+      if (tbounds) {
+        boundsObj.top -= tbounds.top;
+        boundsObj.left -= tbounds.left;
+        boundsObj.bottom -= tbounds.top;
+        boundsObj.right -= tbounds.left;
+      }
+      boundsObj.width = boundsObj.right - boundsObj.left;
+      boundsObj.height = boundsObj.bottom - boundsObj.top;
+      return boundsObj;
+    };
+    return Plugin;
+  })(BaseDOM);
+  return FAB;
+})(cms.ui.Base);
 var MouseUtils;
 MouseUtils = (function() {
   function MouseUtils() {}
@@ -5486,7 +6166,7 @@ MouseUtils = (function() {
       global = true;
     }
     x = e.pageX || e.clientX;
-    y = e.pageX || e.clientX;
+    y = e.pageY || e.clientY;
     if (global) {
       x += document.body.scrollLeft + document.documentElement.scrollLeft;
       y += document.body.scrollTop + document.documentElement.scrollTop;
@@ -5813,6 +6493,56 @@ cms.ui.tag.attributes.Draggable = (function(_super) {
   })(BaseDOM);
   return Draggable;
 })(cms.ui.Base);
+var __hasProp = {}.hasOwnProperty;
+cms.ui.tag.attributes.Confirm = (function(_super) {
+  var Plugin;
+  __extends(Confirm, _super);
+  function Confirm() {
+    return Confirm.__super__.constructor.apply(this, arguments);
+  }
+  Confirm.SELECTOR = '[confirm]';
+  Confirm.prototype._update = function(data) {
+    var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
+    _ref = data.add;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      item = _ref[_i];
+      this._plugins[item] = new Plugin(item);
+    }
+    _ref1 = data.remove;
+    _results = [];
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      item = _ref1[_j];
+      p = this._plugins[item];
+      if (p) {
+        _results.push(typeof p.destroy === "function" ? p.destroy() : void 0);
+      } else {
+        _results.push(void 0);
+      }
+    }
+    return _results;
+  };
+  Plugin = (function(_super1) {
+    __extends(Plugin, _super1);
+    Plugin._destroyPlugin = function(item) {};
+    function Plugin(element) {
+      this._click = __bind(this._click, this);
+      Plugin.__super__.constructor.call(this, {
+        element: element
+      });
+      this._element.on('click', this._click);
+    }
+    Plugin.prototype._click = function(e) {
+      var message;
+      message = this.attr('confirm');
+      if (!window.confirm(message)) {
+        e.preventDefault();
+        return e.stopImmediatePropagation();
+      }
+    };
+    return Plugin;
+  })(BaseDOM);
+  return Confirm;
+})(cms.ui.Base);
 var ColorUtils;
 ColorUtils = (function() {
   function ColorUtils() {}
@@ -5959,11 +6689,15 @@ cms.ui.tag.attributes.Action = (function(_super) {
     function Plugin(element) {
       this._apiComplete = __bind(this._apiComplete, this);
       this._click = __bind(this._click, this);
+      this._addEventListener = __bind(this._addEventListener, this);
       Plugin.__super__.constructor.call(this, {
         element: element
       });
-      this._element.on('click', this._click);
+      setTimeout(this._addEventListener, 1);
     }
+    Plugin.prototype._addEventListener = function() {
+      return this._element.on('click', this._click);
+    };
     Plugin.prototype._click = function(e) {
       API.call(this._element.getAttribute('action'), null, this._apiComplete);
       e.preventDefault();
@@ -6080,29 +6814,20 @@ cms.ui.tags.form.Form = (function(_super) {
   Form.prototype._update = function(data) {
     var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
     _ref = data.add;
-    _results = [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       item = _ref[_i];
-      _ref1 = data.add;
-      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-        item = _ref1[_j];
-        this._plugins[item] = new Plugin(item);
+      this._plugins[item] = new Plugin(item);
+    }
+    _ref1 = data.remove;
+    _results = [];
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      item = _ref1[_j];
+      p = this._plugins[item];
+      if (p) {
+        _results.push(typeof p.destroy === "function" ? p.destroy() : void 0);
+      } else {
+        _results.push(void 0);
       }
-      _results.push((function() {
-        var _k, _len2, _ref2, _results1;
-        _ref2 = data.remove;
-        _results1 = [];
-        for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
-          item = _ref2[_k];
-          p = this._plugins[item];
-          if (p) {
-            _results1.push(typeof p.destroy === "function" ? p.destroy() : void 0);
-          } else {
-            _results1.push(void 0);
-          }
-        }
-        return _results1;
-      }).call(this));
     }
     return _results;
   };
@@ -6379,6 +7104,57 @@ cms.ui.tags.form.Checkbox = (function(_super) {
   return Checkbox;
 })(cms.ui.Base);
 var __hasProp = {}.hasOwnProperty;
+cms.ui.tags.Tooltip = (function(_super) {
+  var Plugin;
+  __extends(Tooltip, _super);
+  function Tooltip() {
+    return Tooltip.__super__.constructor.apply(this, arguments);
+  }
+  Tooltip.SELECTOR = 'tooltip';
+  Tooltip.prototype._update = function(data) {
+    var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
+    _ref = data.add;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      item = _ref[_i];
+      this._plugins[item] = new Plugin(item);
+    }
+    _ref1 = data.remove;
+    _results = [];
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      item = _ref1[_j];
+      p = this._plugins[item];
+      if (p) {
+        _results.push(typeof p.destroy === "function" ? p.destroy() : void 0);
+      } else {
+        _results.push(void 0);
+      }
+    }
+    return _results;
+  };
+  Plugin = (function(_super1) {
+    __extends(Plugin, _super1);
+    Plugin._destroyPlugin = function(item) {};
+    function Plugin(element) {
+      this._out = __bind(this._out, this);
+      this._over = __bind(this._over, this);
+      Plugin.__super__.constructor.call(this, {
+        element: element
+      });
+      this._parent = element.parentNode;
+      this._parent.on('mouseover', this._over);
+      this._parent.on('mouseout', this._out);
+    }
+    Plugin.prototype._over = function() {
+      return this.addClass('show');
+    };
+    Plugin.prototype._out = function() {
+      return this.removeClass('show');
+    };
+    return Plugin;
+  })(BaseDOM);
+  return Tooltip;
+})(cms.ui.Base);
+var __hasProp = {}.hasOwnProperty;
 cms.ui.tags.Pagination = (function(_super) {
   var Plugin;
   __extends(Pagination, _super);
@@ -6413,14 +7189,23 @@ cms.ui.tags.Pagination = (function(_super) {
       this._update = __bind(this._update, this);
       this._getClosest = __bind(this._getClosest, this);
       this._mouseMove = __bind(this._mouseMove, this);
+      this._setSeeking = __bind(this._setSeeking, this);
       this._startPageSeek = __bind(this._startPageSeek, this);
       this._stopPageSeek = __bind(this._stopPageSeek, this);
+      this._cancelSeek = __bind(this._cancelSeek, this);
       this._mouseUp = __bind(this._mouseUp, this);
+      this._keyDown = __bind(this._keyDown, this);
       this._pageMouseDown = __bind(this._pageMouseDown, this);
+      this._lastClick = __bind(this._lastClick, this);
+      this._nextClick = __bind(this._nextClick, this);
+      this._prevClick = __bind(this._prevClick, this);
+      this._firstClick = __bind(this._firstClick, this);
       Plugin.__super__.constructor.call(this, {
         element: element
       });
+      this._page = 0;
       this._element.on('update', this._update);
+      this._target = document.querySelector('#' + this.attr('for'));
       this._pages = [];
       this._pageWrapper = new BaseDOM({
         element: 'div',
@@ -6454,6 +7239,10 @@ cms.ui.tags.Pagination = (function(_super) {
         element: 'a',
         className: 'arrow last'
       });
+      this._first.element.on('click', this._firstClick);
+      this._prev.element.on('click', this._prevClick);
+      this._next.element.on('click', this._nextClick);
+      this._last.element.on('click', this._lastClick);
       this._first.html = '<i />';
       this._prev.html = '<i />';
       this._next.html = '<i />';
@@ -6467,28 +7256,166 @@ cms.ui.tags.Pagination = (function(_super) {
       this.appendChild(this._next);
       this.appendChild(this._last);
       this._pageContainer.element.on('mousedown', this._pageMouseDown);
+      this._setItemValue();
     }
+    Plugin.get({
+      page: function() {
+        return this._page;
+      }
+    });
+    Plugin.set({
+      page: function(value) {
+        var bounds, changed, i, p, pBounds, page, sl, sw, _ref;
+        if (value >= this._total - 1) {
+          value = this._total - 1;
+          this._last.attr('disabled', '1');
+          this._next.attr('disabled', '1');
+        } else {
+          this._last.element.removeAttribute('disabled');
+          this._next.element.removeAttribute('disabled');
+        }
+        if (value <= 0) {
+          value = 0;
+          this._first.attr('disabled', '1');
+          this._prev.attr('disabled', '1');
+        } else {
+          this._first.element.removeAttribute('disabled');
+          this._prev.element.removeAttribute('disabled');
+        }
+        changed = false;
+        if (this._page !== value) {
+          changed = true;
+        }
+        this._page = value;
+        this._element.index = this._page * this._numItems;
+        this._element.numItems = this._numItems;
+        KTween.remove(this);
+        page = this._pages[this._page];
+        if (!page) {
+          return;
+        }
+        i = this._pages.length;
+        while (i-- > 0) {
+          if (i === this._page) {
+            this._pages[i].className = 'hover';
+          } else {
+            this._pages[i].className = '';
+          }
+        }
+        pBounds = this._pageContainer.getBounds();
+        bounds = page.getBoundingClientRect();
+        sl = this._pageContainer.element.scrollLeft;
+        p = (bounds.right + bounds.left) * 0.5 - pBounds.left + sl - pBounds.width * 0.25;
+        p = p / (this._pageContainer.element.scrollWidth - pBounds.width * 0.5);
+        if (p < 0) {
+          p = 0;
+        } else if (p > 1) {
+          p = 1;
+        }
+        sl = this._pageContainer.element.scrollLeft;
+        sw = this._pageContainer.element.scrollWidth;
+        if (sw - pBounds.width < 1) {
+          this._shadowLeft.css('width', 0);
+          this._shadowRight.css('width', 0);
+        } else {
+          this._shadowLeft.css('width', (p * 2) + 'em');
+          this._shadowRight.css('width', ((1 - p) * 2) + 'em');
+        }
+        KTween.tween(this, {
+          scrollPosition: p,
+          onUpdate: this._test
+        }, 'easeInOutQuart', 0.3);
+        if (changed) {
+          return (_ref = this._target) != null ? _ref.trigger('update') : void 0;
+        }
+      }
+    });
+    Plugin.get({
+      total: function() {
+        return this._total;
+      }
+    });
+    Plugin.get({
+      scrollPosition: function() {
+        return this._pageContainer.element.scrollLeft / (this._pageContainer.element.scrollWidth - this._pageContainer.getBounds().width);
+      }
+    });
+    Plugin.set({
+      scrollPosition: function(value) {
+        return this._pageContainer.element.scrollLeft = (this._pageContainer.element.scrollWidth - this._pageContainer.getBounds().width) * value;
+      }
+    });
+    Plugin.prototype._setItemValue = function() {
+      var data, id;
+      id = this._element.getAttribute('for');
+      data = app.router.getParam(id);
+      if (!data) {
+        return;
+      }
+      if (this.attr('numItems')) {
+        this._numItems = this.attr('numItems');
+      } else if (data['_numItems']) {
+        this._numItems = data['_numItems'];
+      }
+      if (data['_index']) {
+        return this.page = this._page = data['_index'] / this._numItems;
+      }
+    };
+    Plugin.prototype._firstClick = function() {
+      return this.page = 0;
+    };
+    Plugin.prototype._prevClick = function() {
+      return this.page -= 1;
+    };
+    Plugin.prototype._nextClick = function() {
+      return this.page += 1;
+    };
+    Plugin.prototype._lastClick = function() {
+      return this.page = this.total - 1;
+    };
     Plugin.prototype._pageMouseDown = function(e) {
       this._seeking = false;
-      this._mousePos = null;
+      this._mousePos = MouseUtils.getMousePos(e);
       window.addEventListener('mouseup', this._mouseUp);
       window.addEventListener('mousemove', this._mouseMove);
-      this._pageSeekTimeout = setTimeout(this._startPageSeek, 100);
+      window.addEventListener('keydown', this._keyDown);
+      this._startPageSeek(e);
       return e.preventDefault();
     };
+    Plugin.prototype._keyDown = function(e) {
+      if (e.keyCode === 27) {
+        return this._cancelSeek();
+      }
+    };
     Plugin.prototype._mouseUp = function() {
-      this._stopPageSeek();
-      return clearTimeout(this._pageSeekTimeout);
+      clearTimeout(this._pageSeekTimeout);
+      return this._stopPageSeek();
+    };
+    Plugin.prototype._cancelSeek = function() {
+      window.removeEventListener('mousemove', this._mouseMove);
+      window.removeEventListener('mouseup', this._mouseUp);
+      window.removeEventListener('keydown', this._keyDown);
+      this.removeClass('seeking');
+      this._seeking = true;
+      return this.page = this._page;
     };
     Plugin.prototype._stopPageSeek = function() {
       window.removeEventListener('mousemove', this._mouseMove);
       window.removeEventListener('mouseup', this._mouseUp);
+      window.removeEventListener('keydown', this._keyDown);
       this.removeClass('seeking');
-      return this._seeking = true;
+      this._seeking = true;
+      if (this._closestItem) {
+        return this.page = this._closestItem.index;
+      }
     };
-    Plugin.prototype._startPageSeek = function() {
-      this.addClass('seeking');
-      return this._seeking = true;
+    Plugin.prototype._startPageSeek = function(e) {
+      this._pageSeekTimeout = setTimeout(this._setSeeking, 100);
+      this._seeking = true;
+      return this._mouseMove(e);
+    };
+    Plugin.prototype._setSeeking = function() {
+      return this.addClass('seeking');
     };
     Plugin.prototype._mouseMove = function(e) {
       var bounds, cX, dx, ePos, pX, pw, px, sl, w, x;
@@ -6556,28 +7483,35 @@ cms.ui.tags.Pagination = (function(_super) {
         }
       }
       if (closestItem) {
-        return closestItem.className = 'hover';
+        closestItem.className = 'hover';
+        return this._closestItem = closestItem;
       }
     };
     Plugin.prototype._update = function(e) {
-      var data, i, l, page, _results;
+      var data, i, l, page;
       data = e.data;
       if (!data || (data.total == null) || (data.numItems == null)) {
         return;
       }
       this._pageContainer.removeAll();
       this._pages.length = 0;
-      l = data.total / data.numItems;
-      l = 100;
+      l = Math.ceil(data.total / data.numItems);
+      this._total = l;
+      this._numItems = data.numItems;
+      if (this._total === 0) {
+        this.css('display', 'none');
+      } else {
+        this.css('display', '');
+      }
       i = -1;
-      _results = [];
       while (++i < l) {
         page = document.createElement('a');
         page.innerHTML = i + 1;
+        page.index = i;
         this._pageContainer.appendChild(page);
-        _results.push(this._pages[i] = page);
+        this._pages[i] = page;
       }
-      return _results;
+      return this.page = this._page = Math.floor(data.index / data.numItems);
     };
     return Plugin;
   })(BaseDOM);
@@ -6792,14 +7726,14 @@ Blocker = (function(_super) {
   return Blocker;
 })(BaseDOM);
 var __hasProp = {}.hasOwnProperty;
-cms.ui.tag.attributes.Confirm = (function(_super) {
+cms.ui.tags["interface"].NavLink = (function(_super) {
   var Plugin;
-  __extends(Confirm, _super);
-  function Confirm() {
-    return Confirm.__super__.constructor.apply(this, arguments);
+  __extends(NavLink, _super);
+  function NavLink() {
+    return NavLink.__super__.constructor.apply(this, arguments);
   }
-  Confirm.SELECTOR = '[confirm]';
-  Confirm.prototype._update = function(data) {
+  NavLink.SELECTOR = 'nav ul a';
+  NavLink.prototype._update = function(data) {
     var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
     _ref = data.add;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -6823,74 +7757,28 @@ cms.ui.tag.attributes.Confirm = (function(_super) {
     __extends(Plugin, _super1);
     Plugin._destroyPlugin = function(item) {};
     function Plugin(element) {
-      this._click = __bind(this._click, this);
+      this._routeChange = __bind(this._routeChange, this);
+      this._parseItems = __bind(this._parseItems, this);
       Plugin.__super__.constructor.call(this, {
         element: element
       });
-      this._element.on('click', this._click);
+      app.router.on(NavigationRouter.CHANGE, this._routeChange);
+      setTimeout(this._routeChange, 1);
     }
-    Plugin.prototype._click = function(e) {
-      var message;
-      message = this.attr('confirm');
-      if (!window.confirm(message)) {
-        e.preventDefault();
-        return e.stopImmediatePropagation();
-      }
+    Plugin.prototype.destroy = function() {
+      Plugin.__super__.destroy.apply(this, arguments);
+      return app.router.off(NavigationRouter.CHANGE, this._routeChange);
+    };
+    Plugin.prototype._parseItems = function() {};
+    Plugin.prototype._routeChange = function() {
+      var p, p2;
+      p = app.router.getCurrentPath().trim('/');
+      p2 = this.attr('href').trim('/');
+      return this.toggleClass('selected', p === p2);
     };
     return Plugin;
   })(BaseDOM);
-  return Confirm;
-})(cms.ui.Base);
-var __hasProp = {}.hasOwnProperty;
-cms.ui.tags.Tooltip = (function(_super) {
-  var Plugin;
-  __extends(Tooltip, _super);
-  function Tooltip() {
-    return Tooltip.__super__.constructor.apply(this, arguments);
-  }
-  Tooltip.SELECTOR = 'tooltip';
-  Tooltip.prototype._update = function(data) {
-    var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
-    _ref = data.add;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      item = _ref[_i];
-      this._plugins[item] = new Plugin(item);
-    }
-    _ref1 = data.remove;
-    _results = [];
-    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-      item = _ref1[_j];
-      p = this._plugins[item];
-      if (p) {
-        _results.push(typeof p.destroy === "function" ? p.destroy() : void 0);
-      } else {
-        _results.push(void 0);
-      }
-    }
-    return _results;
-  };
-  Plugin = (function(_super1) {
-    __extends(Plugin, _super1);
-    Plugin._destroyPlugin = function(item) {};
-    function Plugin(element) {
-      this._out = __bind(this._out, this);
-      this._over = __bind(this._over, this);
-      Plugin.__super__.constructor.call(this, {
-        element: element
-      });
-      this._parent = element.parentNode;
-      this._parent.on('mouseover', this._over);
-      this._parent.on('mouseout', this._out);
-    }
-    Plugin.prototype._over = function() {
-      return this.addClass('show');
-    };
-    Plugin.prototype._out = function() {
-      return this.removeClass('show');
-    };
-    return Plugin;
-  })(BaseDOM);
-  return Tooltip;
+  return NavLink;
 })(cms.ui.Base);
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 slikland.mara.Block = (function() {

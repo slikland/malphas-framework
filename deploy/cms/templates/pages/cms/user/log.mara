@@ -1,7 +1,6 @@
 card.col-full: 
 	header: "Log de atividade"
 	content:
-		pagination: {"for":"log_table", "numItems": "20"}
 		field: 
 			label: "Busca"
 			input: {"for":"log_table", "name":"search"}
@@ -30,6 +29,7 @@ card.col-full:
 					th: {"sort":"created","html":"Data","width":"1%"}
 			tbody.text-small:
 				>logRow: #{items}
+		pagination: {"for":"log_table", "numItems": "20"}
 <logRow:
 	tr:
 		td.nowrap: {"html":"#{name}"}

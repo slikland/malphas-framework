@@ -63,10 +63,11 @@ class User extends \slikland\core\pattern\Singleton
 			$this->db->query('LOCK TABLES cms_user write');
 			$nextID = $this->db->nextId('cms_user');
 			$checksum = $this->getRoleChecksum($nextID, $role);
-			$insertID = $this->db->insert('INSERT INTO cms_user (pk_cms_user, name, email, pass, fk_cms_role, checksum) VALUES (?, ?, ?, ?, ?)', array($nextID, $name, $email, password($password, $nextID), $role, $checksum));
+			$insertID = $this->db->insert('INSERT INTO cms_user (pk_cms_user, name, email, pass, fk_cms_role, checksum) VALUES (?, ?, ?, ?, ?, ?)', array($nextID, $name, $email, password($password, $nextID), $role, $checksum));
+
 		}catch(\Exception $e)
 		{
-
+			var_dump($e);
 		}
 		$this->db->query('UNLOCK TABLES;');
 
@@ -150,7 +151,7 @@ class User extends \slikland\core\pattern\Singleton
 	function login($email, $pass)
 	{
 		$id = NULL;
-		$user = $this->db->fetch_one('SELECT pk_cms_user id, fk_cms_role role FROM cms_user WHERE email = ? AND status = ?', array($email, 1));
+		$user = $this->db->fetch_one('SELECT pk_cms_user id, fk_cms_role role FROM cms_user WHERE email LIKE ? AND status = ?', array($email, 1));
 		if($user)
 		{
 			$pass = password($pass, $user['id']);

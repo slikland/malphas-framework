@@ -4,4 +4,4 @@ card.col-1_2:
 		content:
 			@user/userFormContent 
 		footer.text-right:
-			button.button-5: "Adicionar"
+			button: "Adicionar"

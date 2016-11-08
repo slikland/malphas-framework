@@ -1,4 +1,9 @@
 a
 	color: colors[3]
+	// color: _color_text_dark
 	font-weight: normal
 	cursor: pointer
+	&[disabled]
+		cursor: none
+		pointer-events: none
+		opacity: 0.6

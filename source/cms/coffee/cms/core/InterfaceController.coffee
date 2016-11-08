@@ -50,7 +50,6 @@ class InterfaceController
 	_interfaceLoaded:(e, data)=>
 		@_availPages = data.pages
 		@_availPages.sort(@_sortPages)
-		console.log(@_availPages)
 		iData = {
 			user: app.user.data
 			interface: data
