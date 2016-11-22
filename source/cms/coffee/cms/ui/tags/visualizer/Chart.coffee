@@ -42,12 +42,13 @@ class ChartHelper extends cms.ui.Base
 			@_resize()
 
 			@_data = data
-			console.log(@_data)
 			if !data.options || Array.isArray(data.options)
 				data.options = {}
 			data.options.responsive = false
 			data.options.maintainAspectRatio = false
 			@_chart = new Chart(@_canvas, data)
+			@_chart.onHover = @_mouseMove
+			@_chart.onMouseMove = @_mouseMove
 		_resize:()=>
 			bounds = @getBounds()
 			@_canvas.setAttribute('width', bounds.width)

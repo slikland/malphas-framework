@@ -7284,13 +7284,14 @@ cms.ui.tags.visualizer.ChartHelper = (function(_super) {
       this.appendChild(this._canvas);
       this._resize();
       this._data = data;
-      console.log(this._data);
       if (!data.options || Array.isArray(data.options)) {
         data.options = {};
       }
       data.options.responsive = false;
       data.options.maintainAspectRatio = false;
-      return this._chart = new Chart(this._canvas, data);
+      this._chart = new Chart(this._canvas, data);
+      this._chart.onHover = this._mouseMove;
+      return this._chart.onMouseMove = this._mouseMove;
     };
     Plugin.prototype._resize = function() {
       var bounds;
