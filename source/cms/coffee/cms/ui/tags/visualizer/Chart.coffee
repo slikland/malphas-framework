@@ -1,4 +1,6 @@
 #namespace cms.ui.tags.visualizer
+
+# http://www.chartjs.org/docs/
 class ChartHelper extends cms.ui.Base
 	@SELECTOR: 'chart'
 	_update:(data)->

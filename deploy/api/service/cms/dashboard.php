@@ -10,6 +10,7 @@ class dashboard
 	*/
 	function usersPie($data)
 	{
+		// http://www.chartjs.org/docs/
 		$response = array();
 		$response['type'] = 'pie';
 		$response['data'] = array(
@@ -41,6 +42,7 @@ class dashboard
 	}
 	function usersBar($data)
 	{
+		// http://www.chartjs.org/docs/
 		$response = array();
 		$response['type'] = 'bar';
 		$response['data'] = array(
