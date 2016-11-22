@@ -6,6 +6,8 @@ class Checkbox extends cms.ui.Base
 			@_buildCheckbox(item)
 
 	_buildCheckbox:(item)->
+		if item.getAttribute('checked') in [0, '0', false, 'false', null, 'null']
+			item.removeAttribute('checked')
 		toggle = document.createElement('toggle')
 		def = document.createElement('default')
 		selected = document.createElement('selected')

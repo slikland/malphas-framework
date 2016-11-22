@@ -26,10 +26,10 @@ class cms
 	function getPages()
 	{
 		$response = array();
-		$pages = $this->module->getPages(TRUE);
+		$pages = $this->module->getPages(TRUE, TRUE);
 		$response['pages'] = $pages;
-		$response['menu'] = $this->module->getMenu();
-		$response['config'] = $this->module->getMenu('config');
+		$response['menu'] = $this->module->getMenu(NULL, 0, TRUE);
+		$response['config'] = $this->module->getMenu('config', 0, TRUE);
 		return $response;
 	}
 

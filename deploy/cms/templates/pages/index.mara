@@ -1,3 +1,19 @@
+card.col-1_3:
+	header: "bla"
+	content:
+		chart: {"service":"../api/cms/dashboard/usersPie"}
+card.col-1_3:
+	header: "bla"
+	content:
+		chart: {"service":"../api/cms/dashboard/usersBar"}
+card.col-1_2: 
+	header: {"background":"#FFCCCC","html":"TEst"}
+	content: 
+		select:
+			option: {"value":"1", "html":"HLLO"}
+			option: {"value":"1", "html":"HLLO"}
+			option: {"value":"1", "html":"HLLO"}
+			option: {"value":"1", "html":"HLLO"}
 card.col-1_2:
 	a:{"href":"cms/users"}
 		header.bg-primary: "Usuários"

@@ -1,1 +1,1 @@
-//import js/quill.js
+//import js/chart.bundle.min.js

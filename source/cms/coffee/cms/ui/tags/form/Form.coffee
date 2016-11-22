@@ -16,7 +16,7 @@ class Form extends cms.ui.Base
 
 		constructor:(element)->
 			super({element: element})
-			setTimeout(@_addListeners, 10)
+			setTimeout(@_addListeners, 50)
 		_addListeners:()=>
 			@_api = new API(@_element)
 			@_api.on(API.COMPLETE, @_apiComplete)

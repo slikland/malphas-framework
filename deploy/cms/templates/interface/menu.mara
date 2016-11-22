@@ -1,5 +1,6 @@
 >menuBlock: #{menu}
-hr:
+(#{menu} && #{menu}.items.length > 0 && #{config} && #{config}.items.length > 0)
+	hr:
 >menuBlock: #{config}
 
 <menuBlock

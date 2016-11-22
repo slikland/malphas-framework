@@ -14,6 +14,6 @@ $style = $colorModule->replaceColors($style);
 
 $data['style'] = $style;
 // $data['styles'] = array('css/main.css');
-$data['scripts'] = array('js/Main.js');
+$data['scripts'] = array('js/Main.js', 'js/vendors.js');
 
 $mara->render('index', $data);

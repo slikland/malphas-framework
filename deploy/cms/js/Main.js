@@ -4,7 +4,7 @@ __hasProp={}.hasOwnProperty,
 __indexOf=[].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
 __extends=function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) Object.defineProperty(child, key, Object.getOwnPropertyDescriptor(parent, key)); } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 function __addNamespace(scope, obj){for(k in obj){if(!scope[k]) scope[k] = {};__addNamespace(scope[k], obj[k])}};
-__addNamespace(this, {"cms":{"ui":{"attributes":{},"tag":{"attributes":{}},"tags":{"form":{},"interface":{}}},"core":{}},"slikland":{"mara":{}}});
+__addNamespace(this, {"cms":{"ui":{"attributes":{},"tag":{"attributes":{}},"tags":{"form":{},"interface":{},"visualizer":{}}},"core":{}},"slikland":{"mara":{}}});
 cms.ui.Base = (function() {
   function Base() {
     this._instances = [];
@@ -1872,7 +1872,7 @@ KTObject = (function() {
           this.numParams--;
         }
       }
-      disp = numParams <= 0;
+      disp = this.numParams <= 0;
     }
     if (disp) {
       this.dispose();
@@ -4713,6 +4713,7 @@ API = (function(_super) {
   __extends(API, _super);
   API.COMPLETE = 'apiComplete';
   API.ERROR = 'apiError';
+  API.PROGRESS = 'apiProgress';
   API._interceptors = [];
   API._request = function() {
     if (window.XMLHttpRequest) {
@@ -4810,6 +4811,7 @@ API = (function(_super) {
   function API(arg) {
     this._loaded = __bind(this._loaded, this);
     this._parseJSONElement = __bind(this._parseJSONElement, this);
+    this._progress = __bind(this._progress, this);
     this.submit = __bind(this.submit, this);
     this._submitForm = __bind(this._submitForm, this);
     this._addEventListeners = __bind(this._addEventListeners, this);
@@ -4906,7 +4908,7 @@ API = (function(_super) {
     return delete this._headers[name];
   };
   API.prototype.submit = function(data) {
-    var d, getStr, getValues, k, n, parts, up, url, urlParams, v, _i, _len, _ref, _ref1, _ref2;
+    var d, getStr, getValues, k, n, parts, up, url, urlParams, v, _i, _len, _ref, _ref1, _ref2, _ref3;
     if (data == null) {
       data = null;
     }
@@ -4985,15 +4987,39 @@ API = (function(_super) {
     this._requestURL = url;
     this._request = API._request();
     this._request.onreadystatechange = this._loaded;
+    if ((_ref2 = this._request.upload) != null) {
+      _ref2.addEventListener('progress', this._progress);
+    }
+    this._request.addEventListener('progress', this._progress);
     this._request.open(this.method, url, true);
     if (this._headers) {
-      _ref2 = this._headers;
-      for (k in _ref2) {
-        v = _ref2[k];
+      _ref3 = this._headers;
+      for (k in _ref3) {
+        v = _ref3[k];
         this._request.setRequestHeader(k, v);
       }
     }
     this._request.send(data);
+  };
+  API.prototype._progress = function(e) {
+    var p;
+    if (e.loaded > e.total) {
+      p = 0.5;
+    } else {
+      p = e.loaded / e.total;
+    }
+    p *= 0.5;
+    if (e.currentTarget !== this._request.upload) {
+      p += 0.5;
+    }
+    return this._triggerProgress(p);
+  };
+  API.prototype._triggerProgress = function(progress) {
+    return this.trigger(API.PROGRESS, {
+      loaded: progress,
+      total: 1,
+      progress: progress
+    });
   };
   API.prototype._parseJSON = function(form) {
     var result;
@@ -5074,6 +5100,7 @@ API = (function(_super) {
     if (e.currentTarget.readyState === 4) {
       this._submitting = false;
       if (e.currentTarget.status === 200) {
+        this._triggerProgress(1);
         response = e.currentTarget.responseText || e.currentTarget.response || '';
         try {
           data = eval('(' + response + ')');
@@ -5790,8 +5817,12 @@ cms.ui.tag.attributes.Service = (function(_super) {
     Plugin._destroyPlugin = function(item) {};
     function Plugin(element) {
       this._sortByOrder = __bind(this._sortByOrder, this);
+      this._serviceError = __bind(this._serviceError, this);
       this._serviceLoaded = __bind(this._serviceLoaded, this);
       this._parseData = __bind(this._parseData, this);
+      this._onProgress = __bind(this._onProgress, this);
+      this._showProgress = __bind(this._showProgress, this);
+      this._removeProgress = __bind(this._removeProgress, this);
       this._loadService = __bind(this._loadService, this);
       this._update = __bind(this._update, this);
       Plugin.__super__.constructor.call(this, {
@@ -5808,7 +5839,31 @@ cms.ui.tag.attributes.Service = (function(_super) {
       var data;
       clearTimeout(this._loadServiceTimeout);
       data = this._parseData();
-      return API.call(this._element.getAttribute('service'), data, this._serviceLoaded);
+      this._api = API.call(this._element.getAttribute('service'), data, this._serviceLoaded, this._serviceError);
+      this._api.on(API.PROGRESS, this._onProgress);
+      return this._showProgress();
+    };
+    Plugin.prototype._removeEventListeners = function() {
+      return this._api.off(API.PROGRESS, this._onProgress);
+    };
+    Plugin.prototype._removeProgress = function() {
+      if (this._loading) {
+        return this._loading.hide();
+      }
+    };
+    Plugin.prototype._showProgress = function() {
+      if (this.element.hasAttribute('noloading')) {
+        return;
+      }
+      if (!this._loading) {
+        this._loading = new cms.ui.Loading();
+      }
+      this._loading.show();
+      return this.appendChildAt(this._loading, 0);
+    };
+    Plugin.prototype._onProgress = function(e, data) {
+      var _ref;
+      return (_ref = this._loading) != null ? _ref.progress = data.progress : void 0;
     };
     Plugin.prototype._parseData = function() {
       var i, id, item, items, multiple, name, paramSet, params, sort, sortValues, value, _i, _len, _ref, _ref1;
@@ -5880,18 +5935,23 @@ cms.ui.tag.attributes.Service = (function(_super) {
       return params;
     };
     Plugin.prototype._serviceLoaded = function(e, data) {
-      var i, id, items, _results;
+      var i, id, items;
       app.template.renderBlock(this._element, data);
       if (this.attr('id')) {
         id = this.attr('id');
         items = document.querySelectorAll('[for=' + id + ']');
         i = items.length;
-        _results = [];
         while (i-- > 0) {
-          _results.push(items[i].trigger('update', data));
+          items[i].trigger('update', data);
         }
-        return _results;
       }
+      this._element.trigger('updated', data);
+      this._removeEventListeners();
+      return this._removeProgress();
+    };
+    Plugin.prototype._serviceError = function() {
+      this._removeEventListeners();
+      return this._removeProgress();
     };
     Plugin.prototype._sortByOrder = function(a, b) {
       if (a.sortOrder < b.sortOrder) {
@@ -6844,7 +6904,7 @@ cms.ui.tags.form.Form = (function(_super) {
       Plugin.__super__.constructor.call(this, {
         element: element
       });
-      setTimeout(this._addListeners, 10);
+      setTimeout(this._addListeners, 50);
     }
     Plugin.prototype._addListeners = function() {
       this._api = new API(this._element);
@@ -7075,7 +7135,10 @@ cms.ui.tags.form.Checkbox = (function(_super) {
     return _results;
   };
   Checkbox.prototype._buildCheckbox = function(item) {
-    var child, children, def, i, label, parent, selected, toggle, _i, _len;
+    var child, children, def, i, label, parent, selected, toggle, _i, _len, _ref;
+    if ((_ref = item.getAttribute('checked')) === 0 || _ref === '0' || _ref === false || _ref === 'false' || _ref === null || _ref === 'null') {
+      item.removeAttribute('checked');
+    }
     toggle = document.createElement('toggle');
     def = document.createElement('default');
     selected = document.createElement('selected');
@@ -7102,6 +7165,149 @@ cms.ui.tags.form.Checkbox = (function(_super) {
     }
   };
   return Checkbox;
+})(cms.ui.Base);
+var __hasProp = {}.hasOwnProperty;
+cms.ui.tags["interface"].NavLink = (function(_super) {
+  var Plugin;
+  __extends(NavLink, _super);
+  function NavLink() {
+    return NavLink.__super__.constructor.apply(this, arguments);
+  }
+  NavLink.SELECTOR = 'nav ul a';
+  NavLink.prototype._update = function(data) {
+    var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
+    _ref = data.add;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      item = _ref[_i];
+      this._plugins[item] = new Plugin(item);
+    }
+    _ref1 = data.remove;
+    _results = [];
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      item = _ref1[_j];
+      p = this._plugins[item];
+      if (p) {
+        _results.push(typeof p.destroy === "function" ? p.destroy() : void 0);
+      } else {
+        _results.push(void 0);
+      }
+    }
+    return _results;
+  };
+  Plugin = (function(_super1) {
+    __extends(Plugin, _super1);
+    Plugin._destroyPlugin = function(item) {};
+    function Plugin(element) {
+      this._routeChange = __bind(this._routeChange, this);
+      this._parseItems = __bind(this._parseItems, this);
+      Plugin.__super__.constructor.call(this, {
+        element: element
+      });
+      app.router.on(NavigationRouter.CHANGE, this._routeChange);
+      setTimeout(this._routeChange, 1);
+    }
+    Plugin.prototype.destroy = function() {
+      Plugin.__super__.destroy.apply(this, arguments);
+      return app.router.off(NavigationRouter.CHANGE, this._routeChange);
+    };
+    Plugin.prototype._parseItems = function() {};
+    Plugin.prototype._routeChange = function() {
+      var p, p2;
+      p = app.router.getCurrentPath().trim('/');
+      p2 = this.attr('href').trim('/');
+      return this.toggleClass('selected', p === p2);
+    };
+    return Plugin;
+  })(BaseDOM);
+  return NavLink;
+})(cms.ui.Base);
+var __hasProp = {}.hasOwnProperty;
+cms.ui.tags.visualizer.ChartHelper = (function(_super) {
+  var Plugin;
+  __extends(ChartHelper, _super);
+  function ChartHelper() {
+    return ChartHelper.__super__.constructor.apply(this, arguments);
+  }
+  ChartHelper.SELECTOR = 'chart';
+  ChartHelper.prototype._update = function(data) {
+    var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
+    _ref = data.add;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      item = _ref[_i];
+      this._plugins[item] = new Plugin(item);
+    }
+    _ref1 = data.remove;
+    _results = [];
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      item = _ref1[_j];
+      p = this._plugins[item];
+      if (p) {
+        _results.push(typeof p.destroy === "function" ? p.destroy() : void 0);
+      } else {
+        _results.push(void 0);
+      }
+    }
+    return _results;
+  };
+  Plugin = (function(_super1) {
+    __extends(Plugin, _super1);
+    Plugin._destroyPlugin = function(item) {};
+    function Plugin(element) {
+      this._resize = __bind(this._resize, this);
+      this._update = __bind(this._update, this);
+      var h, w;
+      Plugin.__super__.constructor.call(this, {
+        element: element
+      });
+      if ((w = this.attr('width'))) {
+        if (/^[\d\.]$/.test(w)) {
+          w += 'px';
+        }
+        this.css('width', w);
+      }
+      if ((h = this.attr('height'))) {
+        if (/^[\d\.]$/.test(h)) {
+          h += 'px';
+        }
+        this.css('height', h);
+      }
+      this._canvas = document.createElement('canvas');
+      this._canvas.setAttribute('width', '100%');
+      this._canvas.setAttribute('height', 400);
+      this._context = this._canvas.getContext('2d');
+      this._element.on('updated', this._update);
+      window.addEventListener('resize', this._resize);
+    }
+    Plugin.prototype._update = function(e) {
+      var data;
+      data = e.data;
+      this.appendChild(this._canvas);
+      this._resize();
+      this._data = data;
+      console.log(this._data);
+      if (!data.options || Array.isArray(data.options)) {
+        data.options = {};
+      }
+      data.options.responsive = false;
+      data.options.maintainAspectRatio = false;
+      return this._chart = new Chart(this._canvas, data);
+    };
+    Plugin.prototype._resize = function() {
+      var bounds;
+      bounds = this.getBounds();
+      this._canvas.setAttribute('width', bounds.width);
+      this._canvas.setAttribute('height', bounds.height);
+      this._canvas.style.width = bounds.width + 'px';
+      this._canvas.style.height = bounds.height + 'px';
+      if (this._chart) {
+        this._chart.chart.width = bounds.width;
+        this._chart.chart.height = bounds.height;
+        return this._chart.update(0);
+      }
+    };
+    return Plugin;
+  })(BaseDOM);
+  return ChartHelper;
 })(cms.ui.Base);
 var __hasProp = {}.hasOwnProperty;
 cms.ui.tags.Tooltip = (function(_super) {
@@ -7681,6 +7887,132 @@ Notification = (function(_super) {
   })(BaseDOM);
   return Notification;
 })(EventDispatcher);
+var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+cms.ui.Loading = (function(_super) {
+  __extends(Loading, _super);
+  function Loading() {
+    this._hideComplete = __bind(this._hideComplete, this);
+    this._hideStart = __bind(this._hideStart, this);
+    Loading.__super__.constructor.call(this, {
+      element: 'loading'
+    });
+    this._progress = this._currentPosition = 0;
+    this._showPosition = 0;
+    this._element.removable = false;
+    this._background = new BaseDOM({
+      element: 'div',
+      className: 'background'
+    });
+    this._progressBar = new BaseDOM({
+      element: 'div',
+      className: 'progress-bar'
+    });
+    this.appendChild(this._background);
+    this.appendChild(this._progressBar);
+  }
+  Loading.get({
+    progress: function() {
+      return this._progress;
+    }
+  });
+  Loading.set({
+    progress: function(value) {
+      if (value < 0) {
+        value = 0;
+      } else if (value > 1) {
+        value = 1;
+      }
+      this._progress = value;
+      KTween.remove(this, '_position');
+      return KTween.tween(this, {
+        _position: this._progress
+      }, 'easeOutQuart', 0.3);
+    }
+  });
+  Loading.get({
+    _position: function() {
+      return this._currentPosition;
+    }
+  });
+  Loading.set({
+    _position: function(value) {
+      if (value < 0) {
+        value = 0;
+      } else if (value > 1) {
+        value = 1;
+      }
+      this._currentPosition = value;
+      return this._progressBar.css({
+        width: (value * 100) + '%'
+      });
+    }
+  });
+  Loading.get({
+    showPosition: function() {
+      return this._showPosition;
+    }
+  });
+  Loading.set({
+    showPosition: function(value) {
+      var op;
+      if (value < 0) {
+        value = 0;
+      } else if (value > 1) {
+        value = 1;
+      }
+      this._showPosition = value;
+      op = value * 2 - 1;
+      if (op < 0) {
+        op = 0;
+      } else if (op > 1) {
+        op = 1;
+      }
+      this._background.css({
+        opacity: op
+      });
+      return this._progressBar.css({
+        height: (value * 4) + 'px'
+      });
+    }
+  });
+  Loading.prototype.reset = function() {
+    KTween.remove(this);
+    this.showPosition = 0;
+    return this.progress = this._position = 0;
+  };
+  Loading.prototype.show = function() {
+    this.css({
+      visibility: ''
+    });
+    this.reset();
+    this.removeClass('disabled');
+    return KTween.tween(this, {
+      showPosition: 1
+    }, 'easeOutQuart', 0.1);
+  };
+  Loading.prototype.hide = function() {
+    this.addClass('disabled');
+    this.progress = 1;
+    KTween.remove(this, '_position');
+    return KTween.tween(this, {
+      _position: this._progress,
+      onComplete: this._hideStart
+    }, 'easeOutQuart', 0.2);
+  };
+  Loading.prototype._hideStart = function() {
+    KTween.remove(this, 'showPosition');
+    return KTween.tween(this, {
+      showPosition: 0,
+      onComplete: this._hideComplete
+    }, 'easeOutQuart', 0.1);
+  };
+  Loading.prototype._hideComplete = function() {
+    return this.css({
+      visibility: 'hidden'
+    });
+  };
+  return Loading;
+})(BaseDOM);
 var Blocker;
 Blocker = (function(_super) {
   __extends(Blocker, _super);
@@ -7725,61 +8057,6 @@ Blocker = (function(_super) {
   };
   return Blocker;
 })(BaseDOM);
-var __hasProp = {}.hasOwnProperty;
-cms.ui.tags["interface"].NavLink = (function(_super) {
-  var Plugin;
-  __extends(NavLink, _super);
-  function NavLink() {
-    return NavLink.__super__.constructor.apply(this, arguments);
-  }
-  NavLink.SELECTOR = 'nav ul a';
-  NavLink.prototype._update = function(data) {
-    var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
-    _ref = data.add;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      item = _ref[_i];
-      this._plugins[item] = new Plugin(item);
-    }
-    _ref1 = data.remove;
-    _results = [];
-    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-      item = _ref1[_j];
-      p = this._plugins[item];
-      if (p) {
-        _results.push(typeof p.destroy === "function" ? p.destroy() : void 0);
-      } else {
-        _results.push(void 0);
-      }
-    }
-    return _results;
-  };
-  Plugin = (function(_super1) {
-    __extends(Plugin, _super1);
-    Plugin._destroyPlugin = function(item) {};
-    function Plugin(element) {
-      this._routeChange = __bind(this._routeChange, this);
-      this._parseItems = __bind(this._parseItems, this);
-      Plugin.__super__.constructor.call(this, {
-        element: element
-      });
-      app.router.on(NavigationRouter.CHANGE, this._routeChange);
-      setTimeout(this._routeChange, 1);
-    }
-    Plugin.prototype.destroy = function() {
-      Plugin.__super__.destroy.apply(this, arguments);
-      return app.router.off(NavigationRouter.CHANGE, this._routeChange);
-    };
-    Plugin.prototype._parseItems = function() {};
-    Plugin.prototype._routeChange = function() {
-      var p, p2;
-      p = app.router.getCurrentPath().trim('/');
-      p2 = this.attr('href').trim('/');
-      return this.toggleClass('selected', p === p2);
-    };
-    return Plugin;
-  })(BaseDOM);
-  return NavLink;
-})(cms.ui.Base);
 var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 slikland.mara.Block = (function() {
   var k, v, _ref;
@@ -8081,6 +8358,7 @@ slikland.mara.Block = (function() {
             }
           }
         }
+        el.data = data;
         el.setAttribute('mara', this._maraId);
         if (this._id) {
           el.setAttribute('id', this._id);
@@ -8469,6 +8747,9 @@ slikland.Mara = (function(_super) {
     i = children.length;
     _results = [];
     while (i-- > 0) {
+      if (children[i].removable === false) {
+        continue;
+      }
       _results.push(target.removeChild(children[i]));
     }
     return _results;

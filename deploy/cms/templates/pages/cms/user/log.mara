@@ -6,19 +6,10 @@ card.col-full:
 			input: {"for":"log_table", "name":"search"}
 		field: 
 			label: "Filtro"
-			group:
+			group: {"service":"../api/cms/user/getRoles", "noloading":1}
 				field:
-					input: {"for":"log_table", "name":"filter_fk_cms_role", "type":"checkbox", "value":"1"}
-					label: "a"
-				field:
-					input: {"for":"log_table", "name":"filter_fk_cms_role", "type":"checkbox", "value":"2"}
-					label: "b"
-				field:
-					input: {"for":"log_table", "name":"filter_fk_cms_role", "type":"checkbox", "value":"3"}
-					label: "c"
-				field:
-					input: {"for":"log_table", "name":"filter_fk_cms_role", "type":"checkbox", "value":"4"}
-					label: "d"
+					input: {"for":"log_table", "name":"filter_fk_cms_role", "type":"checkbox", "value":"#{id}"}
+					label: "#{name}"
 		table: {"id":"log_table", "service": "../api/cms/user/getLog"}
 			thead:
 				tr:

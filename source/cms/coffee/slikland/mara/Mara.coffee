@@ -80,6 +80,8 @@ class Mara extends EventDispatcher
 	_removeChildren:(target, children)=>
 		i = children.length
 		while i-- > 0
+			if children[i].removable is false
+				continue
 			target.removeChild(children[i])
 
 	renderBlock:(element, data)->

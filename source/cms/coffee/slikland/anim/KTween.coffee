@@ -278,7 +278,7 @@ class KTObject
 					@distances.splice(l, 1)
 					@initValues.splice(l, 1)
 					@numParams--
-			disp = (numParams <= 0)
+			disp = (@numParams <= 0)
 		if disp
 			@dispose()
 			return true

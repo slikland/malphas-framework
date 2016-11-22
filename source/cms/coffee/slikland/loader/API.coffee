@@ -2,6 +2,7 @@ class API extends EventDispatcher
 
 	@COMPLETE: 'apiComplete'
 	@ERROR: 'apiError'
+	@PROGRESS: 'apiProgress'
 	@_interceptors: []
 
 	@_request:()->
@@ -184,12 +185,25 @@ class API extends EventDispatcher
 		@_requestURL = url
 		@_request = API._request()
 		@_request.onreadystatechange = @_loaded
+		@_request.upload?.addEventListener('progress', @_progress)
+		@_request.addEventListener('progress', @_progress)
 		@_request.open(@method, url, true)
 		if @_headers
 			for k, v of @_headers
 				@_request.setRequestHeader(k, v)
 		@_request.send(data)
 		return 
+	_progress:(e)=>
+		if e.loaded > e.total
+			p = 0.5
+		else
+			p = e.loaded / e.total
+		p *= 0.5
+		if e.currentTarget != @_request.upload
+			p += 0.5
+		@_triggerProgress(p)
+	_triggerProgress:(progress)->
+		@trigger(API.PROGRESS, {loaded: progress, total: 1, progress: progress})
 
 	_parseJSON:(form)->
 		@_parsedElements = []
@@ -245,6 +259,8 @@ class API extends EventDispatcher
 		if e.currentTarget.readyState == 4
 			@_submitting = false
 			if e.currentTarget.status == 200
+				@_triggerProgress(1)
+
 				response = e.currentTarget.responseText || e.currentTarget.response || ''
 				try 
 					data = eval('(' + response + ')')

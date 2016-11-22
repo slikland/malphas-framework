@@ -25,7 +25,23 @@ class Service extends cms.ui.Base
 		_loadService:()=>
 			clearTimeout(@_loadServiceTimeout)
 			data = @_parseData()
-			API.call(@_element.getAttribute('service'), data, @_serviceLoaded)
+			@_api = API.call(@_element.getAttribute('service'), data, @_serviceLoaded, @_serviceError)
+			@_api.on(API.PROGRESS, @_onProgress)
+			@_showProgress()
+		_removeEventListeners:()->
+			@_api.off(API.PROGRESS, @_onProgress)
+		_removeProgress:()=>
+			if @_loading
+				@_loading.hide()
+		_showProgress:()=>
+			if @element.hasAttribute('noloading')
+				return
+			if !@_loading
+				@_loading = new cms.ui.Loading()
+			@_loading.show()
+			@appendChildAt(@_loading, 0)
+		_onProgress:(e, data)=>
+			@_loading?.progress = data.progress
 		_parseData:()=>
 			params = app.router.getParam(@attr('id'))
 			if @attr('id')
@@ -85,6 +101,12 @@ class Service extends cms.ui.Base
 				i = items.length
 				while i-- > 0
 					items[i].trigger('update', data)
+			@_element.trigger('updated', data)
+			@_removeEventListeners()
+			@_removeProgress()
+		_serviceError:()=>
+			@_removeEventListeners()
+			@_removeProgress()
 		_sortByOrder:(a, b)=>
 			if a.sortOrder < b.sortOrder
 				return -1

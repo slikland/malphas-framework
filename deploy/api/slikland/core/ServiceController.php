@@ -143,7 +143,12 @@ class ServiceController
 			}
 			$response = $e;
 		}
-		output($response, $format);
+		if($output)
+		{
+			output($response, $format);
+		}else{
+			return $response;
+		}
 	}
 
 	private static function error()

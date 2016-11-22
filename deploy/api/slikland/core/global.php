@@ -10,8 +10,9 @@ if(!function_exists('isAssoc'))
 }
 
 
-function execute(){
-	$result = slikland\core\ServiceController::execute();
+function execute($servicePath = NULL, $data = NULL, $output = TRUE){
+	$result = slikland\core\ServiceController::execute($servicePath, $data, $output);
+	return $result;
 }
 
 $_headers = [];

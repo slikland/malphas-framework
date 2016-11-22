@@ -5,7 +5,6 @@ class Href extends cms.ui.Base
 		for item in data.add
 			if item.hasAttribute('href') && !item.getAttribute('target')
 				@_plugins[item] = new Plugin(item)
-
 		for item in data.remove
 			p = @_plugins[item]
 			if p
