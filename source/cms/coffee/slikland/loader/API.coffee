@@ -1,3 +1,5 @@
+#import slikland.event.EventDispatcher
+#import slikland.utils.Prototypes
 class API extends EventDispatcher
 
 	@COMPLETE: 'apiComplete'
@@ -9,7 +11,7 @@ class API extends EventDispatcher
 		if window.XMLHttpRequest then return new XMLHttpRequest()
 		else if window.ActiveXObject then return new ActiveXObject("MSXML2.XMLHTTP.3.0")
 	
-	@call:(url, data = null, onComplete = null, onError = null)->
+	@call:(url, data = null, onComplete = null, onError = null, type = 'normal')->
 		api = new API(url)
 		if url instanceof HTMLElement && url.tagName.toLowerCase() == 'form'
 			url.submit()
@@ -20,6 +22,7 @@ class API extends EventDispatcher
 			api.on(API.COMPLETE, onComplete)
 		if onError
 			api.on(API.ERROR, onError)
+		api.type = type
 		api.submit(data)
 		return api
 
@@ -76,7 +79,7 @@ class API extends EventDispatcher
 			setTimeout(@_addEventListeners, 10)
 		else if typeof(arg) == 'string'
 			@_url = arg
-		else
+		else if arg?
 			throw new Error('The API constructor argument needs to be a URL string or a Form element.')
 
 	@get reuse:()->
@@ -87,8 +90,8 @@ class API extends EventDispatcher
 	@get type:()->
 		return @_type
 	@set type:(value)->
-		if !(type in @constructor.TYPES)
-			throw new Error('API.type can only be: ' + @constructor.TYPES.join(', '))
+		if !(value in @TYPES)
+			throw new Error('API.type can only be: ' + @TYPES.join(', '))
 		@_type = value
 
 	@get method:()->
@@ -123,6 +126,10 @@ class API extends EventDispatcher
 	removeHeader:(name)->
 		@_headers[name] = null
 		delete @_headers[name]
+
+	load:(url, data = null)->
+		@_url = url
+		@submit(data)
 
 	submit:(data = null)=>
 		@_data = data

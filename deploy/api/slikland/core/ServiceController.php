@@ -3,7 +3,7 @@ namespace slikland\core;
 
 class ServiceController
 {
-	public static function execute($servicePath = NULL, $data = NULL, $output = TRUE)
+	public static function execute($servicePath = NULL, $data = NULL, $output = FALSE)
 	{
 		$response = NULL;
 		$format = 'json';

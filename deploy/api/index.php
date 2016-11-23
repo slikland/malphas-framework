@@ -23,5 +23,5 @@ class_alias('\slikland\error\Error', 'Error');
 class_alias('\slikland\error\CodedError', 'CodedError');
 
 if(realpath($_SERVER['SCRIPT_FILENAME']) == realpath(__FILE__)){
-	execute();
+	execute(NULL, NULL, TRUE);
 }
