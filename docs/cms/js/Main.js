@@ -1670,6 +1670,7 @@ Content = (function() {
   function Content() {
     this._change = __bind(this._change, this);
     this._contentLoaded = __bind(this._contentLoaded, this);
+    this._onPaste = __bind(this._onPaste, this);
     this._target = document.querySelector('main');
     this._api = new API();
     this._api.on(API.COMPLETE, this._contentLoaded);
@@ -1686,7 +1687,18 @@ Content = (function() {
     this._contentEditor.addShortcutCommand('[cmd][alt]6', 'formatBlock', 'h6');
     this._contentEditor.addShortcutCommand('[cmd][alt]-', 'insertHorizontalRule');
     this._contentEditor.addShortcutCommand('[cmd][alt]e', 'formatBlock', 'pre');
+    this._target.addEventListener('paste', this._onPaste);
   }
+  Content.prototype._onPaste = function(e) {
+    var item, _i, _len, _ref, _results;
+    _ref = e.clipboardData.items;
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      item = _ref[_i];
+      _results.push(console.log(item));
+    }
+    return _results;
+  };
   Content.prototype._contentLoaded = function(e, data) {
     return this._target.innerHTML = data;
   };

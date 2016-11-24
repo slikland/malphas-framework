@@ -19,6 +19,11 @@ class Content
 		@_contentEditor.addShortcutCommand('[cmd][alt]-', 'insertHorizontalRule')
 		@_contentEditor.addShortcutCommand('[cmd][alt]e', 'formatBlock', 'pre')
 
+		@_target.addEventListener('paste', @_onPaste)
+	_onPaste:(e)=>
+		for item in e.clipboardData.items
+			console.log(item)
+
 	_contentLoaded:(e, data)=>
 		@_target.innerHTML = data
 

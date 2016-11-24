@@ -123,7 +123,7 @@ function uid_decode($uid)
 	return \slikland\utils\crypt\UID::decode($uid);
 }
 
-function get_module($moduleName)
+function get_module($moduleName, $newInstance = FALSE)
 {
 	$modulePath = '/module/';
 	$module = preg_replace('/\//', '\\', $modulePath . $moduleName);
@@ -137,7 +137,7 @@ function get_module($moduleName)
 	}
 
 	try{
-		if(method_exists($module, 'getInstance'))
+		if(!$newInstance && method_exists($module, 'getInstance'))
 		{
 			return $module::getInstance();
 		}
