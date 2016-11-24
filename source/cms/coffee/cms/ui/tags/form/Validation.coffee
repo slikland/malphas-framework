@@ -1,4 +1,4 @@
-#namespace cms.ui.attributes
+#namespace cms.ui.tags.form
 class Validation extends cms.ui.Base
 	@SELECTOR: 'field validation'
 

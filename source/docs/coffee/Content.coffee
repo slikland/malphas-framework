@@ -18,6 +18,8 @@ class Content
 		@_contentEditor.addShortcutCommand('[cmd][alt]6', 'formatBlock', 'h6')
 		@_contentEditor.addShortcutCommand('[cmd][alt]-', 'insertHorizontalRule')
 		@_contentEditor.addShortcutCommand('[cmd][alt]e', 'formatBlock', 'pre')
+		@_contentEditor.addShortcutCommand('[cmd][alt]o', 'insertOrderedList')
+		@_contentEditor.addShortcutCommand('[cmd][alt]l', 'insertUnorderedList')
 
 		@_target.addEventListener('paste', @_onPaste)
 	_onPaste:(e)=>
