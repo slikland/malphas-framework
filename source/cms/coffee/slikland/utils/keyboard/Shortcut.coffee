@@ -1,7 +1,7 @@
 #namespace slikland.utils.keyboard
 class Shortcut
 
-	@MODIFIERS: ['alt', 'ctrl', 'meta', 'shift']
+	@MODIFIERS: ['alt', 'ctrl', 'meta', 'shift', 'click']
 	@MAP: ['tab', 'enter', 'esc']
 	@KEY_MAP: {
 		9: 'tab'
@@ -24,14 +24,30 @@ class Shortcut
 
 		@_target.addEventListener('keydown', @_keyDown)
 		@_target.addEventListener('keyup', @_keyUp)
+		window.addEventListener('mousedown', @_mouseDown)
 	destroy:()->
 		@_target?.removeEventListener('keydown', @_keyDown)
 		@_target?.removeEventListener('keyup', @_keyUp)
+		window.removeEventListener('mousedown', @_mouseDown)
 		@_shortcuts.length = 0
 		delete @_shortcuts
 		delete @_target
 
-
+	_mouseDown:(e)=>
+		key = ''
+		mapped = []
+		modifiers = ['click']
+		for k in @constructor.MODIFIERS
+			if e[k + 'Key']
+				modifiers.push(k)
+		modifiers.sort()
+		mapped.sort()
+		shortcut = '[' + modifiers.join('][') + ']' + '[' + mapped.join('][') + ']' + key
+		items = @_findShortcut(shortcut)
+		for item in items
+			item.callback?(e, item)
+			if item.preventDefault
+				e.preventDefault()
 	_keyDown:(e)=>
 		keyCode = e.keyCode
 		key = ''
@@ -52,7 +68,7 @@ class Shortcut
 		shortcut = '[' + modifiers.join('][') + ']' + '[' + mapped.join('][') + ']' + key
 		items = @_findShortcut(shortcut)
 		for item in items
-			item.callback?(item)
+			item.callback?(e, item)
 			if item.preventDefault
 				e.preventDefault()
 

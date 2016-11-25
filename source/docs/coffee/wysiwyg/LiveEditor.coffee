@@ -8,11 +8,17 @@ class LiveEditor extends EventDispatcher
 		@_shortcutCommands = {}
 
 	_startEdit:()=>
+		if @_editting
+			return
+		@_editting = true
 		@_initialContent = @_target.innerHTML
 		@_addEventListeners()
 		@_target.contentEditable = true
 		@_target.focus()
 	_stopEdit:()=>
+		if !@_editting
+			return
+		@_editting = false
 		@_removeEventListeners()
 		@_target.contentEditable = false
 
@@ -36,9 +42,17 @@ class LiveEditor extends EventDispatcher
 		@_shortcut.removeShortcut('[cmd][enter]', @_commitChanges)
 		@_shortcut.removeShortcut('[esc]', @_discardChanges)
 
-	_shortcutCommand:(e)=>
-		if @_shortcutCommands[e.shortcut]
-			document.execCommand(@_shortcutCommands[e.shortcut].command, true, @_shortcutCommands[e.shortcut].value)
+	_shortcutCommand:(e, data)=>
+		if !@_editting
+			return
+		if @_shortcutCommands[data.shortcut]
+			if @_shortcutCommands[data.shortcut].command instanceof Function
+				@_shortcutCommands[data.shortcut].command(e, data)
+			else
+				document.execCommand(@_shortcutCommands[data.shortcut].command, true, @_shortcutCommands[data.shortcut].value)
+
+	execCommand:(name, useUI, value)->
+		document.execCommand(name, useUI, value)
 
 	addShortcutCommand:(shortcut, command, value = null)->
 		@_shortcutCommands[shortcut] = {command: command, value: value}

@@ -23,10 +23,14 @@ class Nav extends EventDispatcher
 		@_links = []
 		@_parseNodes(@_content)
 		pages = []
+		id = (Date.now() - 1480096400000)
 		for k, item of @_links
 			obj = {}
 			if item.getAttribute('href')
 				obj['prev'] = item.getAttribute('href')
+			if !item.hasAttribute('id')
+				item.setAttribute('id', id.toString(16))
+				id++
 			obj['name'] = (Number(k) + 1).toString().padLeft(4, '0') + '.' + item.innerText.replace(/[^a-z0-9]/ig, '-')
 			item.href = obj['name']
 			pages.push(obj)
@@ -62,9 +66,11 @@ class Nav extends EventDispatcher
 			item.addEventListener('click', @_linkClick)
 	_linkClick:(e)=>
 		target = e.currentTarget
-		e.preventDefault()
-		e.stopImmediatePropagation()
-		app.router.goto(target.getAttribute('href'))
+		if !e.metaKey
+			e.preventDefault()
+			e.stopImmediatePropagation()
+		if !e.altKey
+			app.router.goto(target.getAttribute('href'))
 
 	isValid:(path)->
 		i = @_links.length

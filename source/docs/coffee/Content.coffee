@@ -20,20 +20,54 @@ class Content
 		@_contentEditor.addShortcutCommand('[cmd][alt]e', 'formatBlock', 'pre')
 		@_contentEditor.addShortcutCommand('[cmd][alt]o', 'insertOrderedList')
 		@_contentEditor.addShortcutCommand('[cmd][alt]l', 'insertUnorderedList')
+		@_contentEditor.addShortcutCommand('[alt][click]', @_linkCallback)
 
 		@_target.addEventListener('paste', @_onPaste)
+	_linkCallback:(e, data)=>
+		target = e.target
+		if target.matches('a[href]')
+			html = target.outerHTML
+			if target.hasAttribute('id')
+				target = target.cloneNode(true)
+				target.removeAttribute('href')
+				html = target.outerHTML
+			@_contentEditor.execCommand('insertHTML', false, html)
+
 	_onPaste:(e)=>
 		for item in e.clipboardData.items
 			console.log(item)
 
 	_contentLoaded:(e, data)=>
+		@_target.scrollTop = 0
 		@_target.innerHTML = data
+		@_parseLinks()
 
 	_change:()=>
 		data = {}
-		data['content'] = @_target.innerHTML
+		content = @_target.innerHTML
+		content = content.replace(/\[\[(http.*?)\]\]/ig, '<a href="$1" target="_blank">$1</a>')
+		data['content'] = @_target.innerHTML = content
 		data['page'] = @_currentPage
+		@_parseLinks()
 		API.call('php/editPage.php', data, null, null, 'json')
+
+	_parseLinks:()=>
+		anchors = @_target.querySelectorAll('a[id]')
+		for a in anchors
+			nav = document.querySelector('nav a[id="'+a.getAttribute('id')+'"]')
+			if nav
+				a.removeEventListener('click', @_linkClick)
+				a.addEventListener('click', @_linkClick)
+				a.setAttribute('href', nav.getAttribute('href'))
+
+	_linkClick:(e)=>
+		target = e.currentTarget
+		if !e.metaKey
+			e.preventDefault()
+			e.stopImmediatePropagation()
+		if !e.altKey
+			app.router.goto(target.getAttribute('href'))
+
 
 	show:(path)->
 		@_api.abort()
