@@ -203,4 +203,12 @@ function obfuscatePassword(&$data)
 	}
 }
 
+function add_annotation_callback($annotation, $callback, $order = \slikland\core\AnnotationParser::BEFORE)
+{
+	\slikland\core\AnnotationParser::addAnnotationCallback($annotation, $callback, $order);
+}
 
+function remove_annotation_callback()
+{
+	\slikland\core\AnnotationParser::removeAnnotationCallback($annotation);
+}

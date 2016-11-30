@@ -1,6 +1,8 @@
 <?php
 namespace slikland\core;
 
+include_once('slikland/core/annotation.php');
+
 class ServiceController
 {
 	public static function execute($servicePath = NULL, $data = NULL, $output = FALSE)
@@ -16,124 +18,81 @@ class ServiceController
 			if(!($service = self::findService($servicePath)))
 			{
 				error(NULL, 404);
-			}else{
-				$class = new $service['class']();
-				$method = $service['method'];
-				$annotations = \slikland\core\AnnotationParser::getAnnotations($class, $method);
+			}
+			$class = new $service['class']();
+			$method = $service['method'];
+			$annotations = \slikland\core\AnnotationParser::getAnnotations($class, $method);
 
-				$requestHeaders = getallheaders();
+			$params = array('data' => array());
 
-				if(isset($annotations['cmsUser']))
+			foreach($annotations[\slikland\core\AnnotationParser::BEFORE] as $annotation)
+			{
+				call_user_func_array($annotation['callback'], array($annotation['data'], &$params));
+			}
+
+			$data = $params['data'];
+
+			if(!empty($_FILES))
+			{
+				$data = array_merge($data, $_FILES);
+			}
+
+			$response = $class->$method($data);
+
+			foreach($annotations[\slikland\core\AnnotationParser::AFTER] as $annotation)
+			{
+				call_user_func_array($annotation['callback'], array($annotation['data'], &$params));
+			}
+
+			if(isset($annotations['log']))
+			{
+				$annotation = $annotations['log'];
+				$logData = $data;
+				$description = '';
+				$action = $service['path'];
+				if(isAssoc($annotation))
 				{
-
-				}
-
-				if(isset($annotations['user']))
-				{
-
-				}
-
-				if(isset($annotations['permission']))
-				{
-					$user = get_module('cms/User');
-					$user->checkPermission($annotations['permission']);
-				}
-
-				$requestMethod = NULL;
-
-				if(isset($annotations['method']))
-				{
-					$requestMethod = $annotations['method'][0];
-				}
-				switch (strtoupper($requestMethod))
-				{
-					case 'GET':
-						$data = $_GET;
-						break;
-					case 'POST':
-						if(isset($requestHeaders['Content-Type']) && preg_match('/\/json/i', $requestHeaders['Content-Type']))
-						{
-							$data = array('data'=>json_decode(file_get_contents('php://input'), TRUE));
-						}else{
-							$data = $_POST;
-						}
-						break;
-					default:
-						$data = $_REQUEST;
-						break;
-				}
-
-				if(!$data) $data = array();
-
-				if(!empty($_FILES))
-				{
-					$data = array_merge($data, $_FILES);
-				}
-
-				if(isset($service['params'])) $data = array_merge($data, $service['params']);
-
-				if(isset($annotations['validate']))
-				{
-					\slikland\validation\Validator::validate($data, $annotations['validate']);
-				}
-
-				if(isset($annotations['output']))
-				{
-					$format = @$annotations['output'][0];
-					if(isset($annotations['filename']) && !empty($annotations['filename']))
+					if(isset($annotation['action']))
 					{
-						outputFileName($annotations['filename'][0]);
+						$action = $annotation['action'];
+					}
+					if(isset($annotation['description']))
+					{
+						$description = $annotation['description'];
+					}
+					if(isset($annotation['data']))
+					{
+						$logData = $annotation['data'];
+					}
+				}else{
+					if(isset($annotation[0]))
+					{
+						$action = $annotation[0];
+					}
+					if(isset($annotation[1]))
+					{
+						$description = $annotation[1];
+					}
+					if(isset($annotation[2]))
+					{
+						$logData = $annotation[2];
 					}
 				}
 
-				$response = $class->$method($data);
+				log_activity($action, $description, $logData);
+			}
 
-				if(isset($annotations['log']))
-				{
-					$annotation = $annotations['log'];
-					$logData = $data;
-					$description = '';
-					$action = $service['path'];
-					if(isAssoc($annotation))
-					{
-						if(isset($annotation['action']))
-						{
-							$action = $annotation['action'];
-						}
-						if(isset($annotation['description']))
-						{
-							$description = $annotation['description'];
-						}
-						if(isset($annotation['data']))
-						{
-							$logData = $annotation['data'];
-						}
-					}else{
-						if(isset($annotation[0]))
-						{
-							$action = $annotation[0];
-						}
-						if(isset($annotation[1]))
-						{
-							$description = $annotation[1];
-						}
-						if(isset($annotation[2]))
-						{
-							$logData = $annotation[2];
-						}
-					}
-
-					log_activity($action, $description, $logData);
-				}
-
+			if(isset($params['format']))
+			{
+				$format = $params['format'];
 			}
 
 		}catch(\slikland\error\Error $e)
 		{
-			// if(DEBUG)
-			// {
-			// 	var_dump($e);
-			// }
+			if(DEBUG)
+			{
+				var_dump($e);
+			}
 			$response = $e->toObject();
 		}catch(Exception $e)
 		{
