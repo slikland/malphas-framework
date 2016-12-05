@@ -89,10 +89,10 @@ class ServiceController
 
 		}catch(\slikland\error\Error $e)
 		{
-			if(DEBUG)
-			{
-				var_dump($e);
-			}
+			// if(DEBUG)
+			// {
+			// 	var_dump($e);
+			// }
 			$response = $e->toObject();
 		}catch(Exception $e)
 		{

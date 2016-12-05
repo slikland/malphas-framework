@@ -14,14 +14,18 @@ class FAB extends cms.ui.Base
 
 
 		constructor:(element)->
-
 			super({element: element})
 			if @attr('on')
-				@_target = document.querySelector('#' + @attr('on'))
-				@_position = 'TR'
-				if @attr('position')
-					@_position = @attr('position')
-				@_checkPosition()
+				@css('visibility', 'hidden')
+				setTimeout(@_setPosition, 100)
+		_setPosition:()=>
+			@_target = document.querySelector('#' + @attr('on'))
+			console.log(@_target)
+			@_position = 'TR'
+			if @attr('position')
+				@_position = @attr('position')
+			@_checkPosition()
+			@css('visibility', '')
 
 		destroy:()=>
 			super

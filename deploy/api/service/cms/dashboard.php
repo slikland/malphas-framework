@@ -5,7 +5,7 @@ class dashboard
 	/**
 	@cmsUser [0, 1, 2, 3]
 	@user [0, 1, 2, 3]
-	@method GET
+	@method POST
 	@log
 	*/
 	function usersPie($data)
