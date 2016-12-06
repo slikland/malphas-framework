@@ -17,7 +17,6 @@ class Pagination extends cms.ui.Base
 		constructor:(element)->
 			super({element: element})
 			@_page = 0
-			@_element.on('update', @_update)
 
 			@_target = document.querySelector('#' + @attr('for'))
 
@@ -58,6 +57,10 @@ class Pagination extends cms.ui.Base
 			@_pageContainer.element.on('mousedown', @_pageMouseDown)
 
 			@_setItemValue()
+			if @attr('numItems')
+				@element['numItems'] = @attr('numItems')
+
+			@_element.on('update', @_update)
 
 
 		@get page:()->
@@ -135,8 +138,10 @@ class Pagination extends cms.ui.Base
 				@_numItems = @attr('numItems')
 			else if data['_numItems']
 				@_numItems = data['_numItems']
+
 			if data['_index']
 				@page = @_page = data['_index'] / @_numItems
+				@element['index'] = data['_index']
 		_firstClick:()=>
 			@page = 0
 
@@ -250,7 +255,6 @@ class Pagination extends cms.ui.Base
 
 		_update:(e)=>
 			data = e.data
-
 			if !data || !data.total? || !data.numItems?
 				return
 			@_pageContainer.removeAll()
