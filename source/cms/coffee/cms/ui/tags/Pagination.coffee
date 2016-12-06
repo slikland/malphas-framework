@@ -5,6 +5,7 @@ class Pagination extends cms.ui.Base
 	_update:(data)->
 		for item in data.add
 			@_plugins[item] = new Plugin(item)
+			
 
 		for item in data.remove
 			p = @_plugins[item]
