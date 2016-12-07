@@ -2,6 +2,11 @@
 namespace slikland\fs;
 class File
 {
+	static function isWritable($path)
+	{
+		return is_writable($path);
+	}
+
 	static function mkdir($path, $chmod = 0777)
 	{
 		if(!file_exists($path))

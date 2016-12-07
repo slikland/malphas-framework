@@ -50,19 +50,15 @@ function output($data = NULL, $format = 'json')
 {
 	$output = '';
 	$output = @(string)$data;
+	setOutputFormat($format);
 	try{
 		switch(strtolower($format))
 		{
-			case 'html':
-				set_header('Content-type: text/html');
-				break;
-			case 'download':
-				set_header('Content-type: application/octet-stream');
-				break;
 			case 'json':
-			default:
 				$output = @json_encode($data);
-				set_header('Content-type: text/plain');
+				break;
+			default:
+				$output = $data;
 				break;
 		}
 	}catch(Exception $e)
@@ -74,6 +70,30 @@ function output($data = NULL, $format = 'json')
 	}
 	print_headers();
 	print $output;
+}
+
+function setOutputFormat($format = 'json')
+{
+	switch(strtolower($format))
+	{
+		case 'html':
+			set_header('Content-type: text/html');
+			header('Content-type: text/html');
+			break;
+		case 'download':
+			set_header('Content-type: application/octet-stream');
+			header('Content-type: application/octet-stream');
+			break;
+		case 'json':
+			set_header('Content-type: text/json');
+			header('Content-type: text/json');
+			break;
+		default:
+			set_header('Content-type: text/plain');
+			header('Content-type: text/plain');
+			break;
+	}
+
 }
 
 function outputFileName($name)

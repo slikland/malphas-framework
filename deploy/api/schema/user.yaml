@@ -1,4 +1,0 @@
-fk_user
-name
-	type: VARCHAR(255)
-	default: NULL

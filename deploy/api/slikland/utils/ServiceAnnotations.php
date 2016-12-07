@@ -52,6 +52,7 @@ class ServiceAnnotations
 	public static function set_output($data, &$params)
 	{
 		$params['format'] = @$data[0];
+		setOutputFormat($data[0]);
 	}
 
 	public static function set_filename($data)

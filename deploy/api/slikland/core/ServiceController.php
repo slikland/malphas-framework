@@ -23,7 +23,7 @@ class ServiceController
 			$method = $service['method'];
 			$annotations = \slikland\core\AnnotationParser::getAnnotations($class, $method);
 
-			$params = array('data' => array());
+			$params = array('data' => (array)$_REQUEST);
 
 			foreach($annotations[\slikland\core\AnnotationParser::BEFORE] as $annotation)
 			{

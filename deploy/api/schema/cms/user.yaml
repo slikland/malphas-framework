@@ -1,6 +1,0 @@
-name:
-  type: VARCHAR(255)
-pass:
-  type: VARCHAR(64)
-email:
-  type: VARCHAR(255)

@@ -20,6 +20,7 @@ include_once('slikland/AutoLoader.php');
 class_alias('\slikland\core\Setting', 'Setting');
 class_alias('\slikland\error\Error', 'Error');
 class_alias('\slikland\error\CodedError', 'CodedError');
+class_alias('\slikland\fs\File', 'File');
 
 include('slikland/core/ServiceController.php');
 

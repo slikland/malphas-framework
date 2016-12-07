@@ -26,6 +26,81 @@ class SchemaParser{
 		$data = spyc_load($content);
 	}
 
+	private function exportTable($name, $data, $path)
+	{
+		$path = rtrim($path, '/') . '/' . $name . '.php';
+		$schemaName = '_schema_' . $name;
+		if(file_exists($path))
+		{
+			include_once($path);
+			$schema = $$schemaName;
+		}else{
+			$schema = array('__schema'=>array());
+		}
+
+		$schema['__schema'] = $data;
+
+		$fields = array();
+		$refs = array();
+		foreach($schema['__schema']['columns'] as $k=>$v)
+		{
+			if(preg_match('/^pk_/', $k))
+			{
+				$fields['id'] = $k;
+				$fields[$k] = FALSE;
+			}
+			else if(preg_match('/^fk_(.*?)$/', $k, $match))
+			{
+				$refs[$match[1]] = "{$match[1]}.pk_{$match[1]} = {$name}.{$k}";
+				$fields["{$match[1]}_id"] = "{$match[1]}.pk_{$match[1]}";
+			}else if(preg_match('/pass/', $k))
+			{
+				$fields[$k] = FALSE;
+			}else{
+				$fields[$k] = TRUE;
+			}
+		}
+
+		if(isset($schema['FIELDS'])){
+			$schema['FIELDS'] = array_merge($fields, $schema['FIELDS']);
+		}else{
+			$schema['FIELDS'] = $fields;
+		}
+
+		if(isset($schema['REFS'])){
+			$schema['REFS'] = array_merge($refs, $schema['REFS']);
+		}else{
+			$schema['REFS'] = $refs;
+		}
+
+
+		if(!isset($schema['VIEWS']))
+		{
+			$fields = array();
+			foreach($schema['FIELDS'] as $k=>$v)
+			{
+				if(!$v) continue;
+				$fields[$k] = $v;
+			}
+			$schema['VIEWS'] = array('default'=>array('fields'=>$fields, 'where'=>array(), 'order'=>array(), 'limit'=>array()));
+		}
+		file_put_contents($path, "<?php\n\${$schemaName} = " . var_export($schema, TRUE) . ';');
+		chmod($path, 0775);
+	}
+
+	public function exportTables($data, $path = NULL)
+	{
+		if(!$path)
+		{
+			$path = API_PATH . 'schema/';
+		}
+		$path = rtrim($path, '/') . '/';
+		foreach($data as $name=>$item)
+		{
+			$this->exportTable($name, $item, $path);
+		}
+	}
+
 	public function parseTables()
 	{
 		$db = db();
@@ -106,8 +181,8 @@ class SchemaParser{
 		$db = db();
 		$create = $db->fetch_one('SHOW CREATE TABLE ' . $tableName, NULL, TRUE);
 
-		print($create[1]);
-		print "\n\n";
+		// print($create[1]);
+		// print "\n\n";
 
 		$sql = '';
 		$sql .= "CREATE TABLE `${tableName}` ";
