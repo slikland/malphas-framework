@@ -111,14 +111,125 @@ class DBHelper
 		return $db->fetch_value($query, $values);
 	}
 
-	function set()
+	function exists($where)
 	{
+		$value = array();
+		$joins = array();
+		$where = $this->buildWhereConditions($where, $values, $joins);
+		if($where)
+		{
+			$query = "SELECT 1 FROM {$this->table} WHERE " . $where . ' ';
+			if(count($joins) > 0)
+			{
+				$join = array();
+				foreach($joins as $v)
+				{
+					$join[] = "LEFT JOIN {$v} ON {$schema['REFS'][$v]}";
+				}
+				$query .= ' ' . implode($join, ' ');
+			}
+			$query .= ' LIMIT 1';
+			$db = db();
+			$found = $db->fetch_value($query, $values);
+			if($found && $fonud == '1')
+			{
+				return TRUE;
+			}
+		}
+		return FALSE;
+	}
+
+	function nextId()
+	{
+		$db = db();
+		return $db->nextId($this->table);
+	}
+
+	function set($fields, $where = NULL)
+	{
+		$keys = array();
+		$values = array();
+		$joins = array();
+		$valueRefs = array();
+
+		$id = NULL;
+
+		for($fields as $k=>$v)
+		{
+			preg_match('/^([^?]+)(\??)$/', $k, $match);
+			$keys[] = '`' . $match[1] . '`';
+			if($match[2] && !empty($match[2]))
+			{
+				$values[] = $v;
+			}else{
+				$values[] = '?';
+				$valueRef[] = $v;
+			}
+			if(preg_match('/^pk_/', $k))
+			{
+				$id = array($k=>$v);
+			}
+		}
+
+		$update = FALSE:
+		$db = db();
+
+		if(isset($where) && !empty($where))
+		{
+			$update = TRUE;
+		}else if($id)
+		{
+			if($id)
+			{
+				if($this->exists($id))
+				{
+					if(!$where) $where = array();
+					foreach($id as $k=>$v)
+					{
+						$where[$k] = $v;
+					}
+				}
+			}
+		}
+
+		if($update)
+		{
+			$query = "UPDATE $this->table SET ";
+			$cols = array_combine($keys, $values);
+			foreach($cols as $k=>$v)
+			{
+				$query .= "{$k}={$v} ";
+			}
+			$where = $this->buildWhereConditions($where, $valueRefs, $joins);
+			if($where)
+			{
+				$query .= 'WHERE ' . $where;
+			}
+			return $db->query($db, $valueRefs);
+
+		}else{
+			$query = "INSERT INTO this->table (".implode(',', $keys).") VALUES (".implode(',', $values).")";
+			return $db->insert($db, $valueRefs);
+		}
 
 	}
 
-	function delete()
+	function delete($where = NULL)
 	{
+		if(!$where) return;
 
+		$values = array();
+		$joins = array();
+		$where = $this->buildWhereConditions($where, $values, $joins);
+		
+		if(!$where) return;
+		$query = "DELETE FROM {$this->table} ";
+		if(count($joins) > 0)
+		{
+			$query .= ' ' . $query;
+		}
+		$query .= ' WHERE ' . $where;
+		return $db->query($query, $values);
 	}
 
 
