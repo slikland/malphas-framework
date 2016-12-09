@@ -21,6 +21,8 @@
 class Main
 	@RENDER_TEMPLATE: 'app_renderTemplate'
 	constructor:()->
+		new cms.ui.UI()
+		
 		app.body = new BaseDOM({element: document.body})
 		app.template = new slikland.Mara('templates/')
 		slikland.Mara.setGlobalObject('@', app)

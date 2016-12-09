@@ -62,6 +62,33 @@ class DBHelper
 		return $db->fetch_all($query['query'], $query['values']);
 	}
 
+	function paginate($data, $viewName = NULL, $fields = array(), $where = array(), $order = array())
+	{
+		$index = 0;
+		$numItems = 20;
+		$limit = array($index, $numItems);
+		$items = $this->get($viewName, $fields, $where, $order, $limit);
+
+		if(isset($data['_numItems']))
+		{
+			$numItems = $data['_numItems'];
+			$index = $data['index'];
+		}
+
+		if(isset($data['search']))
+		{
+			$numItems = $data['_numItems'];
+			$index = $data['index'];
+		}
+
+		$limit = array($index, $numItems);
+
+		// public function getList($query, $params, $numItems = 20, $array = false)
+
+		$total = $this->foundRows();
+		return array('items'=>$items, 'total'=>$total, 'index'=>$index, 'numItems'=>$numItems);
+	}
+
 	function foundRows()
 	{
 		$db = db();
@@ -154,7 +181,7 @@ class DBHelper
 
 		$id = NULL;
 
-		for($fields as $k=>$v)
+		foreach($fields as $k=>$v)
 		{
 			preg_match('/^([^?]+)(\??)$/', $k, $match);
 			$keys[] = '`' . $match[1] . '`';
@@ -171,7 +198,7 @@ class DBHelper
 			}
 		}
 
-		$update = FALSE:
+		$update = FALSE;
 		$db = db();
 
 		if(isset($where) && !empty($where))

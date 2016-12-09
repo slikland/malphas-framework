@@ -51,4 +51,4 @@ class UI
 			@_instances[i].update()
 
 	# Init UI
-	new @()
+	

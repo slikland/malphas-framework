@@ -803,8 +803,8 @@ if (!EventDispatcher) {
 var App, app, windowLoaded;
 App = (function(_super) {
   __extends(App, _super);
-  App.project_version_raw = "SL_PROJECT_VERSION:1.1.0";
-  App.project_date_raw = "SL_PROJECT_DATE:1480954286745";
+  App.project_version_raw = "SL_PROJECT_VERSION:1.1.1";
+  App.project_date_raw = "SL_PROJECT_DATE:1481226592769";
   App.FRAMEWORK_VERSION = "2.2.15";
   function App() {
     App.__super__.constructor.apply(this, arguments);
@@ -5629,6 +5629,7 @@ cms.ui.tag.attributes.Service = (function(_super) {
     return Service.__super__.constructor.apply(this, arguments);
   }
   Service.SELECTOR = '[service]';
+  Service._queue = [];
   Service.prototype._update = function(data) {
     var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
     _ref = data.add;
@@ -5643,6 +5644,7 @@ cms.ui.tag.attributes.Service = (function(_super) {
     for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
       item = _ref1[_j];
       p = this._plugins[item];
+      this.removeQueue(p);
       if (p) {
         _results.push(typeof p.destroy === "function" ? p.destroy() : void 0);
       } else {
@@ -5650,6 +5652,21 @@ cms.ui.tag.attributes.Service = (function(_super) {
       }
     }
     return _results;
+  };
+  Service.prototype.removeQueue = function(plugin) {};
+  Service.prototype.queueService = function(plugin, delay) {
+    if (delay == null) {
+      delay = 0;
+    }
+  };
+  Service.prototype._sortByOrder = function(a, b) {
+    if (a.order > b.order) {
+      return 1;
+    }
+    if (a.order < b.order) {
+      return -1;
+    }
+    return 0;
   };
   Plugin = (function(_super1) {
     __extends(Plugin, _super1);
@@ -7814,7 +7831,6 @@ cms.ui.UI = (function() {
     }
     return _results;
   };
-  new UI();
   return UI;
 })();
 var Notification;
@@ -8800,6 +8816,7 @@ Main = (function() {
     this._indexComplete = __bind(this._indexComplete, this);
     this._routeChange = __bind(this._routeChange, this);
     this._init = __bind(this._init, this);
+    new cms.ui.UI();
     app.body = new BaseDOM({
       element: document.body
     });

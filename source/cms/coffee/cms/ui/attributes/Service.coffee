@@ -1,6 +1,8 @@
 #namespace cms.ui.tag.attributes
 class Service extends cms.ui.Base
 	@SELECTOR: '[service]'
+
+	@_queue: []
 	_update:(data)->
 		for item in data.add
 			if item.hasAttribute('service')
@@ -8,8 +10,21 @@ class Service extends cms.ui.Base
 
 		for item in data.remove
 			p = @_plugins[item]
+			@removeQueue(p)
 			if p
 				p.destroy?()
+
+	removeQueue:(plugin)->
+
+	queueService:(plugin, delay = 0)->
+		# _queue
+
+	_sortByOrder:(a, b)->
+		if a.order > b.order
+			return 1
+		if a.order < b.order
+			return -1
+		return 0
 
 	class Plugin extends BaseDOM
 		@_destroyPlugin:(item)->
