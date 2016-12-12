@@ -25,19 +25,23 @@ class Field extends cms.ui.Base
 		constructor:(element)->
 			super({element: element})
 			@_input = @_element.querySelector('input:not([type="hidden"]),select,textarea')
-			if @_input?.tagName.toLowerCase() in ['select', 'textarea']
-				@_input?.setAttribute('type', @_input?.tagName.toLowerCase())
-			if @_input?.hasAttribute('type')
-				@addClass(@_input.getAttribute('type'))
-				switch @_input.getAttribute('type').toLowerCase()
-					when 'password'
-						@_checkPasswordPreview()
+			nameAttr = @_input.getAttribute("type")
+			if(nameAttr == 'date' || nameAttr == 'time')
+				@_checkFilled(true)
+			else
+				if @_input?.tagName.toLowerCase() in ['select', 'textarea']
+					@_input?.setAttribute('type', @_input?.tagName.toLowerCase())
+				if @_input?.hasAttribute('type')
+					@addClass(@_input.getAttribute('type'))
+					switch @_input.getAttribute('type').toLowerCase()
+						when 'password'
+							@_checkPasswordPreview()
 
-			@_input?.on('focus', @_focus)
-			@_input?.on('blur', @_blur)
-			@_input?.on('change', @_change)
-			@_input?.on('input', @_change)
-			setTimeout(@_checkFilled, 1)
+				@_input?.on('focus', @_focus)
+				@_input?.on('blur', @_blur)
+				@_input?.on('change', @_change)
+				@_input?.on('input', @_change)
+				setTimeout(@_checkFilled, 1)
 
 		_checkPasswordPreview:()->
 			pp = @find('.show-password')
@@ -65,8 +69,9 @@ class Field extends cms.ui.Base
 		_change:()=>
 			@_checkFilled()
 
-		_checkFilled:()=>
-			if @_focused
+		_checkFilled:(focusStarts = false)=>
+
+			if @_focused || focusStarts
 				@addClass('filled')
 				return
 			v = @_input?.value.trim()

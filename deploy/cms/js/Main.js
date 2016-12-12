@@ -7066,36 +7066,41 @@ cms.ui.tags.form.Field = (function(_super) {
       this._focus = __bind(this._focus, this);
       this._password = __bind(this._password, this);
       this._passwordPreviewChange = __bind(this._passwordPreviewChange, this);
-      var _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8;
+      var nameAttr, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8;
       Plugin.__super__.constructor.call(this, {
         element: element
       });
       this._input = this._element.querySelector('input:not([type="hidden"]),select,textarea');
-      if ((_ref = (_ref1 = this._input) != null ? _ref1.tagName.toLowerCase() : void 0) === 'select' || _ref === 'textarea') {
-        if ((_ref2 = this._input) != null) {
-          _ref2.setAttribute('type', (_ref3 = this._input) != null ? _ref3.tagName.toLowerCase() : void 0);
+      nameAttr = this._input.getAttribute("type");
+      if (nameAttr === 'date' || nameAttr === 'time') {
+        this._checkFilled(true);
+      } else {
+        if ((_ref = (_ref1 = this._input) != null ? _ref1.tagName.toLowerCase() : void 0) === 'select' || _ref === 'textarea') {
+          if ((_ref2 = this._input) != null) {
+            _ref2.setAttribute('type', (_ref3 = this._input) != null ? _ref3.tagName.toLowerCase() : void 0);
+          }
         }
-      }
-      if ((_ref4 = this._input) != null ? _ref4.hasAttribute('type') : void 0) {
-        this.addClass(this._input.getAttribute('type'));
-        switch (this._input.getAttribute('type').toLowerCase()) {
-          case 'password':
-            this._checkPasswordPreview();
+        if ((_ref4 = this._input) != null ? _ref4.hasAttribute('type') : void 0) {
+          this.addClass(this._input.getAttribute('type'));
+          switch (this._input.getAttribute('type').toLowerCase()) {
+            case 'password':
+              this._checkPasswordPreview();
+          }
         }
+        if ((_ref5 = this._input) != null) {
+          _ref5.on('focus', this._focus);
+        }
+        if ((_ref6 = this._input) != null) {
+          _ref6.on('blur', this._blur);
+        }
+        if ((_ref7 = this._input) != null) {
+          _ref7.on('change', this._change);
+        }
+        if ((_ref8 = this._input) != null) {
+          _ref8.on('input', this._change);
+        }
+        setTimeout(this._checkFilled, 1);
       }
-      if ((_ref5 = this._input) != null) {
-        _ref5.on('focus', this._focus);
-      }
-      if ((_ref6 = this._input) != null) {
-        _ref6.on('blur', this._blur);
-      }
-      if ((_ref7 = this._input) != null) {
-        _ref7.on('change', this._change);
-      }
-      if ((_ref8 = this._input) != null) {
-        _ref8.on('input', this._change);
-      }
-      setTimeout(this._checkFilled, 1);
     }
     Plugin.prototype._checkPasswordPreview = function() {
       var pp;
@@ -7133,9 +7138,12 @@ cms.ui.tags.form.Field = (function(_super) {
     Plugin.prototype._change = function() {
       return this._checkFilled();
     };
-    Plugin.prototype._checkFilled = function() {
+    Plugin.prototype._checkFilled = function(focusStarts) {
       var v, _ref, _ref1;
-      if (this._focused) {
+      if (focusStarts == null) {
+        focusStarts = false;
+      }
+      if (this._focused || focusStarts) {
         this.addClass('filled');
         return;
       }
