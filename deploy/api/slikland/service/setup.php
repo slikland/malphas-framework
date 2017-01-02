@@ -18,6 +18,7 @@ class setup{
 	{
 		$users = new \slikland\db\DBHelper('cms_user');
 		var_dump($users->get());
+		// return $users->count();
 		return $users;
 	}
 

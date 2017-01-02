@@ -65,7 +65,9 @@ $_schema_cms_interface_role = array (
     'id' => 'pk_cms_interface_role',
     'pk_cms_interface_role' => false,
     'cms_interface_id' => 'cms_interface.pk_cms_interface',
+    'fk_cms_interface' => false,
     'cms_role_id' => 'cms_role.pk_cms_role',
+    'fk_cms_role' => false,
     'created' => true,
   ),
   'REFS' => 

@@ -79,6 +79,7 @@ $_schema_cms_user = array (
     'id' => 'pk_cms_user',
     'pk_cms_user' => false,
     'cms_role_id' => 'cms_role.pk_cms_role',
+    'fk_cms_role' => false,
     'email' => true,
     'pass' => false,
     'name' => true,

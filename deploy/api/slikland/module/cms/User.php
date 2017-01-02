@@ -287,17 +287,23 @@ class User extends \slikland\core\pattern\Singleton
 			$data['sort'] = '-created';
 		}
 
-		if(isset($data['search']))
-		{
-			$data['search'] = array('value'=>$data['search'], 'fields'=>'name,action,description,data');
-		}
-		$data['where'] = array();
-		$data['where'][] = 'cu.fk_cms_role >= ' . $user['role'];
-		$log = $this->db->getList('
-			SELECT cu.name name, cl.action, cl.description, cl.data, cl.created, cu.fk_cms_role role FROM cms_log cl
-			LEFT JOIN cms_session cs ON cs.pk_cms_session = cl.fk_cms_session
-			LEFT JOIN cms_user cu ON cu.pk_cms_user = cs.fk_cms_user
-		', $data, NULL);
+		// if(isset($data['search']))
+		// {
+		// 	$data['search'] = array('value'=>$data['search'], 'fields'=>'name,action,description,data');
+		// }
+
+		// var_dump($data);
+
+		$db = new \slikland\db\DBHelper('cms_log');
+		return $db->paginate($data, 'list', array('cms_user.name','action','description','data'));
+
+		// $data['where'] = array();
+		// $data['where'][] = 'cu.fk_cms_role >= ' . $user['role'];
+		// $log = $this->db->getList('
+		// 	SELECT cu.name name, cl.action, cl.description, cl.data, cl.created, cu.fk_cms_role role FROM cms_log cl
+		// 	LEFT JOIN cms_session cs ON cs.pk_cms_session = cl.fk_cms_session
+		// 	LEFT JOIN cms_user cu ON cu.pk_cms_user = cs.fk_cms_user
+		// ', $data, NULL);
 		return $log;
 	}
 }

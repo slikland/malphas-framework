@@ -127,7 +127,7 @@ class user
 	}
 
 	/**
-	@method POST
+	// @method POST
 	*/
 
 	function getLog($data)

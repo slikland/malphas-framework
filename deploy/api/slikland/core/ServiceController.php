@@ -32,6 +32,11 @@ class ServiceController
 
 			$data = $params['data'];
 
+			if(isset($service['params']) && !empty($service['params']))
+			{
+				$data = array_merge($data, $service['params']);
+			}
+
 			if(!empty($_FILES))
 			{
 				$data = array_merge($data, $_FILES);

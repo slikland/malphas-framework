@@ -64,6 +64,7 @@ $_schema_cms_session = array (
     'id' => 'pk_cms_session',
     'pk_cms_session' => false,
     'cms_user_id' => 'cms_user.pk_cms_user',
+    'fk_cms_user' => false,
     'created' => true,
     'updated' => true,
     'ip' => true,

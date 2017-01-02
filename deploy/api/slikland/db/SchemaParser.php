@@ -53,6 +53,7 @@ class SchemaParser{
 			{
 				$refs[$match[1]] = "{$match[1]}.pk_{$match[1]} = {$name}.{$k}";
 				$fields["{$match[1]}_id"] = "{$match[1]}.pk_{$match[1]}";
+				$fields[$k] = FALSE;
 			}else if(preg_match('/pass/', $k))
 			{
 				$fields[$k] = FALSE;

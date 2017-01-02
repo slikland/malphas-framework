@@ -54,12 +54,15 @@ $_schema_cms_log = array (
     'id' => 'pk_cms_log',
     'pk_cms_log' => false,
     'cms_session_id' => 'cms_session.pk_cms_session',
+    'fk_cms_session' => false,
     'action' => true,
     'created' => true,
   ),
   'REFS' => 
   array (
     'cms_session' => 'cms_session.pk_cms_session = cms_log.fk_cms_session',
+    'cms_user' => 'cms_user.pk_cms_user = cms_session.fk_cms_user',
+    'cms_role' => 'cms_role.pk_cms_role = cms_user.fk_cms_role',
   ),
   'VIEWS' => 
   array (
@@ -70,6 +73,26 @@ $_schema_cms_log = array (
         'id' => 'pk_cms_log',
         'cms_session_id' => 'cms_session.pk_cms_session',
         'action' => true,
+        'created' => true,
+      ),
+      'where' => 
+      array (
+      ),
+      'order' => 
+      array (
+      ),
+      'limit' => 
+      array (
+      ),
+    ),
+    'list' => 
+    array (
+      'fields' => 
+      array (
+        'id' => 'pk_cms_log',
+        'cms_session_id' => 'cms_session.pk_cms_session',
+        'action' => true,
+        'name' => 'cms_user.name',
         'created' => true,
       ),
       'where' => 

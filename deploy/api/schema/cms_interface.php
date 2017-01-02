@@ -57,6 +57,7 @@ $_schema_cms_interface = array (
     'id' => 'pk_cms_interface',
     'pk_cms_interface' => false,
     'cms_interface_id' => 'cms_interface.pk_cms_interface',
+    'fk_cms_interface' => false,
     'name' => true,
     'path' => true,
     'order' => true,
