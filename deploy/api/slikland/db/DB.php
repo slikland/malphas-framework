@@ -91,7 +91,7 @@ class DB{
 		$this->initMySQLi();
 		if(!$params)
 		{
-			return $this->mysqli->query($sql);;
+			return $this->mysqli->query($sql);
 		}else
 		{
 			$sql = preg_replace('/;+$/', '', $sql);

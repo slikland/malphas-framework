@@ -61,7 +61,7 @@ class DBHelper
 		}
 		$queryData = DBQueryBuilder::select($name, $fields, $where, $order, $limit);
 		$db = db();
-		$this->selectExecuted = TRUE; 
+		$this->selectExecuted = TRUE;
 		return $db->fetch_all($queryData['query'], $queryData['values']);
 	}
 
@@ -194,7 +194,7 @@ class DBHelper
 				$values[] = $v;
 			}else{
 				$values[] = '?';
-				$valueRef[] = $v;
+				$valueRefs[] = $v;
 			}
 			if(preg_match('/^pk_/', $k))
 			{
@@ -231,16 +231,18 @@ class DBHelper
 			{
 				$query .= "{$k}={$v} ";
 			}
-			$where = $this->buildWhereConditions($where, $valueRefs, $joins);
+
+			DBQueryBuilder::setSchema($this->table);
+			$where = DBQueryBuilder::buildWhereConditions($where, $valueRefs, $joins);
 			if($where)
 			{
 				$query .= 'WHERE ' . $where;
 			}
-			return $db->query($db, $valueRefs);
+			return $db->query($query, $valueRefs);
 
 		}else{
 			$query = "INSERT INTO this->table (".implode(',', $keys).") VALUES (".implode(',', $values).")";
-			return $db->insert($db, $valueRefs);
+			return $db->insert($query, $valueRefs);
 		}
 
 	}

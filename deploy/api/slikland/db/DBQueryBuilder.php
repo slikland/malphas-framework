@@ -11,6 +11,22 @@ class DBQueryBuilder
 	private static $_usedFields;
 	private static $_schemas = array();
 
+	public static function setSchema($schema)
+	{
+		if(preg_match('/^([^\.]+)\.([^\.]+)$/', $schema, $match))
+		{
+			$schema = $match[1];
+			$viewName = $match[2];
+		}
+		else
+		{
+			$viewName = 'default';
+		}
+
+		self::$_schema = $schema;
+		self::parseSchema($schema, $viewName);
+	}
+
 	public static function select($schema, $fields = NULL, $where = NULL, $order = NULL, $limit = NULL)
 	{
 		self::reset();
@@ -372,12 +388,11 @@ class DBQueryBuilder
 		return array('field'=>$field, 'alias'=>$alias, 'schema'=>$schema, 'ref'=>$ref);
 	}
 
-	private static function buildWhereConditions($items, &$values, &$refs)
+	public static function buildWhereConditions($items, &$values, &$refs)
 	{
 		$where = '';
 		foreach($items as $k=>$v)
 		{
-
 			if(!preg_match('/^([\&\|]?)([^\!\>\<\=\%\?]*)([\!\>\<\=\%\?]{0,2})$/', $k, $match))
 			{
 				continue;
