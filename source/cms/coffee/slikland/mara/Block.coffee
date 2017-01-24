@@ -131,11 +131,14 @@ class Block
 
 
 	_parseObjectString:(object, data = {}, test = false)->
+
 		glob = slikland.Mara.globals
 		replaceObject = object.replace(/\#\{(\$|\@)([^\}\}\#]+)\}/g, '(glob[\'$1\']\.$2 || \'\')')
 		replaceObject = replaceObject.replace(/\#\{([^\}\}\#]+)\}/g, '(data[\'$1\'] || \'\')').replace(/\#\{\}/g, '(data || \'\')')
+
 		try
 			object = eval('(function(){return (' + replaceObject + ');})();')
+
 		if test
 			return Boolean(object)
 		if typeof(object) != 'string'
@@ -148,7 +151,7 @@ class Block
 				object = {'html': object}
 			else
 				object = {}
-		if typeof(object) == 'string'
+		if typeof(object) in ['string', 'number']
 			object = {'html': object}
 
 		return object

@@ -18,6 +18,8 @@ class Field extends cms.ui.Base
 
 		@_checkPlugin:(item)->
 			input = item.querySelector('input:not([type="hidden"]),select,textarea')
+			if !input
+				return false
 			if input.findParents('field') != item
 				return false
 			return true
