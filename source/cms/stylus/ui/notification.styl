@@ -1,0 +1,26 @@
+notification
+	overflow: auto
+	position: fixed
+	top: headerHeight
+	left: menuWidth
+	right: 0px
+	bottom: 0px
+	opacity: 0.9
+	z-index: 500
+.notification-item
+	box-sizing: border-box
+	font-size: 0.8em
+	font-family: tahoma
+	padding: 8px
+	
+	.closeBtn
+		float: right
+		cursor: pointer
+		&:hover
+			color: #000000
+		
+
+	for i in (1...length(bg-colors) + 1)
+		&.p{i}
+			generateColor(i - 1, 80%)
+			border-width: 1px

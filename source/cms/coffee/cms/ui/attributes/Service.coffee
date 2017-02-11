@@ -119,7 +119,10 @@ class Service extends cms.ui.Base
 			@_element.trigger('updated', data)
 			@_removeEventListeners()
 			@_removeProgress()
-		_serviceError:()=>
+		_serviceError:(e, data)=>
+			if data?.message?length > 0
+				app.notification.showNotification(data.message)
+			app.notification.showNotification("BLE")
 			@_removeEventListeners()
 			@_removeProgress()
 		_sortByOrder:(a, b)=>

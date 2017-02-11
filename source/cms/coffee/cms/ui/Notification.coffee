@@ -19,7 +19,7 @@ class Notification extends EventDispatcher
 		target = document.querySelector('notification')
 		if !target
 			target = document.body
-		if !target.getInstance()
+		if !target.getInstance?()
 			target = new BaseDOM({element: target})
 		else
 			target = target.getInstance()
@@ -38,10 +38,15 @@ class Notification extends EventDispatcher
 	class NotificationItem extends BaseDOM
 		constructor:(data)->
 			super({element: 'div', className: 'notification-item show-down'})
+			if typeof(data) == 'string'
+				data = {message: data}
 			if data['message']
 				@text = data['message']
 			if data['type']
 				@addClass('p' + data['type'])
+			else
+				@addClass('p3')
+
 			@timeout = Notification.DEFAULT_TIMEOUT
 			if data['timeout']
 				@timeout = Number(data['timeout'])

@@ -54,7 +54,7 @@ class Main
 		# app.viewController = ViewController.getInstance()
 		# app.viewController.getInterface()
 
-		# app.notification = new Notification()
+		app.notification = new Notification()
 		# app.componentController.parse()
 
 		# API.call({url: 'user/getSession', onComplete: @_indexComplete, onError: @_error})
