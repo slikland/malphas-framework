@@ -36,4 +36,3 @@ class Action extends cms.ui.Base
 						window.location.reload()
 					else
 						app.interface.show(success)
-

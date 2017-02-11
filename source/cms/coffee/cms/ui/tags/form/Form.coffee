@@ -4,6 +4,8 @@ class Form extends cms.ui.Base
 	@SELECTOR: 'form'
 	_update:(data)->
 		for item in data.add
+			if item.getAttribute('target') && item.getAttribute('target').toLowerCase() == '_blank'
+				continue
 			@_plugins[item] = new Plugin(item)
 
 		for item in data.remove
