@@ -33,6 +33,6 @@ class NavLink extends cms.ui.Base
 
 
 		_routeChange:()=>
-			p = app.router.getCurrentPath().trim('/')
+			p = app.router.getCurrentPath().trim('/').replace(/\?.*?$/, '')
 			p2 = @attr('href').trim('/')
 			@toggleClass('selected', p == p2)

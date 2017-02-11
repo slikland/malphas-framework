@@ -16,6 +16,13 @@ class Notification extends EventDispatcher
 			else
 				@showNotification(item)
 	showNotification:(item)=>
+		if typeof(item) == 'string'
+			if item.length == 0
+				return
+		else if !item.message?
+			return
+		else if item.message.length == 0
+			return
 		target = document.querySelector('notification')
 		if !target
 			target = document.body
