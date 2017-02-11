@@ -18,6 +18,7 @@ class For extends cms.ui.Base
 			super({element: element})
 			
 			@_target = document.querySelector('#' + @attr('for'))
+			console.log(@_target)
 			@_setItemValue()
 			@_element.on('change', @_change)
 			@_element.on('input', @_change)
@@ -36,4 +37,5 @@ class For extends cms.ui.Base
 				else
 					@_element.value = data
 		_change:()=>
+			console.log("CHANGE!", @_target)
 			@_target?.trigger('update')

@@ -7,6 +7,8 @@ class Base
 	update:()->
 		if !@constructor.SELECTOR
 			return
+		setTimeout(@_updateItems, 0)
+	_updateItems:()=>
 		foundElements = document.body.querySelectorAll(@constructor.SELECTOR)
 		elements = []
 
