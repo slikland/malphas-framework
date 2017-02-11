@@ -121,8 +121,9 @@ class Service extends cms.ui.Base
 			@_removeProgress()
 		_serviceError:(e, data)=>
 			if data?.message?length > 0
-				app.notification.showNotification(data.message)
-			app.notification.showNotification("BLE")
+				if !data.type
+					data.type = 1
+				app.notification.showNotification(data)
 			@_removeEventListeners()
 			@_removeProgress()
 		_sortByOrder:(a, b)=>
