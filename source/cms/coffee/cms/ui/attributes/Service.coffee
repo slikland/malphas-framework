@@ -116,6 +116,10 @@ class Service extends cms.ui.Base
 				i = items.length
 				while i-- > 0
 					items[i].trigger('update', data)
+			if data?.notification?.message?.length > 0
+				if !data.notification.type
+					data.notification.type = 3
+				app.notification.showNotification(data.notification)
 			@_element.trigger('updated', data)
 			@_removeEventListeners()
 			@_removeProgress()
