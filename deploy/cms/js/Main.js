@@ -7054,6 +7054,9 @@ cms.ui.tags.form.Field = (function(_super) {
     Plugin._checkPlugin = function(item) {
       var input;
       input = item.querySelector('input:not([type="hidden"]),select,textarea');
+      if (!input) {
+        return false;
+      }
       if (input.findParents('field') !== item) {
         return false;
       }
@@ -8265,7 +8268,7 @@ slikland.mara.Block = (function() {
     return this._type = type;
   };
   Block.prototype._parseObjectString = function(object, data, test) {
-    var e, glob, replaceObject;
+    var e, glob, replaceObject, _ref1;
     if (data == null) {
       data = {};
     }
@@ -8297,7 +8300,7 @@ slikland.mara.Block = (function() {
         object = {};
       }
     }
-    if (typeof object === 'string') {
+    if ((_ref1 = typeof object) === 'string' || _ref1 === 'number') {
       object = {
         'html': object
       };

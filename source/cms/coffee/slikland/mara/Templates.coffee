@@ -77,7 +77,6 @@ class Templates
 
 	_fileLoaded:(e, data)=>
 		@_parse(data, e.currentTarget.data.file)
-
 		@_checkCallbacks()
 	
 	_parse:(data, file = '')->
@@ -89,9 +88,8 @@ class Templates
 		else if blocks.length == 1
 			block = blocks[0]
 		else
-			return
+			block = new slikland.mara.Block('', file)
 		@_addInstance(block)
-
 
 	_removeIndent:(data)->
 		indentLength = Number.MAX_VALUE

@@ -21,6 +21,8 @@ class InterfaceController
 		@_showPage(page)
 	_showPage:(page)->
 		validPage = @_findValidPage(page)
+		if !validPage
+			return
 		pathObj = {}
 		parsedPath = app.router.getParsedPath()
 		pageParts = page.substr(page.indexOf(validPage) + validPage.length).trim('/').split('/')
@@ -29,7 +31,6 @@ class InterfaceController
 		for k, v of parsedPath.params
 			pathObj[k] = v
 		slikland.Mara.setGlobalObject('$', pathObj)
-
 		app.template.render('pages/' + validPage, {}, @_context)
 
 	_findValidPage:(page = '')->
