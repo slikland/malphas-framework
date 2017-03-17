@@ -18,6 +18,7 @@ class For extends cms.ui.Base
 			super({element: element})
 			
 			@_target = document.querySelector('#' + @attr('for'))
+			@_value = ''
 			@_setItemValue()
 			@_element.on('change', @_change)
 			@_element.on('input', @_change)
@@ -33,7 +34,24 @@ class For extends cms.ui.Base
 					if @_element.value in data
 						@_element.checked = true
 						@_element.trigger('change')
+						@_value = true
+					else
+						@_value = false
 				else
 					@_element.value = data
+					@_value = data
 		_change:()=>
-			@_target?.trigger('update')
+			changed = false
+			newValue = null
+			if @_element.tagName.toLowerCase() == 'input' && @_element.getAttribute('type')?.toLowerCase() in ['checkbox','radio']
+				newValue = @_element.checked
+				if newValue != @_value
+					changed = true
+					@_value = newValue
+			else
+				newValue = @_element.value
+				if newValue.trim() != @_value.trim()
+					changed = true
+					@_value = newValue
+			if changed
+				@_target?.trigger('update')

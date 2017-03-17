@@ -198,7 +198,7 @@ class NavigationRouter extends EventDispatcher
 		if p_trigger
 			@triggerPath(p_path)
 		false
-
+		
 	###*
 	@method triggerPath
 	@param {String} p_path

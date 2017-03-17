@@ -2,6 +2,7 @@
 #import slikland.utils.Prototypes
 class API extends EventDispatcher
 
+	@START: 'apiStart'
 	@COMPLETE: 'apiComplete'
 	@ERROR: 'apiError'
 	@PROGRESS: 'apiProgress'
@@ -141,7 +142,7 @@ class API extends EventDispatcher
 			@_form = data
 			data = null
 		else if BaseDOM? && data instanceof BaseDOM && data.element.tagName.toLowerCase == 'form'
-			@_form = data
+			@_form = data.element
 			data = null
 
 		url = @_url || ''
@@ -198,8 +199,34 @@ class API extends EventDispatcher
 		if @_headers
 			for k, v of @_headers
 				@_request.setRequestHeader(k, v)
+		if @_form && @_form.getAttribute('globalLoading')
+			@_loading = new cms.ui.Loading()
+			@_loading.css({'position': 'fixed'})
+			@_loading.show()
+			window.addEventListener('resize', @_loadingResize)
+
+			app.interface.context.appendChildAt(@_loading, 0)
+			setTimeout(@_loadingResize, 0)
+		@trigger(API.START)
 		@_request.send(data)
 		return 
+	_hideLoading:()=>
+		if @_loading
+			@_loading?.progress = 1
+			@_loading.on(cms.ui.Loading.HIDE_COMPLETE, @_loadingHideComplete)
+			@_loading.hide()
+
+	_loadingHideComplete:()=>
+		if @_loading.element.parentNode
+			@_loading.element.parentNode.removeChild(@_loading.element)
+		@_loading.remove()
+		@_loading.off(cms.ui.Loading.HIDE_COMPLETE, @_loadingHideComplete)
+		@_loading.destroy?()
+		@_loading = null
+		window.removeEventListener('resize', @_loadingResize)
+		delete @_loading
+
+
 	_progress:(e)=>
 		if e.loaded > e.total
 			p = 0.5
@@ -208,6 +235,7 @@ class API extends EventDispatcher
 		p *= 0.5
 		if e.currentTarget != @_request.upload
 			p += 0.5
+		@_loading?.progress = p
 		@_triggerProgress(p)
 	_triggerProgress:(progress)->
 		@trigger(API.PROGRESS, {loaded: progress, total: 1, progress: progress})
@@ -290,9 +318,21 @@ class API extends EventDispatcher
 			if !@_reuse
 				@off()
 	_loadSuccess:(data = null)->
+		@_hideLoading()
 		@trigger(API.COMPLETE, data)
 		@constructor._checkInterceptor(@_requestURL, data)
 
 	_loadError:(data = null)->
+		@_hideLoading()
 		@trigger(API.ERROR, data)
 		@constructor._checkInterceptor(@_requestURL, data)
+	_loadingResize:()=>
+		if !@_loading
+			return
+		bounds = app.interface.context.getBounds()
+		@_loading.css({
+			'top': bounds.top + 'px'
+			'left': bounds.left + 'px'
+			'height': bounds.height + 'px'
+			'width': bounds.width + 'px'
+		})

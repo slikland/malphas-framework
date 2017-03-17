@@ -9,14 +9,13 @@ field
 	label
 		font-weight: 500
 		position: absolute
-		bottom: 0px
+		top: 0.4em
 		pointer-events: none
 		z-index: 1
 		font-size: 1em
 		padding: 0.2em
 		padding-left: 0.4em
-		padding-bottom: 0.6em
-		transition: bottom 0.1s, font-size 0.1s
+		transition: top 0.1s, font-size 0.1s
 		opacity: 0.4
 	input
 		font-family: Roboto
@@ -45,7 +44,7 @@ field
 			// margin-top: -1.2em
 			opacity: 1
 			font-size: 0.8em
-			bottom: 1.8em
+			top: -1em
 		input
 			border-top-color: rgba(0, 0, 0, 0)
 			border-left-color: rgba(0, 0, 0, 0)
@@ -65,7 +64,7 @@ field
 		label
 			opacity: 1
 			font-size: 0.8em
-			bottom: 1.8em
+			top: -1em
 			transition: none
 		input
 			border-top-color: rgba(0, 0, 0, 0)
@@ -79,6 +78,7 @@ field
 			font-weight: 500
 			position: relative
 			bottom: auto
+			top: auto
 			pointer-events: cursor
 			z-index: auto
 			font-size: auto
@@ -106,4 +106,10 @@ field
 		i
 			opacity: 0.2
 			line-height: 2em
-			
+	.icon
+		position: absolute
+		right: 0.6em
+		cursor: pointer
+		i
+			line-height: 2em
+				

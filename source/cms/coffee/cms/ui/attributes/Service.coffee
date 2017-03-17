@@ -124,10 +124,12 @@ class Service extends cms.ui.Base
 			@_removeEventListeners()
 			@_removeProgress()
 		_serviceError:(e, data)=>
-			if data?.message?length > 0
+			if data?.message?.length > 0
 				if !data.type
 					data.type = 1
 				app.notification.showNotification(data)
+			if @_element.getAttribute('onError')
+				app.router.goto(@_element.getAttribute('onError'))
 			@_removeEventListeners()
 			@_removeProgress()
 		_sortByOrder:(a, b)=>

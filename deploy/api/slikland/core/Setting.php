@@ -10,7 +10,7 @@ class Setting
 	public static function get($name)
 	{
 		$db = db();
-		return $db->fetch_one("SELECT value FROM cms_setting WHERE name LIKE ?", array($name));
+		return $db->fetch_value("SELECT value FROM cms_setting WHERE name LIKE ?", array($name));
 	}
 
 	public static function getAll($name)

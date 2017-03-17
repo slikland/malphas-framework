@@ -1,6 +1,8 @@
 paths:
 	root: '../../'
 	deploy: '{paths.root}deploy/cms/'
+	deploy: '{paths.root}../s401.Ford.KA2017/deploy/manager/admin/'
+	deploy: '{paths.root}../s385.Halls.Heranca/deploy/cms/'
 	source: '{paths.root}source/cms/'
 	coffee: '{paths.source}coffee/'
 	stylus: '{paths.source}stylus/'

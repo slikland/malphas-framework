@@ -41,6 +41,8 @@ table
 a
 	color: inherit
 	text-decoration: none
+i.fa
+	vertical-align: middle
 
 @import 'core/mixins'
 @import 'core/animations'
@@ -52,6 +54,6 @@ a
 @import 'components/*'
 // @import 'component/*'
 
-for i in (1...length(bg-colors) + 1)
+generateColors(0)for i in (1...length(bg-colors) + 1)
 	&.color{i}
 		generateTextColor(i - 1, 80%)

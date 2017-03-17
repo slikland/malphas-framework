@@ -1,5 +1,4 @@
 #namespace cms.ui.tags
-#import slikland.utils.MouseUtils
 class Tooltip extends cms.ui.Base
 	@SELECTOR: 'tooltip'
 	_update:(data)->

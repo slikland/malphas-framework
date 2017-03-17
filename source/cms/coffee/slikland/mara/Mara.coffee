@@ -76,6 +76,7 @@ class Mara extends EventDispatcher
 		items = []
 		while i-- > 0
 			items[i] = children[i]
+			items[i].style.display = 'none'
 		setTimeout(@_removeChildren, 0, target, items)
 	_removeChildren:(target, children)=>
 		i = children.length
@@ -84,12 +85,23 @@ class Mara extends EventDispatcher
 				continue
 			target.removeChild(children[i])
 
+	renderBlockByReference:(reference, data, reset = false, callback = null)->
+		@_renderData.callback = callback
+		@_templates.get(@_renderData.file + reference, @_referenceLoaded)
+	_referenceLoaded:(block)=>
+		if !@_renderData
+			return
+		items = block.render(@_renderData.data)
+		@_renderData.context.appendChild(items[0][1])
+		@_block = block
+		@_renderData.callback?(items, @_block)
 	renderBlock:(element, data)->
 		if !(element instanceof HTMLElement) || !element.getAttribute('mara')
 			return
 		@_resetContext(element)
 		block = slikland.mara.Block.findBlock(element.getAttribute('mara'))
 		block.render(data, element, true)
+		app.trigger('redraw')
 
 	# update:(element, data)->
 	# 	block = @_block

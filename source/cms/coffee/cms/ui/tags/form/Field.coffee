@@ -50,7 +50,7 @@ class Field extends cms.ui.Base
 			if !pp
 				return
 			@_passwordPreview = pp
-			@_passwordPreview.off('change', @_passwordPreviewChange)
+			@_passwordPreview.on('change', @_passwordPreviewChange)
 		_passwordPreviewChange:()=>
 			if @_passwordPreview.selected
 				@_input?.setAttribute('type', 'text')

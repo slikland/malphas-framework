@@ -1,7 +1,7 @@
 #import slikland.loader.API
 class User extends EventDispatcher
 	@STATUS_CHANGE: 'user_statusChange'
-	@API_PATH: '../api/cms/user/'
+	@API_PATH: 'api/cms/user/'
 	constructor:()->
 		super
 		@_logged = false
@@ -24,6 +24,11 @@ class User extends EventDispatcher
 					@_data = data
 					@_changeStatus(true)
 					app.interface.show()
+					params = app.router.getParsedPath()['params']
+					if params['__redirect__']
+						app.router.removeParam('__redirect__')
+						window.location = decodeURIComponent(params['__redirect__'])
+
 				when 'forgot'
 					2
 				when 'changePassword'
@@ -42,7 +47,7 @@ class User extends EventDispatcher
 		@trigger(@constructor.STATUS_CHANGE, logged)
 
 	_getUser:()->
-		API.call(@constructor.API_PATH + 'getUser')
+		API.call(app.rootPath + @constructor.API_PATH + 'getUser')
 
 	_showLogin:()->
 		if !app.template.isCurrent('user/login')

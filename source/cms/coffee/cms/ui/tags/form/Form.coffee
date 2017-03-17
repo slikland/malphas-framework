@@ -4,8 +4,6 @@ class Form extends cms.ui.Base
 	@SELECTOR: 'form'
 	_update:(data)->
 		for item in data.add
-			if item.getAttribute('target') && item.getAttribute('target').toLowerCase() == '_blank'
-				continue
 			@_plugins[item] = new Plugin(item)
 
 		for item in data.remove
@@ -20,21 +18,34 @@ class Form extends cms.ui.Base
 			super({element: element})
 			setTimeout(@_addListeners, 50)
 		_addListeners:()=>
-			@_api = new API(@_element)
-			@_api.on(API.COMPLETE, @_apiComplete)
-			@_api.on(API.ERROR, @_apiError)
-			@_element.on('submit', @_submit)
+			if !(@_element.getAttribute('target') && @_element.getAttribute('target').toLowerCase() == '_blank')
+				@_api = new API(@_element)
+				@_api.on(API.START, @_apiStart)
+				@_api.on(API.COMPLETE, @_apiComplete)
+				@_api.on(API.ERROR, @_apiError)
+				@_element.on('submit', @_submit)
 			@_element.on('change', @_change)
+			@_element.on('reset', @_reset)
 		_change:()=>
 			@_clearMessage()
+
 		_submit:(e)=>
-			console.log(e.defaultPrevented)
 			if e.defaultPrevented
 				e.stopImmediatePropagation()
 				return
 			e.preventDefault()
+		_reset:()=>
+			setTimeout(@_resetFields, 0)
+		_resetFields:()=>
+			items = @_element.querySelectorAll('[type=checkbox],[type=radio]')
+			i = items.length
+			while i-- > 0
+				items[i].trigger('change')
 
-		_apiComplete:()=>
+		_apiStart:()=>
+			
+
+		_apiComplete:(e, data)=>
 			@_element.reset()
 			success = @attr('success')
 			if success && success.length > 0
@@ -45,6 +56,10 @@ class Form extends cms.ui.Base
 						window.location.reload()
 					else
 						app.router.goto(success)
+			if data?.notification?.message?.length > 0
+				if !data.notification.type
+					data.notification.type = 3
+				app.notification.showNotification(data.notification)
 
 		_apiError:(e, data)=>
 			@_showMessage(data?.message)

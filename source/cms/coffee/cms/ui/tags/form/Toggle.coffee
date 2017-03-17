@@ -19,10 +19,18 @@ class Toggle extends cms.ui.Base
 			if @_input
 				@selected = @_input.checked
 				@_input.on('change', @_update)
+				# if @_input.getAttribute('type').toLowerCase() == 'radio'
+					# @@_checkParents:()-
 			@_element.on('click', @_toggle)
 			@_element.on('change', @_change)
 		_change:()=>
-
+			if @_input
+				form = @findParents('form')
+				items = form.querySelectorAll('input[name="'+@_input.getAttribute('name')+'"]')
+				i = items.length
+				while i-- > 0
+					if items[i] != @_input
+						items[i].trigger('change')
 		@get selected:()->
 			return @_selected
 
@@ -37,7 +45,7 @@ class Toggle extends cms.ui.Base
 			@_element.trigger('change')
 		_toggle:()=>
 			@selected = !@_selected
-			@_input.trigger('change')
+			@_input?.trigger('change')
 		_update:(e = null)=>
 			if @_input
 				@selected = @_input.checked

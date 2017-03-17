@@ -1,5 +1,6 @@
 #namespace cms.ui
 class Loading extends BaseDOM
+	@HIDE_COMPLETE: 'loading_hideComplete'
 	constructor:()->
 		super({element: 'loading'})
 		@_progress = @_currentPosition = 0
@@ -64,11 +65,12 @@ class Loading extends BaseDOM
 		@progress = 1
 		KTween.remove(@, '_position')
 		KTween.tween(@, {_position: @_progress, onComplete: @_hideStart}, 'easeOutQuart', 0.2)
-
+	
 	_hideStart:()=>
 		KTween.remove(@, 'showPosition')
 		KTween.tween(@, {showPosition: 0, onComplete: @_hideComplete}, 'easeOutQuart', 0.1)
 	_hideComplete:()=>
 		@css({visibility: 'hidden'})
+		@trigger(@HIDE_COMPLETE)
 		# if @_element.parentNode
 		# 	@_element.parentNode.removeChild(@_element)

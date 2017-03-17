@@ -1,3 +1,4 @@
+#import slikland.display.BaseDOM
 #namespace cms.core
 class InterfaceController
 	@getInstance:()=>
@@ -5,6 +6,18 @@ class InterfaceController
 
 	constructor:()->
 		app.user.on(User.STATUS_CHANGE, @_loginStatusChange)
+		API.intercept(/.*/g, @_apiRedirectInterceptor)
+
+	@get context:()->
+		return @_context
+
+	_apiRedirectInterceptor:(data, url)=>
+		if data?.goto
+			app.router.goto(data.goto)
+		else if data?.redirect
+			app.router.goto(data.redirect)
+		else if data?.refresh
+			1
 
 	show:(page = null)->
 		if !app.user.logged
@@ -20,6 +33,12 @@ class InterfaceController
 			page = 'index'
 		@_showPage(page)
 	_showPage:(page)->
+		if !@_loading
+			@_loading = new cms.ui.Loading()
+		@_context.appendChildAt(@_loading, 0)
+		@_loading.show()
+		@_loading.progress = 0.5
+
 		validPage = @_findValidPage(page)
 		if !validPage
 			return
@@ -31,7 +50,11 @@ class InterfaceController
 		for k, v of parsedPath.params
 			pathObj[k] = v
 		slikland.Mara.setGlobalObject('$', pathObj)
-		app.template.render('pages/' + validPage, {}, @_context)
+		app.template.render('pages/' + validPage, {}, @_context.element, @_pageShown)
+	_pageShown:()=>
+		@_loading.progress = 1
+		@_loading.hide()
+
 
 	_findValidPage:(page = '')->
 		page = page.trim('/')
@@ -47,7 +70,7 @@ class InterfaceController
 			return
 		@_interfaceShown = true
 
-		API.call('../api/cms/cms/getInterface', null, @_interfaceLoaded)
+		API.call(app.rootPath + 'api/cms/cms/getInterface', null, @_interfaceLoaded)
 	_interfaceLoaded:(e, data)=>
 		@_availPages = data.pages
 		@_availPages.sort(@_sortPages)
@@ -77,8 +100,9 @@ class InterfaceController
 		context = items[0][1]
 		@_header = context.querySelector('header')
 		@_menu = context.querySelector('nav')
-		@_context = context.querySelector('main')
+		@_context = new BaseDOM({element: context.querySelector('main')})
 		@show()
+
 
 	_loginStatusChange:()=>
 		@_interfaceShown = false

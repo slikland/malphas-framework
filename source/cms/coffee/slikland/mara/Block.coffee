@@ -82,6 +82,8 @@ class Block
 		obj['data'] = @_data
 		return obj
 
+	duplicate:(context, data)->
+		@render(data, context)
 
 	_parseInstruction:(instruction)->
 		ref = instruction[2] || ''
