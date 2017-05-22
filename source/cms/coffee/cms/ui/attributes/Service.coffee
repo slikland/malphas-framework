@@ -53,6 +53,7 @@ class Service extends cms.ui.Base
 				return
 			if !@_loading
 				@_loading = new cms.ui.Loading()
+			@_loading.reset()
 			@_loading.show()
 			@appendChildAt(@_loading, 0)
 		_onProgress:(e, data)=>

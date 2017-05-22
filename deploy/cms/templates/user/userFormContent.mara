@@ -1,15 +1,6 @@
 input: {"type":"hidden","name":"id","value":"#{id}"}
 group:
 	field.col-1_2:
-		label: "Nível"
-		(#{roles})
-			select: {"name":"role"}
-				option: {"html": "#{name}", "value":"#{id}","selected":#{selected}} #{roles}
-		(!#{roles})
-			select: {"service": "../api/cms/user/getRoles", "name":"role"}
-				option: {"html": "#{name}", "value":"#{id}"}
-group:
-	field.col-1_2:
 		label: "E-mail"
 		input: {"type":"text", "name":"email","value":"#{email}"}
 		validation:
@@ -52,8 +43,3 @@ group:
 		validation:
 			match: {"field":"password"}
 				message: "As senhas não conferem"
-
-
-
-<test
-	div: "test"

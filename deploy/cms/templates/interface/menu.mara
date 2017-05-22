@@ -9,7 +9,8 @@
 <menuItem
 	li:
 		(#{path})
-			a: {"href":"#{path}", "html":"#{name}"}
+			a: {"href":"#{path}"}
+				span: "#{name}"
 		(!#{path})
 			a: {"html":"#{name}"}
 	(#{items})

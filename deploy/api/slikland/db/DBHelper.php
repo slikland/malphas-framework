@@ -65,7 +65,7 @@ class DBHelper
 		return $db->fetch_all($queryData['query'], $queryData['values']);
 	}
 
-	function paginate($data, $viewName = NULL, $searchFields = array())
+	function paginate($data, $viewName = NULL, $searchFields = array(),$order = array())
 	{
 		$index = 0;
 		$numItems = 20;
@@ -73,7 +73,6 @@ class DBHelper
 
 		$fields = array();
 		$where = array();
-		$order = array();
 
 		if(isset($data['_numItems']))
 		{
@@ -83,7 +82,6 @@ class DBHelper
 		{
 			$index = $data['_index'];
 		}
-
 
 		if(isset($data['search']))
 		{
@@ -106,6 +104,10 @@ class DBHelper
 			}
 		}
 
+		if(isset($data['conditions']) && is_array($data['conditions'])){
+			$where = array_merge($where, $data['conditions']);
+		}
+
 		$limit = array($index, $numItems);
 
 		$items = $this->get($viewName, $fields, $where, $order, $limit);
@@ -119,7 +121,7 @@ class DBHelper
 		return $db->fetch_value("SELECT FOUND_ROWS();") + 0;
 	}
 
-	function count($view = NULL)
+	function count($view = NULL,$where = NULL)
 	{
 		if(!$view && $this->selectExecuted)
 		{
@@ -135,7 +137,7 @@ class DBHelper
 		{
 			$schema .= '.' . $view;
 		}
-		$queryData = DBQueryBuilder::select($schema, array('qtd?'=>'count(*)'));
+		$queryData = DBQueryBuilder::select($schema, array('qtd?'=>'count(*)'),$where);
 
 		$db = db();
 		return $db->fetch_value($queryData['query'], $queryData['values']);
@@ -145,7 +147,7 @@ class DBHelper
 	{
 		$value = array();
 		$joins = array();
-		$where = $this->buildWhereConditions($where, $values, $joins);
+		$where = DBQueryBuilder::buildWhereConditions($where, $values, $joins);
 		if($where)
 		{
 			$query = "SELECT 1 FROM {$this->table} WHERE " . $where . ' ';
@@ -161,7 +163,7 @@ class DBHelper
 			$query .= ' LIMIT 1';
 			$db = db();
 			$found = $db->fetch_value($query, $values);
-			if($found && $fonud == '1')
+			if($found && $found == '1')
 			{
 				return TRUE;
 			}
@@ -214,6 +216,7 @@ class DBHelper
 			{
 				if($this->exists($id))
 				{
+					$update = TRUE;
 					if(!$where) $where = array();
 					foreach($id as $k=>$v)
 					{
@@ -227,10 +230,12 @@ class DBHelper
 		{
 			$query = "UPDATE $this->table SET ";
 			$cols = array_combine($keys, $values);
+			$updateValues = array();
 			foreach($cols as $k=>$v)
 			{
-				$query .= "{$k}={$v} ";
+				$updateValues[] = "{$k}={$v} ";
 			}
+			$query .= implode(', ', $updateValues);
 
 			DBQueryBuilder::setSchema($this->table);
 			$where = DBQueryBuilder::buildWhereConditions($where, $valueRefs, $joins);
@@ -241,7 +246,7 @@ class DBHelper
 			return $db->query($query, $valueRefs);
 
 		}else{
-			$query = "INSERT INTO this->table (".implode(',', $keys).") VALUES (".implode(',', $values).")";
+			$query = "INSERT INTO $this->table (".implode(',', $keys).") VALUES (".implode(',', $values).")";
 			return $db->insert($query, $valueRefs);
 		}
 

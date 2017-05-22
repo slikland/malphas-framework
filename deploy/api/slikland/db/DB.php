@@ -55,8 +55,22 @@ class DB{
 		if(!isset($this->mysqli))
 		{
 			$this->mysqli = new \mysqli($this->host, $this->user, $this->pass, $this->name, $this->port);
-			$this->mysqli->query("SET NAMES 'utf8'");
+			$this->mysqli->query("SET NAMES 'utf8';");
+			$time = $this->getTimeDiff();
+			$this->mysqli->query("SET time_zone = '{$time}';");
 		}
+	}
+
+	private function getTimeDiff()
+	{
+		$time = (int)(date_offset_get(new \DateTime()) / 60);
+		$timeArr = array();
+		$min = $time % 60;
+		$hour = abs((int)(($time - $min) / 60));
+		$sign = ($time < 0)?'-':'';
+		while(strlen($min) < 2) $min = '0' . $min;
+		while(strlen($hour) < 2) $hour = '0' . $hour;
+		return $sign . $hour . ':' . $min;
 	}
 
 	public function escapeString($string)
@@ -120,6 +134,15 @@ class DB{
 						}else{
 							$type .= 'd';
 						}
+					}else if(is_bool($param))
+					{
+						$type .= 'i';
+						if($param)
+						{
+							$param = 1;
+						}else{
+							$param = 0;
+						}
 					}else
 					{
 						$type .= 's';
@@ -141,6 +164,18 @@ class DB{
 			}
 			return $statement;
 		}
+	}
+
+	public function getColumns($table)
+	{
+		$columns = $this->fetch_all('SELECT `COLUMN_NAME` name FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA` = ? AND `TABLE_NAME` = ?', array($this->name, $table));
+		$i = count($columns);
+		while($i-- > 0)
+		{
+			$columns[$i] = $columns[$i]['name'];
+		}
+		return $columns;
+
 	}
 
 	public function insert($sql, $params = NULL)

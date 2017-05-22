@@ -20,8 +20,13 @@ class Setting
 		{
 			$name .= '%';
 		}
-		$values = $db->fetch_all("SELECT name, value FROM cms_setting WHERE name LIKE ?", array($name));
-		return $values;
+		$values = $db->fetch_all("SELECT name, value FROM cms_setting WHERE name LIKE ?", array($name), TRUE);
+		$items = array();
+		foreach($values as $value)
+		{
+			$items[$value[0]] = $value[1];
+		}
+		return $items;
 	}
 
 	public static function set($name, $value)

@@ -2,8 +2,15 @@
 session_start();
 set_include_path(__DIR__ . '/');
 
+date_default_timezone_set('America/Sao_Paulo');
+
 $debug = FALSE;
-if(isset($_GET['__debug__']) || preg_match('/(127\.0\.0\.1|localhost|local\.slikland|dev\.s\d+\.slikland)/',$_SERVER['HTTP_HOST']))
+$host = '';
+if(isset($_SERVER['HTTP_HOST']))
+{
+	$host = $_SERVER['HTTP_HOST'];
+}
+if(isset($_GET['__debug__']) || preg_match('/(127\.0\.0\.1|localhost|local\.slikland|dev\.s\d+\.slikland)/',$host))
 {
 	$debug = TRUE;
 	@ini_set('display_errors', 'On');

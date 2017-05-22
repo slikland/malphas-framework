@@ -114,7 +114,7 @@ class User extends \slikland\core\pattern\Singleton
 		return $this->db->fetch_all('SELECT pk_cms_role id, name FROM cms_role WHERE pk_cms_role >= ' . $user['role']);
 	}
 
-	function getList($data)
+	function getList($data, $role = NULL)
 	{
 		if(!$data)
 		{
@@ -134,6 +134,10 @@ class User extends \slikland\core\pattern\Singleton
 		$data['where'] = array();
 		$data['where'][] = 'cu.fk_cms_role >= ' . $user['role'];
 		$data['where'][] = 'cu.status = 1';
+		if(isset($role))
+		{
+			$data['where'][] = 'cu.fk_cms_role = ' . $role;
+		}
 		$list = $this->db->getList('
 			SELECT 
 				cu.pk_cms_user id, 

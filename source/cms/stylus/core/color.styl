@@ -60,4 +60,13 @@ generateColors(lightenAmount = 0)
 					else
 						color: #FFFFFF
 
+getColor(index, lightenAmount = 0, opacity = 1)
+	color = colors[index - 1]
+	if lightenAmount != 0
+		color = lighten(color, lightenAmount)
+	if opacity < 1
+		color = alpha(color, opacity)
+	color
+color = getColor(1)
+
 generateColors(0)

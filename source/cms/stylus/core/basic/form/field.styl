@@ -28,6 +28,9 @@ field
 		border-bottom: 2px solid #EEEEEE
 		background: transparent
 		transition: border-color 0.1s, border-left-color 0.1s, border-right-color 0.1s, border-top-color 0.1s, border-bottom-color 0.1s
+	select
+		margin-top: 1em
+	
 	validation
 		display: none
 		
@@ -59,8 +62,12 @@ field
 	&.invalid
 		input
 			border-bottom-color: colors[0]
+	&.color
+		input
+			height: 2em
+			padding: 0
 			
-	&.select
+	&.select, &.file, &.color
 		label
 			opacity: 1
 			font-size: 0.8em

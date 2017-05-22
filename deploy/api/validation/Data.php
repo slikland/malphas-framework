@@ -10,7 +10,7 @@ class Data
 	*/
 	public static function required($value)
 	{
-		return isset($value);
+		return isset($value) && !empty($value);
 	}
 
 }

@@ -1,15 +1,15 @@
 <?php
 namespace slikland\core\pattern;
-class Singleton
+abstract class Singleton
 {
-	private static $instance = NULL;
-	final public static function getInstance()
+	protected static $instances = array();
+	public static function getInstance()
 	{
-		if(!self::$instance)
+		$class = get_called_class();
+		if(!@self::$instances[$class])
 		{
-			$c = static::class;
-			self::$instance = new $c;
+			self::$instances[$class] = new $class;
 		}
-		return self::$instance;
+		return self::$instances[$class];
 	}
 }

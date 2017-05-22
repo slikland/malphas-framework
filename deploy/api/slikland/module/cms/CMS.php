@@ -57,7 +57,7 @@ class CMS
 	{
 		$userModule = get_module('cms/User');
 		$user = $userModule->getCurrent();
-		$rPath = ROOT_PATH . 'cms/templates/pages/';
+		$rPath = ROOT_PATH . CMS_PATH . 'templates/pages/';
 		$pages = array();
 		$files = \slikland\fs\File::listDir($rPath);
 		foreach($files as &$file)

@@ -1,5 +1,21 @@
 <?php
 
+if (!function_exists('getallheaders')) 
+{ 
+    function getallheaders() 
+    { 
+           $headers = ''; 
+       foreach ($_SERVER as $name => $value) 
+       { 
+           if (substr($name, 0, 5) == 'HTTP_') 
+           { 
+               $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value; 
+           } 
+       } 
+       return $headers; 
+    } 
+}
+
 if(!function_exists('isAssoc'))
 {
 	function isAssoc($arr)
@@ -77,19 +93,19 @@ function setOutputFormat($format = 'json')
 	switch(strtolower($format))
 	{
 		case 'html':
-			set_header('Content-type: text/html');
+			set_header('Content-type: text/html; charset=utf-8');
 			header('Content-type: text/html');
 			break;
 		case 'download':
-			set_header('Content-type: application/octet-stream');
+			set_header('Content-type: application/octet-stream; charset=utf-8');
 			header('Content-type: application/octet-stream');
 			break;
 		case 'json':
-			set_header('Content-type: text/json');
+			set_header('Content-type: text/json; charset=utf-8');
 			header('Content-type: text/json');
 			break;
 		default:
-			set_header('Content-type: text/plain');
+			set_header('Content-type: text/plain; charset=utf-8');
 			header('Content-type: text/plain');
 			break;
 	}
@@ -98,7 +114,7 @@ function setOutputFormat($format = 'json')
 
 function outputFileName($name)
 {
-	set_header('Content-Disposition: attachment; filename="'.$name.'"');
+	set_header('Content-Disposition: attachment; filename="'.$name.'"; charset=utf-8');
 }
 
 function debug()

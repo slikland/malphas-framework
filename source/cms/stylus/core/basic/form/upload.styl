@@ -1,0 +1,23 @@
+upload
+	display: inline-block
+	width: 100%
+	height: 5em
+	background-color: rgba(0, 0, 0, 0.1)
+	border: 2px dashed rgba(0, 0, 0, 0.2)
+	padding: 1em
+	cursor: pointer
+	&.accept
+		background-color: getColor(5, 10, 0.3)
+		border-color: getColor(5, 5, 0.4)
+	&.deny
+		background-color: getColor(1, 10, 0.3)
+		border-color: getColor(1, 5, 0.4)
+		
+	&>*
+		pointer-events: none
+
+	placeholder
+		@extend .center-content
+		display: inline-block
+		width: 100%
+		height: 100%

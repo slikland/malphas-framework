@@ -8,10 +8,12 @@ card#card1:
 		field: 
 			label: "Busca"
 			input: {"for":"user_list", "name":"search"}
-		group: {"service":"../api/cms/user/getUsers", "id":"user_list"}
-			>userCard: #{items}
+		group: {"service":"#{@apiPath}cms/user/getUsers", "id":"user_list"}
+			fieldset: #{items}
+				legend: "#{name}"
+				>userCard: #{items}
 <userCard
-	card.col-1_3:
+	card.col-1_3.even-height:
 		content: 
 			div.left: {"style":"font-size: 50px;color: #CCCCCC;"}
 				i.fa.fa-user:
@@ -29,6 +31,6 @@ card#card1:
 					a.text-center.text-3: {"style":"width: 1em;display:inline-block;"}
 						i.fa.fa-user
 				(#{@user.data.id} != #{id})
-					a.text-center.text-1: {"style":"width: 1em;display:inline-block;","confirm":"Deseja realmente remover este usuário?","action":"../api/cms/user/remove/#{id}","success":"refresh"}
+					a.text-center.text-1: {"style":"width: 1em;display:inline-block;","confirm":"Deseja realmente remover este usuário?","action":"#{@apiPath}cms/user/remove/#{id}","success":"refresh"}
 						i.fa.fa-user-times
 						tooltip: "Remover usuário"

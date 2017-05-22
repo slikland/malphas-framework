@@ -4,8 +4,18 @@ class ServiceAnnotations
 {
 	public static function check_permission($data)
 	{
-		array(get_module('cms/User'), 'checkPermission');
+		call_user_func(array(get_module('cms/User'), 'checkPermission'), $data);
+	}
 
+	public static function authenticate($data)
+	{
+		$user = get_module('cms/User');
+		$user = $user->getCurrent();
+		if(!$user)
+		{
+			header('Location: ' . CMS_URL . '?__redirect__=' . rawurlencode(CURRENT_URL));
+			die();
+		}
 	}
 
 	public static function request_method($data, &$params)

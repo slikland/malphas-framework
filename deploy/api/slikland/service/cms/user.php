@@ -77,9 +77,18 @@ class user
 
 	function getUsers($data)
 	{
-		$list = $this->module->getList($data);
-		$list['params'] = $data;
-		return $list;
+		$roles = $this->module->getRoles();
+		$response = array();
+		$items = array();
+		foreach($roles as $role)
+		{
+			$roleData = array();
+			$roleData['name'] = $role['name'];
+			$users = $this->module->getList($data, $role['id']);
+			$roleData['items'] = $users['items'];
+			$items[] = $roleData;
+		}
+		return array('items'=>$items);
 	}
 
 	function getRoles()
@@ -137,12 +146,4 @@ class user
 		return $list;
 	}
 
-	function test()
-	{
-		$db = db();
-		$db->query('UPDATE cms_user SET email = ? WHERE pk_cms_user = ?', array('test', '3'));
-		$a = $db->fetch_all('SELECT * FROM cms_user WHERE pk_cms_user = ?', array("3"));
-		var_dump($a);
-		var_dump($db->query("SELECT * FROM cms_user WHERE pk_cms_user = ?;", array('1')));
-	}
 }

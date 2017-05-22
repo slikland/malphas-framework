@@ -71,6 +71,7 @@ class DBQueryBuilder
 					continue;
 				}else{
 					$fieldData = self::getField($v);
+					$fieldData['alias'] = $k;
 				}
 			}else{
 				$fieldData = self::getField($k);
@@ -347,40 +348,43 @@ class DBQueryBuilder
 		}else{
 
 			$viewData = self::parseSchema($schema, $view);
-
-			$fieldValue = $viewData['fields'][$field];
-			$alias = $field;
-			if(preg_match('/\?$/', $alias))
+			if(isset($viewData['fields'][$field]))
 			{
-				$alias = preg_replace('/\?$/', '', $alias);
-				$field = $fieldValue;
-			}else{
-				if(is_null($fieldValue))
+				
+				$fieldValue = $viewData['fields'][$field];
+				$alias = $field;
+				if(preg_match('/\?$/', $alias))
 				{
-					return NULL;
-				}
-				if(is_bool($fieldValue))
-				{
-					if($fieldValue === FALSE)
+					$alias = preg_replace('/\?$/', '', $alias);
+					$field = $fieldValue;
+				}else{
+					if(is_null($fieldValue))
 					{
 						return NULL;
 					}
-					if($schema != self::$_schema)
+					if(is_bool($fieldValue))
 					{
-						if(isset(self::$_usedRefs[$schema]))
+						if($fieldValue === FALSE)
 						{
-							$ref = self::$_usedRefs[$schema][0];
+							return NULL;
+						}
+						if($schema != self::$_schema)
+						{
+							if(isset(self::$_usedRefs[$schema]))
+							{
+								$ref = self::$_usedRefs[$schema][0];
+							}
 						}
 					}
-				}
-				if(is_string($fieldValue))
-				{
-					if(preg_match('/^[^\.]+.[^\.]+/', $fieldValue))
+					if(is_string($fieldValue))
 					{
-						$fieldData = self::getField($fieldValue);
-						$field = $fieldData['field'];
-						$schema = $fieldData['schema'];
-						$ref = $fieldData['ref'];
+						if(preg_match('/^[^\.]+.[^\.]+/', $fieldValue))
+						{
+							$fieldData = self::getField($fieldValue);
+							$field = $fieldData['field'];
+							$schema = $fieldData['schema'];
+							$ref = $fieldData['ref'];
+						}
 					}
 				}
 			}
@@ -415,7 +419,6 @@ class DBQueryBuilder
 					continue;
 				}
 				$fieldData = self::getField($match[2]);
-
 				if(isset($fieldData['ref']) && !empty($fieldData['ref']))
 				{
 					if(!isset($refs[$fieldData['schema']]))
@@ -423,7 +426,6 @@ class DBQueryBuilder
 						$refs[$fieldData['schema']] = $fieldData['ref'];
 					}
 				}
-
 				$name = "`{$fieldData['schema']}`.`{$fieldData['field']}`";
 				$value = $v;
 				$cond = ' ' . $name;
@@ -433,7 +435,6 @@ class DBQueryBuilder
 					$values = array_merge($values, $value);
 
 				}else{
-
 					switch($match[3])
 					{
 						case '!':
@@ -478,6 +479,8 @@ class DBQueryBuilder
 		{
 			$where = self::clearWhereConditions($where);
 		}
+
+
 		return $where;
 	}
 
@@ -501,13 +504,27 @@ class DBQueryBuilder
 		{
 			$dir = 'ASC';
 
-			preg_match('/^(\-?)(.*?)$/', $item, $match);
-			$value = $match[2];
+			preg_match('/^(\??)(\-?)(.*?)$/', $item, $match);
+			$value = $match[3];
 			if(isset($match[1]) && !empty($match[1]))
 			{
-				$dir = 'DESC';
+				$orders[] = $value;
+			}else{
+
+				if(isset($match[2]) && !empty($match[2]))
+				{
+					$dir = 'DESC';
+				}
+
+				if(preg_match("/(RAND\()/", $item))
+				{
+					$orders[] = $item;
+				}else
+				{
+					$orders[] = '`'.$value.'` ' . $dir;	
+				}
 			}
-			$orders[] = '`'.$value.'` ' . $dir;
+			
 		}
 
 		if(count($orders) > 0)

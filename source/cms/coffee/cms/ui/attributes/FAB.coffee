@@ -20,7 +20,6 @@ class FAB extends cms.ui.Base
 				setTimeout(@_setPosition, 100)
 		_setPosition:()=>
 			@_target = document.querySelector('#' + @attr('on'))
-			console.log(@_target)
 			@_position = 'TR'
 			if @attr('position')
 				@_position = @attr('position')
@@ -40,11 +39,9 @@ class FAB extends cms.ui.Base
 				return
 			@_checkPositionTicker = window.requestAnimationFrame(@_checkPosition)
 
-
 			bounds = @_getTargetBounds(@_target)
 			pBounds = @_element.parentNode.getBoundingClientRect()
 			bBounds = @getBounds()
-
 
 			t = bounds.top + bBounds.height * 0.25
 			l = bounds.left

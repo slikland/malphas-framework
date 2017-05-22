@@ -1,6 +1,6 @@
 modal:
 	card:{"width": "300"}
-		form:{"action":"../api/cms/user/login"}
+		form:{"action":"#{@apiPath}cms/user/login"}
 			header.bg-primary:
 				align:
 					span: {"html":"Login", "align": "bl"}
@@ -25,4 +25,3 @@ modal:
 						required: {"message": "Este campo não pode estar vazio"}
 			footer.text-right:
 				button.bg-secondary: {"style":"width: 100%;", "html": "ENTRAR"}
-				a.text-small: {"html":"Esqueci minha senha", "template":"user/forgot", "templateTarget": "body"}

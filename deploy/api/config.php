@@ -4,6 +4,7 @@ $config = array();
 
 $cofig['db_host'] = '';
 
+$config['cms_path'] = 'manager/admin/';
 //TEMP
 
 define('CMS_SESSION_TIMEOUT', 100000000);

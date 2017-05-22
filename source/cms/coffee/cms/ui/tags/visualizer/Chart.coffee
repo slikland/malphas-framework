@@ -16,6 +16,7 @@ class ChartHelper extends cms.ui.Base
 		@_destroyPlugin:(item)->
 
 		constructor:(element)->
+			console.log({a: element})
 			super({element: element})
 
 			if (w = @attr('width'))
@@ -35,6 +36,10 @@ class ChartHelper extends cms.ui.Base
 			@_element.on('updated', @_update)
 
 			window.addEventListener('resize', @_resize)
+			itemData = element.itemData
+			if itemData && itemData.type?
+				@_update({data: itemData})
+
 
 		_update:(e)=>
 			data = e.data
@@ -46,9 +51,24 @@ class ChartHelper extends cms.ui.Base
 				data.options = {}
 			data.options.responsive = false
 			data.options.maintainAspectRatio = false
+			data.options.tooltips = {
+				callbacks: {
+					label: @_labelTooltip
+					title: @_labelTooltipTitle
+				}
+			}
+			data = @_parseFunctions(data)
 			@_chart = new Chart(@_canvas, data)
 			@_chart.onHover = @_mouseMove
 			@_chart.onMouseMove = @_mouseMove
+		_parseFunctions:(data)=>
+			for k, v of data
+				if typeof(v) == 'string'
+					if /function\s*\(/.test(v)
+						data[k] = eval('(' + v + ')')
+				else if typeof(v) == 'object'
+					data[k] = @_parseFunctions(v)
+			return data
 		_resize:()=>
 			bounds = @getBounds()
 			@_canvas.setAttribute('width', bounds.width)
@@ -59,3 +79,25 @@ class ChartHelper extends cms.ui.Base
 				@_chart.chart.width = bounds.width
 				@_chart.chart.height = bounds.height
 				@_chart.update(0)
+		_labelTooltipTitle:(tooltip, data)=>
+			if Array.isArray(tooltip)
+				tooltip = tooltip[0]
+			item = data.datasets[tooltip.datasetIndex].data[tooltip.index]
+			if item.title?
+				return item.title
+			return ''
+		_labelTooltip:(tooltip, data)=>
+			item = data.datasets[tooltip.datasetIndex].data[tooltip.index]
+			if item.label?
+				return item.label
+			else
+				if Array.isArray(item)
+					return item.join(', ')
+				else
+					labels = []
+					for k, v of item
+						if typeof(v) != 'string' && isNaN(v)
+							continue
+						labels.push(k + ': ' + v)
+					return labels.join(', ')
+			return ''

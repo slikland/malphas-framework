@@ -305,7 +305,6 @@ class Block
 
 		if($test)
 		{
-			var_dump($object);
 			return (Boolean)($object);
 		}
 

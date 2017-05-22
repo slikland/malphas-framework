@@ -42,6 +42,12 @@ class ServiceController
 				$data = array_merge($data, $_FILES);
 			}
 
+			if($inputData = file_get_contents('php://input'))
+			{
+				$inputData = json_decode($inputData, TRUE);
+				$data = array_merge($data, array('data'=>$inputData));
+			}
+
 			$response = $class->$method($data);
 
 			foreach($annotations[\slikland\core\AnnotationParser::AFTER] as $annotation)

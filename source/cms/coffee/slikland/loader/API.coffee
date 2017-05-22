@@ -7,6 +7,7 @@ class API extends EventDispatcher
 	@ERROR: 'apiError'
 	@PROGRESS: 'apiProgress'
 	@_interceptors: []
+	@_cachedURLs: {}
 
 	@_request:()->
 		if window.XMLHttpRequest then return new XMLHttpRequest()
@@ -59,6 +60,28 @@ class API extends EventDispatcher
 			if interceptor.regex.test(url)
 				interceptor.callback?(data, url)
 
+	@_cacheURL:(url, scope)->
+		console.log(url)
+		if @_cachedURLs[url]
+			return false
+		iframe = document.createElement('iframe')
+		iframe.style['position'] = 'absolute'
+		iframe.style['left'] = '-10000px'
+		document.body.appendChild(iframe)
+		iframe.addEventListener('load', @_iframeLoaded)
+		iframe.scope = scope
+		iframe.src = url
+	@_iframeLoaded:(e)=>
+		iframe = e.currentTarget
+		scope = iframe.scope
+		@_cachedURLs[iframe.getAttribute('src')] = true
+		iframe.removeEventListener('load', @_iframeLoaded)
+		iframe.scope = null
+		if iframe.parentNode
+			iframe.parentNode.removeChild(iframe)
+		scope.submit(scope._data)
+
+
 
 	# FORM
 	# URL
@@ -66,7 +89,7 @@ class API extends EventDispatcher
 
 	constructor: (arg) ->
 		super
-		@TYPES = ['normal', 'json']
+		@TYPES = ['normal', 'json', 'binary']
 		@_headers = []
 		@_reuse = true
 		@_method = 'POST'
@@ -82,6 +105,11 @@ class API extends EventDispatcher
 			@_url = arg
 		else if arg?
 			throw new Error('The API constructor argument needs to be a URL string or a Form element.')
+
+	@get url:()->
+		return @_url
+	@set url:(value)->
+		@_url = value
 
 	@get reuse:()->
 		return @_reuse
@@ -133,8 +161,16 @@ class API extends EventDispatcher
 		@submit(data)
 
 	submit:(data = null)=>
+		@_currentProgress = 0
 		@_data = data
 		if @_submitting
+			return
+		url = @_url || ''
+		if @_form
+			if @_form.hasAttribute('action')
+				url = @_form.getAttribute('action')
+
+		if /\W?login\W?/.test(url) && @constructor._cacheURL(url, @)
 			return
 		@_submitting = true
 
@@ -145,16 +181,14 @@ class API extends EventDispatcher
 			@_form = data.element
 			data = null
 
-		url = @_url || ''
 		if @_form
-			if @_form.hasAttribute('action')
-				url = @_form.getAttribute('action')
 			if @_form.hasAttribute('enctype')
 				@addHeader('Content-type', @_form.getAttribute('enctype'))
 			if @_form.hasAttribute('method')
 				@method = @_form.getAttribute('method')
 			if @_form.hasAttribute('type') && @_form.getAttribute('type') == 'json'
-				@addHeader('Content-type', 'application/json;charset=UTF-8')
+				# @addHeader('Content-type', 'application/json;charset=UTF-8')
+				@addHeader('Content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
 				data = JSON.stringify(@_parseJSON(@_form))
 			else
 				data = new FormData(@_form)
@@ -164,13 +198,16 @@ class API extends EventDispatcher
 				if !data
 					data = new FormData()
 				if data && !(data instanceof FormData)
-					d = new FormData();
+					d = new FormData()
 					d.append n, v for n, v of data
 					data = d
 			else if @_type == 'json'
-				@addHeader('Content-type', 'application/json;charset=UTF-8')
+				# @addHeader('Content-type', 'application/json;charset=UTF-8')
+				@addHeader('Content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
 				data = JSON.stringify(data)
-
+			else if @_type == 'binary'
+				@addHeader('Content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
+				@method = 'POST'
 
 		getValues = {}
 		urlParams = window.location.search
@@ -235,10 +272,13 @@ class API extends EventDispatcher
 		p *= 0.5
 		if e.currentTarget != @_request.upload
 			p += 0.5
-		@_loading?.progress = p
+		p *= 0.7
 		@_triggerProgress(p)
 	_triggerProgress:(progress)->
-		@trigger(API.PROGRESS, {loaded: progress, total: 1, progress: progress})
+		if progress > @_currentProgress
+			@_currentProgress = progress
+		@_loading?.progress = @_currentProgress
+		@trigger(API.PROGRESS, {loaded: progress, total: 1, progress: @_currentProgress})
 
 	_parseJSON:(form)->
 		@_parsedElements = []
@@ -291,12 +331,23 @@ class API extends EventDispatcher
 		if !@_reuse
 			@off()
 	_loaded:(e)=>
-		if e.currentTarget.readyState == 4
+		target = e.currentTarget
+		t = target.responseText || ''
+		if /__p[\d\.]+__/.test(t)
+			re = /__p([\d\.]+)__/g
+			p = 0
+			while o = re.exec(t)
+				p = Number(o[1])
+			@_triggerProgress(0.7 + p * 0.3)
+
+		if target.readyState == 4
 			@_submitting = false
-			if e.currentTarget.status == 200
+			if target.status == 200
 				@_triggerProgress(1)
 
-				response = e.currentTarget.responseText || e.currentTarget.response || ''
+				response = target.responseText || target.response || ''
+				response = response.replace(/__p([\d\.]+)__\s*\n?/g, '')
+
 				try 
 					data = eval('(' + response + ')')
 				catch e

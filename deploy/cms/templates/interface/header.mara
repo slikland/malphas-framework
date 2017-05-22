@@ -3,4 +3,7 @@ h1:
 aside:
 	tag: {"html":"#{user.roleName}"}
 	span: {"html":"#{user.name}"}
-	button.button-1: {"html":"Log out","action":"../api/cms/user/logout"}
+	a.text-3:{"href":"cms/user/edit", "style":"margin-right: 1em"}
+		i.fa.fa-edit
+		tooltip: {"html":"Editar perfil", "align":"B"}
+	button.button-1: {"html":"Log out","action":"#{@apiPath}cms/user/logout"}

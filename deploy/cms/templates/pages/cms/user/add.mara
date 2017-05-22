@@ -1,7 +1,12 @@
 card.col-1_2:
 	header: "Adicionar usuário"
-	form: {"action":"../api/cms/user/edit","success":"cms/users"}
+	form: {"action":"#{@apiPath}cms/user/edit","success":"cms/users"}
 		content:
+			group:
+				field.col-1_2:
+					label: "Nível"
+					select: {"service": "#{@apiPath}cms/user/getRoles", "name":"role"}
+						option: {"html": "#{name}", "value":"#{id}"}
 			@user/userFormContent 
 		footer.text-right:
 			button: "Adicionar"

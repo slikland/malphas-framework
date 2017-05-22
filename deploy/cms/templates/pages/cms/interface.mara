@@ -9,8 +9,8 @@ card:
 				input: {"name":"title"}
 		footer.text-right:
 			button: 'Salvar'
-card: {"service":"../api/cms/cms/getPages"}
-	form: {"type":"json","action":"../api/cms/cms/updateMenu", "success":"reload"}
+card: {"service":"#{@apiPath}cms/cms/getPages"}
+	form: {"type":"json","action":"#{@apiPath}cms/cms/updateMenu", "success":"reload"}
 		content:
 			card.col-1_2
 				header:

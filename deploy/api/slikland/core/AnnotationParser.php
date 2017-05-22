@@ -14,6 +14,8 @@ class AnnotationParser
 
 	public static function parseAnnotations($class, $method = NULL)
 	{
+		include_once('vendors/Spyc.php');
+
 		if($method)
 		{
 			$refl = new \ReflectionMethod($class, $method);
@@ -24,22 +26,30 @@ class AnnotationParser
 		$doc = preg_replace('/\/\*\*(?:\s*\n)*([\s\S]*?)(?:\n\s*)*\*\//m', '$1', $doc);
 
 		$doc = \slikland\utils\StringUtils::blockTrim($doc) . "\n";
-		preg_match_all('/^\@(.*?)(?:\s|$)((?:.*?$)(?:\n\s+.*)*)/ms', $doc, $annotations, PREG_SET_ORDER);
+		preg_match_all('/^\@(.*?)(?:\s|$)(?:(?!\@)((?:.*?$)(?:\n\s+.*)*))/ms', $doc, $annotations, PREG_SET_ORDER);
 
 		if(!$annotations || count($annotations) == 0)
 		{
 			return NULL;
 		}
+
 		$arr = array();
 		foreach($annotations as $annotation)
 		{
 			$name = trim($annotation[1]);
-			$data = trim($annotation[2]);
+			$data = \slikland\utils\StringUtils::blockTrim($annotation[2]);
 			if(empty($data))
 			{
-				$data = NULL;
+				$data = FALSE;
 			}else{
-				if(!($data = @json_decode($data, TRUE)))
+				$tmpData = FALSE;
+				if(($tmpData = @json_decode($data, TRUE)))
+				{
+					$data = $tmpData;
+				}else if($tmpData = @spyc_load($data))
+				{
+					$data = $tmpData;
+				}else
 				{
 					$data = array(trim($annotation[2]));
 				}
@@ -51,9 +61,13 @@ class AnnotationParser
 		return $arr;
 	}
 
-	public static function getAnnotations($class, $method = NULL)
+	public static function getAnnotations($class, $method = NULL, $raw = FALSE)
 	{
 		$parsedAnnotations = self::parseAnnotations($class, $method);
+		if($raw)
+		{
+			return $parsedAnnotations;
+		}
 		$annotations = array(self::BEFORE => array(), self::AFTER => array());
 		foreach($annotations as $k=>&$aOrder)
 		{
@@ -70,7 +84,7 @@ class AnnotationParser
 
 	public static function getData($class, $method, $name)
 	{
-		$annotations = self::getAnnotations($class, $method);
+		$annotations = self::getAnnotations($class, $method, TRUE);
 		return @$annotations[$name];
 	}
 

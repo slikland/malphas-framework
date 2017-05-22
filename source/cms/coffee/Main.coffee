@@ -27,6 +27,7 @@ class Main
 		
 		app.body = new BaseDOM({element: document.body})
 		app.rootPath = window.rootPath || '../';
+		app.apiPath = window.apiPath || app.rootPath + 'api/';
 		app.template = new slikland.Mara('templates/')
 		slikland.Mara.setGlobalObject('@', app)
 		app.templateContext = document.body

@@ -30,6 +30,7 @@ class Form extends cms.ui.Base
 			@_clearMessage()
 
 		_submit:(e)=>
+			@_clearFieldMessages()
 			if e.defaultPrevented
 				e.stopImmediatePropagation()
 				return
@@ -63,6 +64,45 @@ class Form extends cms.ui.Base
 
 		_apiError:(e, data)=>
 			@_showMessage(data?.message)
+			if Array.isArray(data.data)
+				for item in data.data
+					if item?.field
+						@_showFieldMessage(item.field, item.message)
+		_showFieldMessage:(fieldName, message, type = 1)->
+			field = @find('[name="'+fieldName+'"]')?.findParents('field')
+
+			if !field
+				return
+			if field.__instance__
+				field = field.__instance__
+			else
+				return
+
+			messageField = field.find('.validation-message')
+			field.removeClass('valid')
+			field.addClass('invalid')
+			if !messageField
+				messageField = new BaseDOM({element: 'div', className: 'validation-message'})
+				field.appendChild(messageField)
+			else
+				if messageField.__instance__
+					messageField = messageField.__instance__
+				else
+					messageField = new BaseDOM({element: messageField})
+			messageField.css({display: ''})
+			messageField.html = message
+
+		_clearFieldMessages:()->
+			fields = @findAll('field .validation-message')
+			for field in fields
+				if field.__instance__
+					field = field.__instance__
+				else
+					field = new BaseDOM({element: field})
+				field.css({display: 'none'})
+				field.findParents('field').__instance__.removeClass('invalid')
+				field.html = ''
+
 		_showMessage:(message, type = 1)->
 			if !@_messageField
 				if !message || message.length == 0

@@ -1,6 +1,6 @@
 modal:
 	card:{"width": "300"}
-		form:{"action":"../api/cms/user/forgot"}
+		form:{"action":"#{@apiPath}cms/user/forgot"}
 			header: {"background": "#455a64"}
 				align:
 					span: {"html":"Esqueci minha senha", "align": "bl"}

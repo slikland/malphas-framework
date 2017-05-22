@@ -235,6 +235,7 @@ class Block
 					if typeof(k) in ['string', 'number']
 						if v
 							el.setAttribute(k, v)
+				el.itemData = item
 				el.data = data
 				el.setAttribute('mara', @_maraId)
 				if @_id

@@ -25,26 +25,32 @@ class Validator
 				if(method_exists($cName, $vName) && ($result = @call_user_func(array($cName, $vName), $value, $validationData)) !== TRUE)
 				{
 					$response = array();
-					if(is_bool($result))
+					if(isset($validationData['message']))
 					{
-						$message = \slikland\core\AnnotationParser::getData($cName, $vName, 'message');
-						if(!empty($message))
-						{
-							if(is_array($message))
-							{
-								$message = $message[0];
-							}
-						}
-						$response['message'] = $message;
-					}elseif(is_string($result))
-					{
-						$response['message'] = $result;
+						$response['message'] = $validationData['message'];
 					}else{
-						$response = (array)$result;
+						if(is_bool($result))
+						{
+							$message = \slikland\core\AnnotationParser::getData($cName, $vName, 'message');
+							if(!empty($message))
+							{
+								if(is_array($message))
+								{
+									$message = $message[0];
+								}
+							}
+							$response['message'] = $message;
+						}elseif(is_string($result))
+						{
+							$response['message'] = $result;
+						}else{
+							$response = (array)$result;
+						}
 					}
 					$response['field'] = $k;
 					$response['type'] = $validationName;
 					$validation[] = $response;
+					break;
 				}
 			}
 		}
