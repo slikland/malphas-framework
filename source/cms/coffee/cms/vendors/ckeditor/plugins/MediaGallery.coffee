@@ -43,7 +43,6 @@ class MediaGallery
 		upcast:(element)=>
 			return element.hasClass('mediagallery')
 		edit:()->
-			console.log('>>', arguments)
 			return @template
 	class WidgetInstance
 		constructor:(instance)->
@@ -73,7 +72,6 @@ class MediaGallery
 				return
 			@_editor.getSelection().selectElement(@_wrapper)
 		_emptyRemoveable:()=>
-			console.log("REMOVEABLE")
 			return false
 
 CKEDITOR.plugins.add( 'mediagallery', new components.ckeditor.plugins.MediaGallery());

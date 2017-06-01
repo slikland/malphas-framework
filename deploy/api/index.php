@@ -15,6 +15,7 @@ if(isset($_GET['__debug__']) || preg_match('/(127\.0\.0\.1|localhost|local\.slik
 	$debug = TRUE;
 	@ini_set('display_errors', 'On');
 	@error_reporting(E_ALL);
+	@error_reporting(E_ALL ^ E_DEPRECATED);
 }else{
 	@ini_set('display_errors', 'Off');
 	@error_reporting(0);

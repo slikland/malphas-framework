@@ -24,15 +24,20 @@ class Sort extends cms.ui.Base
 			@_sortButton.appendChild(@_icon)
 			@_sortOrder = document.createElement('sup')
 			@_sortButton.appendChild(@_sortOrder)
-			if @attr('for')
-				@_target = document.querySelector('#' + @attr('for'))
-			else
-				@_target = @findParents('[service]')
+			@_getTarget()
 			@_parseParam()
 
 			@_element.on('click', @_click)
 			@_element.on('update', @_update)
 			@appendChild(@_sortButton)
+		_getTarget:()->
+			if @attr('for')
+				@_target = document.querySelector('#' + @attr('for'))
+				@_parentTarget = @_target.parentNode
+			else
+				@_target = @findParents('[service]')
+				@_parentTarget = @_target
+
 		_parseParam:()=>
 			if (targetId = @_target.getAttribute('id'))
 				data = app.router.getParam(targetId)
@@ -52,7 +57,7 @@ class Sort extends cms.ui.Base
 				@_update()
 
 		_resetOthers:()=>
-			items = @_target.querySelectorAll('[sort]')
+			items = @_parentTarget.querySelectorAll('[sort]')
 			i = items.length
 			while i-- > 0
 				items[i].sortOrder = null
@@ -61,12 +66,13 @@ class Sort extends cms.ui.Base
 					continue
 				items[i].value = null
 		_updateAll:()->
-			items = @_target.querySelectorAll('[sort]')
+			items = @_parentTarget.querySelectorAll('[sort]')
 			i = items.length
 			while i-- > 0
 				items[i].trigger('update')
 
 		_update:()=>
+			@_getTarget()
 			if !@_element.value
 				@_element.removeAttribute('value')
 			else
@@ -87,7 +93,7 @@ class Sort extends cms.ui.Base
 				value = @_name
 
 			if e.metaKey
-				items = ArrayUtils.toArray(@_target.querySelectorAll('[sort][value]'))
+				items = ArrayUtils.toArray(@_parentTarget.querySelectorAll('[sort][value]'))
 				items.sort(@_sortByOrder)
 				index = items.length
 				i = items.length

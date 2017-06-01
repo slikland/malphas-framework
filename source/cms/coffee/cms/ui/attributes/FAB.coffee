@@ -32,7 +32,6 @@ class FAB extends cms.ui.Base
 			window.cancelAnimationFrame(@_checkPositionTicker)
 
 		_scroll:()=>
-			console.log('scroll')
 
 		_checkPosition:()=>
 			if !@_target || !@_element.parentNode

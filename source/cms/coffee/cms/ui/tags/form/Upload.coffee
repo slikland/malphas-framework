@@ -15,23 +15,58 @@ class Upload extends cms.ui.Base
 
 		constructor:(element)->
 			super
+			@_loading = new cms.ui.Loading()
+			@_loading.reset()
+			@_loading.hide()
+			@appendChild(@_loading)
 			accept = (@attr('accept') || '').trim()
 			@_apiPath = @attr('api') || app.apiPath + 'upload'
 			if !accept || accept.length == 0
 				accept = '*/*'
 
-			accept = accept.split(/(,|;)/)
+			accept = accept.split(/,|;/)
+			@_acceptStr = accept.join(',')
 			for k, v of accept
 				accept[k] = v.replace(/\./g, '\\.').replace(/\*/g, '[^/]*').replace(/\//g, '\\/')
 			@_accept = new RegExp('(' + accept.join('|') + ')', 'i')
 
 			@_maxSize = Number(@attr('maxSize') || 2000000) * 0.95
+			
+			@_input = document.createElement('input')
+			@_input.setAttribute('name', @attr('name'))
+			@_input.setAttribute('type', 'hidden')
+			@appendChild(@_input)
+
+			@_container = document.createElement('div')
+			@_container.className = 'container'
+			if el = @find('placeholder')
+				@_container.appendChild(el)
+			if el = @find('preview')
+				@_container.appendChild(el)
+			@appendChild(@_container)
 
 			@element.on('drop', @_drop)
 			@element.on('dragenter', @_dragEnter)
 			@element.on('dragleave', @_dragLeave)
 			@element.on('dragover', @_dragOver)
-			# @element.on('dragend', @_dragEnd)
+			@_container.on('click', @_click)
+
+
+			@_deleteBtn = document.createElement('a')
+			@_deleteBtn.className = 'delete-btn'
+			deleteIcon = document.createElement('i')
+			deleteIcon.className = 'fa fa-trash text-1'
+			@_deleteBtn.on('click', @_remove)
+			@_deleteBtn.appendChild(deleteIcon)
+			@appendChild(@_deleteBtn)
+
+
+			if @attr('value')
+				@_setValue(@attr('value'))
+
+		_remove:()=>
+			@_setValue(null)
+
 		upload:()->
 			if @_uploading
 				return
@@ -52,10 +87,12 @@ class Upload extends cms.ui.Base
 				@_api.reuse = true
 				@_api.type = 'binary'
 				@_api.on(API.COMPLETE, @_chunkUploadComplete)
+				@_api.on(API.PROGRESS, @_chunkProgress)
 				@_api.on(API.ERROR, @_chunkUploadError)
 			@_apiStarter.submit(@_items)
 		_apiStarted:(e, data)=>
-			@_uploadId = data
+			@_loading.show()
+			@_uploadId = data.id
 			@_apiUploadURL = @_apiPath + '/' + @_uploadId + '/'
 			@_splitChunks()
 			@_uploadNextChunk()
@@ -71,11 +108,17 @@ class Upload extends cms.ui.Base
 				b = @_buffer.slice(init, end)
 				@_chunks.push({buffer: b, index: init})
 				i = end
+			@_numChunks = @_chunks.length
+
+		_chunkProgress:(e)=>
+			p = 1 - ((@_chunks.length + 1) / @_numChunks) + e.progress / @_numChunks
+			@_loading.progress = p
 
 		_uploadNextChunk:()->
 			if @_chunks.length == 0
 				@_completeUpload()
 				return
+			@_loading.progress = 1 - ((@_chunks.length) / @_numChunks)
 			chunk = @_chunks.shift()
 			@_api.url = @_apiUploadURL + chunk.index
 			@_api.submit(chunk.buffer)
@@ -85,12 +128,29 @@ class Upload extends cms.ui.Base
 		_chunkUploadError:()=>
 
 		_completeUpload:()->
+			@_loading.progress = 1
+			@_loading.hide()
 			@_apiCompleter.url = @_apiPath + '/complete/' + @_uploadId
 			@_apiCompleter.submit()
 
-		_apiCompleted:()=>
-			console.log("FINISHED!")
+		_apiCompleted:(e, data)=>
+			@_uploading = false
+			@_setValue(data)
 
+		_setValue:(value)->
+			if !value
+				@_input.value = '__none__'
+				@removeClass('showPreview')
+			else if value.id
+				@_input.value = value.id
+			else if typeof(value) == 'string' || !isNaN(value)
+				@_input.value = value
+			if value
+				if @find('preview')
+					@addClass('showPreview')
+					app.template.renderBlock(@find('preview'), value)
+			@removeClass('deny')
+			@removeClass('accept')
 
 		_parseFiles:(files)=>
 			@_items = []
@@ -98,7 +158,12 @@ class Upload extends cms.ui.Base
 			totalSize = 0
 			i = files.length
 			while i-- > 0
-				file = files[i].getAsFile()
+				if files[i] instanceof File
+					file = files[i]
+				else if files[i].getAsFile?
+					file = files[i].getAsFile()
+				else
+					continue
 				@_items[i] = {name: file.name, size: file.size, file: file, init: totalSize}
 				totalSize += file.size
 			@_totalSize = totalSize
@@ -133,19 +198,26 @@ class Upload extends cms.ui.Base
 		_filesLoaded:()=>
 			@upload()
 
+		_click:(e)=>
+			if !@_fileBrowser
+				@_fileBrowser = document.createElement('input')
+				@_fileBrowser.setAttribute('type', 'file')
+				if @_acceptStr
+					console.log(@_acceptStr)
+					@_fileBrowser.setAttribute('accept', @_acceptStr)
+				@_fileBrowser.addEventListener('change', @_fileSelect)
+			@_fileBrowser.click()
+		_fileSelect:(e)=>
+			if @_fileBrowser.files.length > 0
+				@_parseFiles(@_fileBrowser.files)
 		_drop:(e)=>
-			console.log(@element)
 			e.preventDefault()
 			files = e.dataTransfer.items
 			accepts = @_checkAccepts(files)
 			if accepts
-				console.log('YAY!')
-				# console.log(files[0])
 				@_parseFiles(files)
-				# @upload()
 			else
-				console.log('NAY!')
-
+				1
 		_dragOver:(e)=>
 			e.preventDefault()
 			e.stopImmediatePropagation()

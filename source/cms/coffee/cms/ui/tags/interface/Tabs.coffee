@@ -45,10 +45,22 @@ class Tabs extends cms.ui.Base
 				tab = tabs[i]
 				tab.on('click', @_tabClick)
 				@_tabs[i] = tab
-			@_select(@_tabs[0].getAttribute('name'))
+
+			found = false
+			for k, v of slikland.Mara.globals['#']
+				if !v || v.length == 0
+					continue
+				try
+					if @matches(k)
+						found = true
+						@_select(v)
+			if !found
+				@_select(@_tabs[0].getAttribute('name'))
 				
 
 		_tabClick:(e)=>
+			if @attr('id')
+				app.router.setHash('#' + @attr('id'), e.currentTarget.getAttribute('name'))
 			@_select(e.currentTarget.getAttribute('name'))
 
 		_select:(name)->

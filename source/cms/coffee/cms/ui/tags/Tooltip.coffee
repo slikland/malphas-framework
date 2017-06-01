@@ -22,3 +22,5 @@ class Tooltip extends cms.ui.Base
 			@addClass('show')
 		_out:()=>
 			@removeClass('show')
+		destroy:()->
+			# super

@@ -42,7 +42,18 @@ class Viewstack extends cms.ui.Base
 				@_views[name] = view
 			if !@_defaultView
 				@_defaultView = view
-			@reset()
+
+			found = false
+			for k, v of slikland.Mara.globals['#']
+				if !v || v.length == 0
+					continue
+				try
+					if @matches(k)
+						found = true
+						console.log(v)
+						@show(v)
+			if !found
+				@reset()
 
 		reset:()->
 			@show(@_defaultView.name)

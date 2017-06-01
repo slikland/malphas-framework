@@ -33,7 +33,7 @@ class Service extends cms.ui.Base
 			super({element: element})
 			@_element.on('update', @_update)
 			@_loadServiceTimeout = setTimeout(@_loadService, 1)
-		_update:()=>
+		_update:(e, data)=>
 			clearTimeout(@_loadServiceTimeout)
 			@_loadServiceTimeout = setTimeout(@_loadService, 300)
 
@@ -94,7 +94,7 @@ class Service extends cms.ui.Base
 						else
 							params[name] = value
 
-				sort = ArrayUtils.toArray(@_element.querySelectorAll('[sort][value]'))
+				sort = [].concat(ArrayUtils.toArray(@_element.querySelectorAll('[sort][value]')), ArrayUtils.toArray(document.querySelectorAll('[for="'+id+'"][sort][value]')))
 				if sort.length > 0
 					sort.sort(@_sortByOrder)
 					sortValues = []

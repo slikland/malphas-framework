@@ -61,7 +61,6 @@ class API extends EventDispatcher
 				interceptor.callback?(data, url)
 
 	@_cacheURL:(url, scope)->
-		console.log(url)
 		if @_cachedURLs[url]
 			return false
 		iframe = document.createElement('iframe')
@@ -206,7 +205,7 @@ class API extends EventDispatcher
 				@addHeader('Content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
 				data = JSON.stringify(data)
 			else if @_type == 'binary'
-				@addHeader('Content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
+				@addHeader('Content-type', 'application/octet-stream;charset=UTF-8')
 				@method = 'POST'
 
 		getValues = {}

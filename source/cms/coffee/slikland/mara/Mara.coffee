@@ -95,13 +95,17 @@ class Mara extends EventDispatcher
 		@_renderData.context.appendChild(items[0][1])
 		@_block = block
 		@_renderData.callback?(items, @_block)
-	renderBlock:(element, data)->
+	renderBlock:(element, data, context = null)->
 		if !(element instanceof HTMLElement) || !element.getAttribute('mara')
 			return
-		@_resetContext(element)
+		if !context
+			@_resetContext(element)
+			context = element
 		block = slikland.mara.Block.findBlock(element.getAttribute('mara'))
-		block.render(data, element, true)
+
+		renderData = block.render(data, context, true)
 		app.trigger('redraw')
+		return renderData
 
 	# update:(element, data)->
 	# 	block = @_block

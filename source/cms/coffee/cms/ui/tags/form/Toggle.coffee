@@ -26,11 +26,12 @@ class Toggle extends cms.ui.Base
 		_change:()=>
 			if @_input
 				form = @findParents('form')
-				items = form.querySelectorAll('input[name="'+@_input.getAttribute('name')+'"]')
-				i = items.length
-				while i-- > 0
-					if items[i] != @_input
-						items[i].trigger('change')
+				if form
+					items = form.querySelectorAll('input[name="'+@_input.getAttribute('name')+'"]')
+					i = items.length
+					while i-- > 0
+						if items[i] != @_input
+							items[i].trigger('change')
 		@get selected:()->
 			return @_selected
 

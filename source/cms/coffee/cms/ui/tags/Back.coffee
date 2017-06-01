@@ -3,7 +3,6 @@ class Back extends cms.ui.Base
 	@SELECTOR: 'back'
 	_update:(data)->
 		for item in data.add
-			console.log(app.main.hasHistory)
 			if !app.main.hasHistory
 				item?.parentNode.removeChild(item)
 			else

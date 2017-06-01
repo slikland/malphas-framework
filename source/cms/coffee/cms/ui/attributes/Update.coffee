@@ -1,6 +1,6 @@
-#namespace cms.ui.tags.form
-class Select extends cms.ui.Base
-	@SELECTOR: 'select'
+#namespace cms.ui.tag.attributes
+class Sort extends cms.ui.Base
+	@SELECTOR: 'input[update]'
 	_update:(data)->
 		for item in data.add
 			@_plugins[item] = new Plugin(item)
@@ -14,8 +14,7 @@ class Select extends cms.ui.Base
 		@_destroyPlugin:(item)->
 
 		constructor:(element)->
-			super
-			@element.on('updated', @_updated)
+			super({element: element})
 
 			if @attr('update')
 				@_updateParams = []
@@ -25,21 +24,31 @@ class Select extends cms.ui.Base
 					@_updateParams.push(o[1].split(','))
 
 				if @_updateParams.length > 0
-					@element.on('change', @_updateTargets)
+					@element.on('change', @_change)
+					@element.on('input', @_input)
 					setTimeout(@_updateTargets, 1)
-
-		_updated:()=>
-			setTimeout(@_updateTargets, 1)
-
 		_updateTargets:()=>
-			if !@_updateParams
-				return
-			i = @_updateParams.length
-			value = @element.value
-			while i-- > 0
+			li = @_updateParams.length
+			i = -1
+			while ++i < li
 				params = @_updateParams[i]
 				items = document.body.querySelectorAll(params[0])
-				j = items.length
-				while j-- > 0
+				try
+					v = null
+					`with(this.element){v = eval(params[2])};`
+					if v
+						value = v
+				catch
+					value = @element.value
+				lj = items.length
+				j = -1
+				while ++j < lj
 					items[j].trigger(params[1], value)
+		_updateDelayed:()->
+			clearTimeout(@_updateTimeout)
+			@_updateTimeout = setTimeout(@_updateTargets, 200)
+		_change:(e)=>
+			@_updateTargets
 
+		_input:()=>
+			@_updateDelayed()

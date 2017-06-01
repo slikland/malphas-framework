@@ -16,7 +16,6 @@ class ChartHelper extends cms.ui.Base
 		@_destroyPlugin:(item)->
 
 		constructor:(element)->
-			console.log({a: element})
 			super({element: element})
 
 			if (w = @attr('width'))

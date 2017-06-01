@@ -51,6 +51,8 @@ class Form extends cms.ui.Base
 			success = @attr('success')
 			if success && success.length > 0
 				switch success
+					when 'update'
+						@_element.trigger('update')
 					when 'refresh'
 						app.interface.show()
 					when 'reload'

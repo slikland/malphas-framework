@@ -20,7 +20,6 @@ class ShowModal extends cms.ui.Base
 		_addEventListener:()=>
 			@_element.on('click', @_click)
 		_click:(e)=>
-			console.log(@_modalRef)
 			app.template.renderBlockByReference(@_modalRef, null, null, @_modalRendered)
 			e.preventDefault()
 			e.stopImmediatePropagation()

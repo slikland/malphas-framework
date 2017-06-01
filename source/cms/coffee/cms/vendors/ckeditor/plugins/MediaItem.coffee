@@ -60,21 +60,16 @@ class MediaItem
 
 			setTimeout(@_test, 0)
 		_test:()=>
-			console.log(@_dialog.parts.contents.find(''))
 
 		_onShow:()->
-			console.log("SHOW", @)
 
 		_onOk:()=>
-			console.log("OK")
 
 		_onCancel:()=>
-			console.log("Cancel")
 
 		_test123:()->
-			console.log('>>>', @, arguments)
+
 		_dialogDefinition:()=>
-			console.log('bla')
 			return {
 				title: 'Media'
 				minWidth: 400
@@ -110,7 +105,6 @@ class MediaItem
 				]
 			}
 		_onLoad:()->
-			console.log(@)
 			WidgetDialog.getInstance().setDialog(@)
 
 CKEDITOR.plugins.add( 'mediaitem', new components.ckeditor.plugins.MediaItem());

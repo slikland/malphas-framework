@@ -44,12 +44,14 @@ class InterfaceController
 			return
 		pathObj = {}
 		parsedPath = app.router.getParsedPath()
+		page = page.replace(/(\?|\#).*?$/, '')
 		pageParts = page.substr(page.indexOf(validPage) + validPage.length).trim('/').split('/')
 		for k, v of pageParts
 			pathObj[k] = v
 		for k, v of parsedPath.params
 			pathObj[k] = v
 		slikland.Mara.setGlobalObject('$', pathObj)
+		slikland.Mara.setGlobalObject('#', parsedPath.hashes)
 		app.template.render('pages/' + validPage, {}, @_context.element, @_pageShown)
 	_pageShown:()=>
 		@_loading.progress = 1

@@ -94,8 +94,11 @@ class NavigationRouter extends EventDispatcher
 	_parsePath:(p_rawPath)->
 		pathParts = /^(?:#?!?\/*)([^?]*)\??(.*?)$/.exec(p_rawPath)
 		path = pathParts[1]
-		params = @_parseParams(pathParts[2])
-		return {rawPath: p_rawPath, path: path, params: params}
+		params = window.location.search?.replace(/^\?/, '')
+		hashes = window.location.hash?.replace(/^\#/, '')
+		params = @_parseParams(params)
+		hashes = @_parseParams(hashes)
+		return {rawPath: p_rawPath, path: path, params: params, hashes: hashes}
 
 	###*
 	@method _parseParams
@@ -362,6 +365,29 @@ class NavigationRouter extends EventDispatcher
 		params = @_getParams()
 		params[name] = value
 		@_setParams(params)
+
+	getHash:(name)->
+		hashes = window.location.hash?.replace(/^\#/, '')
+		hashes = @_parseParams(hashes)
+		return hashes[name]
+
+	setHash:(name, value)->
+		hashes = window.location.hash?.replace(/^\#/, '')
+		hashes = @_parseParams(hashes)
+		hashes[name] = value
+		@_setHashes(hashes)
+	_setHashes:(hashes)->
+		pArr = []
+
+		for k, v of hashes
+			try
+				if typeof(v) != 'string'
+					v = JSON.stringify(v)
+			pArr.push(k + '=' + encodeURIComponent(v))
+		path = @_getPath()
+		path = path.replace(/\#.*?$/, '')
+		@replace(path + '#' + pArr.join('&'), false)
+
 
 	removeParam:(name)->
 		params = @_getParams()
