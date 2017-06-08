@@ -73,6 +73,7 @@ class Main
 		app.body.css('visibility', '')
 
 	_routeChange:(e, data)=>
+		console.log(123)
 		@_history.push(data)
 		app.interface.show()
 	_goBack:()=>
@@ -91,6 +92,8 @@ class Main
 		# console.log(jsyaml.load(@_template))
 
 	_renderTemplate:(e, data)=>
+		console.log('> render',data)
+		# app.currentPath = data.target
 		if data.target && data.currentTarget
 			target = data.currentTarget.findParents(data.target)
 			if !target

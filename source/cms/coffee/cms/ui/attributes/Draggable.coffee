@@ -48,6 +48,7 @@ class Draggable extends cms.ui.Base
 			@_removeEventListeners()
 			@_cloned.parentNode.removeChild(@_cloned)
 			@_element.style.opacity = ''
+			@element.trigger('update')
 		_mouseDown:(e)=>
 			@_updateDraggableItems()
 			e.preventDefault()

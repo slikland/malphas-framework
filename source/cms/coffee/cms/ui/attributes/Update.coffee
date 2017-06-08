@@ -1,6 +1,6 @@
 #namespace cms.ui.tag.attributes
-class Sort extends cms.ui.Base
-	@SELECTOR: 'input[update]'
+class Update extends cms.ui.Base
+	@SELECTOR: '[update]'
 	_update:(data)->
 		for item in data.add
 			@_plugins[item] = new Plugin(item)
@@ -15,6 +15,7 @@ class Sort extends cms.ui.Base
 
 		constructor:(element)->
 			super({element: element})
+			console.log(123)
 
 			if @attr('update')
 				@_updateParams = []
@@ -26,6 +27,7 @@ class Sort extends cms.ui.Base
 				if @_updateParams.length > 0
 					@element.on('change', @_change)
 					@element.on('input', @_input)
+					@element.on('update', @_input)
 					setTimeout(@_updateTargets, 1)
 		_updateTargets:()=>
 			li = @_updateParams.length
@@ -51,4 +53,5 @@ class Sort extends cms.ui.Base
 			@_updateTargets
 
 		_input:()=>
+			console.log("UPDAte")
 			@_updateDelayed()
