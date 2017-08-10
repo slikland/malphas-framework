@@ -6,7 +6,7 @@ class Field extends cms.ui.Base
 			if Plugin._checkPlugin(item)
 				@_plugins[item] = new Plugin(item)
 			else
-				item.className = 'filled'
+				item.className += ' filled'
 
 		for item in data.remove
 			p = @_plugins[item]

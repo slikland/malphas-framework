@@ -78,6 +78,13 @@ class Mara extends EventDispatcher
 			items[i] = children[i]
 			items[i].style.display = 'none'
 		setTimeout(@_removeChildren, 0, target, items)
+	resetContext:(target)->
+		children = target.childNodes
+		i = children.length
+		while i-- > 0
+			if children[i]?.removable is false
+				continue
+			target.removeChild(children[i])
 	_removeChildren:(target, children)=>
 		i = children.length
 		while i-- > 0

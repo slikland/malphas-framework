@@ -32,7 +32,13 @@ class Service extends cms.ui.Base
 		constructor:(element)->
 			super({element: element})
 			@_element.on('update', @_update)
+			@_element.on('abort', @_abort)
 			@_loadServiceTimeout = setTimeout(@_loadService, 1)
+		_abort:()=>
+			clearTimeout(@_loadServiceTimeout)
+			@_api?.abort()
+			@_removeProgress()
+
 		_update:(e, data)=>
 			clearTimeout(@_loadServiceTimeout)
 			@_loadServiceTimeout = setTimeout(@_loadService, 300)

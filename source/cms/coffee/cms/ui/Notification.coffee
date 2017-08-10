@@ -32,7 +32,7 @@ class Notification extends EventDispatcher
 			target = target.getInstance()
 		item = new NotificationItem(item)
 		target.appendChildAt(item)
-
+		item.element.scrollIntoView()
 
 	_showNotification:(e, data)=>
 		data = [].concat(data)

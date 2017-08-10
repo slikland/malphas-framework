@@ -11,6 +11,7 @@ class Duplicate extends cms.ui.Base
 				p.destroy?()
 
 	class Plugin extends BaseDOM
+		@_form: null
 		@_destroyPlugin:(item)->
 
 		constructor:(element)->
@@ -21,4 +22,11 @@ class Duplicate extends cms.ui.Base
 			e.stopImmediatePropagation()
 			target = app.interface.context.find(@attr('duplicate'))
 			block = slikland.mara.Block.findBlock(target.getAttribute('mara'))
-			block.duplicate(target.parentNode, target.data)
+			child = target.cloneNode(true)
+			inputs = child.querySelectorAll('input,textarea')
+			for input in inputs
+				input.value = ''
+				input.innerHTML = ''
+
+			target.parentNode.appendChild(child)
+

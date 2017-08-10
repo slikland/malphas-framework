@@ -18,23 +18,35 @@ class Form extends cms.ui.Base
 			super({element: element})
 			setTimeout(@_addListeners, 50)
 		_addListeners:()=>
+			@_api = new API(@_element)
 			if !(@_element.getAttribute('target') && @_element.getAttribute('target').toLowerCase() == '_blank')
-				@_api = new API(@_element)
 				@_api.on(API.START, @_apiStart)
 				@_api.on(API.COMPLETE, @_apiComplete)
 				@_api.on(API.ERROR, @_apiError)
-				@_element.on('submit', @_submit)
+			@_element.on('submit', @_submit)
 			@_element.on('change', @_change)
 			@_element.on('reset', @_reset)
+			@_element.on('abort', @_abort)
+		_abort:()=>
+			@_api?.abort()
 		_change:()=>
 			@_clearMessage()
 
 		_submit:(e)=>
-			@_clearFieldMessages()
-			if e.defaultPrevented
-				e.stopImmediatePropagation()
-				return
-			e.preventDefault()
+			if @attr('target')?.toLowerCase?() == '_blank'
+				data = @_api.parseJSON(@_element)
+				if !@_dataElement
+					@_dataElement = document.createElement('textarea')
+					@_dataElement.name = '__data'
+					@_dataElement.style.display = 'none'
+					@appendChild(@_dataElement)
+				@_dataElement.innerHTML = JSON.stringify(data)
+			else
+				@_clearFieldMessages()
+				if e.defaultPrevented
+					e.stopImmediatePropagation()
+					return
+				e.preventDefault()
 		_reset:()=>
 			setTimeout(@_resetFields, 0)
 		_resetFields:()=>
@@ -93,6 +105,7 @@ class Form extends cms.ui.Base
 					messageField = new BaseDOM({element: messageField})
 			messageField.css({display: ''})
 			messageField.html = message
+			messageField.element.scrollIntoView()
 
 		_clearFieldMessages:()->
 			fields = @findAll('field .validation-message')
@@ -126,6 +139,7 @@ class Form extends cms.ui.Base
 					@_messageField = document.createElement('message')
 					@appendChildAt(@_messageField, 0)
 			@_messageField.innerHTML = message
+			@_messageField.scrollIntoView()
 
 		_clearMessage:()=>
 			@_showMessage('')

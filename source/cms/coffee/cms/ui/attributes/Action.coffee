@@ -21,6 +21,7 @@ class Action extends cms.ui.Base
 			setTimeout(@_addEventListener, 1)
 		_addEventListener:()=>
 			@_element.on('click', @_click)
+			@_element.on('abort', @_abort)
 		_click:(e)=>
 			@_api = API.call(@_element.getAttribute('action'), null, @_apiComplete, @_apiError)
 			if @_element.getAttribute('globalLoading')
@@ -32,8 +33,14 @@ class Action extends cms.ui.Base
 
 				app.interface.context.appendChildAt(@_loading, 0)
 				setTimeout(@_loadingResize, 0)
+			if @attr('prevent') && @attr('prevent') == 'false'
+				return
 			e.preventDefault()
 			e.stopImmediatePropagation()
+
+		_abort:()=>
+			@_api?.abort()
+			@_hideLoading()
 
 		_hideLoading:()=>
 			if @_loading

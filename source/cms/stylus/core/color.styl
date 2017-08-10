@@ -37,6 +37,9 @@ generateColors(lightenAmount = 0)
 			color = colors[i - 1]
 			if lightenAmount != 0
 				color = lighten(color, lightenAmount)
+			+prefix-classes('border-')
+				&.{i}
+					border-color: color
 			+prefix-classes('bg-')
 				&.{i}
 					background-color: color

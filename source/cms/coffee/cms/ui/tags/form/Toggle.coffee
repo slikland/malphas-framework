@@ -43,8 +43,12 @@ class Toggle extends cms.ui.Base
 			@_element.selected = value
 			if @_input
 				@_input.checked = value
+				@_input?.trigger('update')
 			@_element.trigger('change')
 		_toggle:()=>
+			if @_input?.getAttribute('type') == 'radio'
+				@_input.click()
+				return
 			@selected = !@_selected
 			@_input?.trigger('change')
 		_update:(e = null)=>

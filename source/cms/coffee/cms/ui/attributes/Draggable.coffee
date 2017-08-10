@@ -160,7 +160,7 @@ class Draggable extends cms.ui.Base
 				i = children.length
 				while i-- > 0
 					child = children[i]
-					if child != @_element && !child.matches('[cloned]')
+					if !child.matches('[cloned]')
 						items.push(child)
 
 				i = items.length
@@ -175,6 +175,9 @@ class Draggable extends cms.ui.Base
 						a = Math.atan2(dy, dx)
 						closest = item
 						closestPos = ipos
+			if closest == @_element
+				return null
+
 			if closest
 				if context = closest.querySelector('[draggableContext="'+@_draggableName+'"]')
 					cPos = @_getElementPosition(context)

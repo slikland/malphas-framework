@@ -25,7 +25,6 @@ class Viewstack extends cms.ui.Base
 			data = e.data
 			@show(data)
 
-
 		_parseViews:()->
 			@_views = {}
 			views = @findAll('view[name]')
@@ -66,9 +65,14 @@ class Viewstack extends cms.ui.Base
 					if view == @_selectedView
 						continue
 					view.style['display'] = ''
+					app.template.resetContext(view)
 					app.template.renderBlock(view, view.itemData)
 				else
 					view.style['display'] = 'none'
+					items = view.querySelectorAll('form,[action],[service]')
+					for item in items
+						try
+							item.trigger('abort')
 			@_selectedView = selectedView
 			return selectedView
 

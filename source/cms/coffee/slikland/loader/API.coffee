@@ -278,6 +278,8 @@ class API extends EventDispatcher
 			@_currentProgress = progress
 		@_loading?.progress = @_currentProgress
 		@trigger(API.PROGRESS, {loaded: progress, total: 1, progress: @_currentProgress})
+	parseJSON:(form)->
+		return @_parseJSON(form)
 
 	_parseJSON:(form)->
 		@_parsedElements = []
@@ -302,7 +304,7 @@ class API extends EventDispatcher
 				if !o[name]
 					o[name] = []
 				o[name].push(data)
-		inputs = element.querySelectorAll('input,textarea')
+		inputs = element.querySelectorAll('input,textarea,select')
 		for input in inputs
 			if @_parsedElements.indexOf(input) >= 0
 				continue

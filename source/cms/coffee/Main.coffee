@@ -73,7 +73,6 @@ class Main
 		app.body.css('visibility', '')
 
 	_routeChange:(e, data)=>
-		console.log(123)
 		@_history.push(data)
 		app.interface.show()
 	_goBack:()=>

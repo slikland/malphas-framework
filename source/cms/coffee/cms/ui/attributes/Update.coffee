@@ -15,7 +15,6 @@ class Update extends cms.ui.Base
 
 		constructor:(element)->
 			super({element: element})
-			console.log(123)
 
 			if @attr('update')
 				@_updateParams = []
@@ -30,6 +29,9 @@ class Update extends cms.ui.Base
 					@element.on('update', @_input)
 					setTimeout(@_updateTargets, 1)
 		_updateTargets:()=>
+			if @element.tagName.toLowerCase() == 'input' && @element.getAttribute('type') in ['radio', 'checkbox']
+				if !@element.checked
+					return
 			li = @_updateParams.length
 			i = -1
 			while ++i < li
@@ -42,6 +44,12 @@ class Update extends cms.ui.Base
 						value = v
 				catch
 					value = @element.value
+				if !v
+					value = @element.value
+				if !value || value is undefined
+					value = @element.itemData
+				if value is undefined
+					return
 				lj = items.length
 				j = -1
 				while ++j < lj
@@ -50,8 +58,7 @@ class Update extends cms.ui.Base
 			clearTimeout(@_updateTimeout)
 			@_updateTimeout = setTimeout(@_updateTargets, 200)
 		_change:(e)=>
-			@_updateTargets
+			@_updateTargets()
 
 		_input:()=>
-			console.log("UPDAte")
 			@_updateDelayed()

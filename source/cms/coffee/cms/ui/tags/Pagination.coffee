@@ -19,8 +19,6 @@ class Pagination extends cms.ui.Base
 			super({element: element})
 			@_page = 0
 
-			@_target = document.querySelector('#' + @attr('for'))
-
 			@_pages = []
 
 			@_pageWrapper = new BaseDOM({element: 'div', className: 'wrapper'})
@@ -121,6 +119,9 @@ class Pagination extends cms.ui.Base
 			KTween.tween(@, {scrollPosition: p, onUpdate: @_test}, 'easeInOutQuart', 0.3)
 			if changed
 				@_target?.trigger('update')
+
+		@get _target:()->
+			return document.querySelector('#' + @attr('for'))
 
 		@get total:()->
 			return @_total

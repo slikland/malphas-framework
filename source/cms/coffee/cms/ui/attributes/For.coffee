@@ -41,6 +41,7 @@ class For extends cms.ui.Base
 					@_element.value = data
 					@_value = data
 		_change:()=>
+			@_target = document.querySelector('#' + @attr('for'))
 			changed = false
 			newValue = null
 			if @_element.tagName.toLowerCase() == 'input' && @_element.getAttribute('type')?.toLowerCase() in ['checkbox','radio']
