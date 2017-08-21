@@ -15,8 +15,3 @@
 			a: {"html":"#{name}"}
 	(#{items})
 		>menuBlock: #{}
-(#{@user}.data.role == 1)
-	br:
-	br:
-	button.col-1_1.button-2: {"html": "Atualizar JSONs", "confirm": "Tem certeza que gostaria de atualizar os JSONs?", "action": "#{@apiPath}cms/content/generateContent", "success": "reload"}
-	a.col-1_1.button-3: {"style": "line-height: 2em; text-align: center;", "html": "Invalidar CDN", "href": "#{@apiPath}cms/content/invalidateCDN", "target": "_blank"}
