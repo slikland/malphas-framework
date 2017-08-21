@@ -1,0 +1,45 @@
+input: {"type":"hidden","name":"id","value":"#{id}"}
+group:
+	field.col-1_2:
+		label: "E-mail"
+		input: {"type":"text", "name":"email","value":"#{email}"}
+		validation:
+			required: {"message": "Este campo não pode estar vazio"}
+			email: 
+				message: "Email inválido"
+			length: {"min": 10, "max": 100}
+				message: ""
+	field.col-1_2:
+		label: "Nome"
+		input: {"type":"text", "name":"name","value":"#{name}"}
+		validation:
+			required: {"message": "Este campo não pode estar vazio"}
+			regex: {"pattern": "[\\w\\d]{3,} [\\w\\d]+"}
+				message: "Por favor informe o nome completo"
+group:
+	field.col-1_2:
+		label: "Senha"
+		input: {"type":"password", "name":"password"}
+		toggle.show-password: 
+			default: 
+				i.fa.fa-eye:
+			selected:
+				i.fa.fa-eye-slash
+		validation:
+			(#{id})
+				regex: {"pattern": "/^((?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\!\\@\\£\\#\\$\\%\\^\\&\\*\\.\\?])[A-Za-z\\d\\!\\@\\£\\#\\$\\%\\^\\&\\*\\.\\?]{8,20})?$/"}
+					message: "A senha deve conter letras minúsculas, maiúsculas, números e símbolos"
+			(!#{id})
+				regex: {"pattern": "/^((?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\!\\@\\£\\#\\$\\%\\^\\&\\*\\.\\?])[A-Za-z\\d\\!\\@\\£\\#\\$\\%\\^\\&\\*\\.\\?]{8,20})$/"}
+					message: "A senha deve conter letras minúsculas, maiúsculas, números e símbolos"
+	field.col-1_2:
+		label: "Confirmação da senha"
+		input: {"type":"password", "name":"password_confirmation"}
+		toggle.show-password: 
+			default: 
+				i.fa.fa-eye:
+			selected:
+				i.fa.fa-eye-slash
+		validation:
+			match: {"field":"password"}
+				message: "As senhas não conferem"

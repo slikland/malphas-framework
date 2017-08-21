@@ -1,6 +1,22 @@
-#import slikland.loader.PreloadFiles
+#import slikland.core.loader.PreloadFiles
+#import slikland.vendors.preloaderjs.CacheControllerPlugin
+#import slikland.vendors.preloaderjs.MediaPlugin
 
 class AssetLoader extends EventDispatcher
+
+	@INITIALIZE: "initialize"
+
+	@COMPLETE_ALL: "complete"
+	@COMPLETE_FILE: "fileload"
+
+	@PROGRESS_ALL: "progress"
+	@PROGRESS_FILE: "fileprogress"
+
+	@START_ALL: "loadstart"
+	@START_FILE: "filestart"
+
+	@ERROR: "error"
+	@FILE_ERROR: "fileerror"
 
 	@getInstance:()=>
 		@_instance ?= new @(arguments...)
@@ -19,11 +35,13 @@ class AssetLoader extends EventDispatcher
 		group = @_groups[p_groupId]
 		if !group
 			group = new createjs.LoadQueue(p_xhr)
+			group.installPlugin(createjs.CacheControllerPlugin)
+			group.installPlugin(createjs.MediaPlugin)
 			group.id = p_groupId
 			@_groups[p_groupId] = group
-			group.on('fileload', @_fileLoad)
-			group.on('error', @_onError)
-			group.on('fileerror', @_onError)
+			group.on(AssetLoader.COMPLETE_FILE, @_fileLoad)
+			group.on(AssetLoader.ERROR, @_onError)
+			group.on(AssetLoader.FILE_ERROR, @_onFileError)
 		group.setMaxConnections(p_concurrent)
 		return group
 
@@ -32,21 +50,25 @@ class AssetLoader extends EventDispatcher
 		return group
 
 	_onError:(e)=>
-		e.currentTarget.off('error', @_onError)
-		e.currentTarget.off('fileerror', @_onError)
+		e.currentTarget.off(AssetLoader.ERROR, @_onError)
+		e.currentTarget.off(AssetLoader.COMPLETE_FILE, @_fileLoad)
+		console.log e
+		throw new Error(e.title).stack
+		false
 
-		switch e.type
-			when 'fileerror'
-				break
-			
-			when 'error'
-				break
-		console.log e.title, e.data
-		
+	_onFileError:(e)=>
+		e.currentTarget.off(AssetLoader.FILE_ERROR, @_onFileError)
+		e.currentTarget.off(AssetLoader.COMPLETE_FILE, @_fileLoad)
+		console.log e
+		throw new Error(e.title).stack
+		false
 
 	_fileLoad:(e)=>
-		e.target.off('fileload', @_fileLoad)
+		e.currentTarget.off(AssetLoader.COMPLETE_FILE, @_fileLoad)
+		e.currentTarget.off(AssetLoader.ERROR, @_onError)
+		e.currentTarget.off(AssetLoader.FILE_ERROR, @_onFileError)
 		e.item.tag = e.result
+		false
 
 	getItem:(p_id, p_groupId=null)->
 		if p_groupId
@@ -57,14 +79,16 @@ class AssetLoader extends EventDispatcher
 				return i
 
 	getResult:(p_id, p_groupId=null)->
+		result = null
 		if p_groupId
-			return @_groups[p_groupId]?.getResult(p_id)
+			result = @_groups[p_groupId]?.getResult(p_id)
 		
 		for k, v of @_groups
 			if i = v.getResult(p_id)
-				return i
+				result = i
+		return result
 
-	@addFiles:(p_files, queue)->
+	@addFiles:(p_files, p_queue)->
 		jsRE = /.*\.(js|css|svg)$/g
 		mp4RE = /.*\.(mp4)$/g
 		for f in p_files
@@ -78,18 +102,18 @@ class AssetLoader extends EventDispatcher
 			obj.src = f.src
 			
 			# 
-			# WHEN IT'S A VIDEO PLEASE SET 'TRUE' ON THE XHR PARAM TO GET PROGRESS AND LOAD FILE
+			# When it's a video please set 'false' on the xhr param to get progress and load file
 			#
 			
 			if mp4RE.test(obj.src)
 				obj['type'] = 'video'
-				# continue
 
 			if f.src && jsRE.test(f.src)
 				obj['type'] = 'text'
 
 			if obj.src
-				queue.loadFile(obj, false)
+				p_queue.loadFile(obj, false)
 
 		if p_files.length > 0
-			queue.load()
+			p_queue.load()
+		false

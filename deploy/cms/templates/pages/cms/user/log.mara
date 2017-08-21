@@ -1,0 +1,30 @@
+card.col-full: 
+	header: "Log de atividade"
+	content:
+		field: 
+			label: "Busca"
+			input: {"for":"log_table", "name":"search"}
+		field: 
+			label: "Filtro"
+			group: {"service":"#{@apiPath}cms/user/getRoles", "noloading":1, "serviceOrder":-1}
+				field:
+					input: {"for":"log_table", "name":"filter_fk_cms_role", "type":"checkbox", "value":"#{id}"}
+					label: "#{name}"
+		table: {"id":"log_table", "service": "#{@apiPath}cms/user/getLog"}
+			thead:
+				tr:
+					th: {"sort":"name", "html":"Usuário", "width": "1%"}
+					th: {"sort":"action", "html":"Ação"}
+					th: {"sort":"description","html":"Descrição"}
+					th: "Dados"
+					th: {"sort":"created","html":"Data","width":"1%"}
+			tbody.text-small:
+				>logRow: #{items}
+		pagination: {"for":"log_table", "numItems": "20"}
+<logRow:
+	tr:
+		td.nowrap: {"html":"#{name}"}
+		td: {"html":"#{action}"}
+		td: {"html":"#{description}"}
+		td: {"html":""}
+		td.text-right.nowrap: {"html":"#{created}"}

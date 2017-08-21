@@ -1,0 +1,126 @@
+field
+	font-weight: normal
+	font-size: 1em
+	width: 100%
+	margin-top: 1em
+	margin-bottom: 0.2em
+	display: inline-block
+	padding: 0.2em
+	label
+		font-weight: 500
+		position: absolute
+		top: 0.4em
+		pointer-events: none
+		z-index: 1
+		font-size: 1em
+		padding: 0.2em
+		padding-left: 0.4em
+		transition: top 0.1s, font-size 0.1s
+		opacity: 0.4
+	input
+		font-family: Roboto
+		// font-weight: 200
+		font-size: 1em
+		border: 1px solid #EEEEEE
+		padding: 0.4em
+		padding-bottom: 0.2em
+		padding-left: 0.2em
+		border-bottom: 2px solid #EEEEEE
+		background: transparent
+		transition: border-color 0.1s, border-left-color 0.1s, border-right-color 0.1s, border-top-color 0.1s, border-bottom-color 0.1s
+	textarea
+		border-color: #EEEEEE
+	select
+		margin-top: 1em
+	
+	validation
+		display: none
+		
+	.validation-message
+		padding-left: 0.5em
+		position: absolute
+		font-size: 0.6em
+		color: colors[0]
+		bottom: -0.1em
+		height: 0px
+	
+	&.filled
+		label
+			// margin-top: -1.2em
+			opacity: 1
+			font-size: 0.8em
+			top: -1em
+		input
+			border-top-color: rgba(0, 0, 0, 0)
+			border-left-color: rgba(0, 0, 0, 0)
+			border-right-color: rgba(0, 0, 0, 0)
+			border-bottom-color: #CCCCCC
+		textarea
+			border-color: #CCCCCC
+			
+		
+	&.valid
+		input
+			border-bottom-color: colors[4]
+			
+	&.invalid
+		input
+			border-bottom-color: colors[0]
+	&.color
+		input
+			height: 2em
+			padding: 0
+			
+	&.select, &.file, &.color
+		label
+			opacity: 1
+			font-size: 0.8em
+			top: -1em
+			transition: none
+		input
+			border-top-color: rgba(0, 0, 0, 0)
+			border-left-color: rgba(0, 0, 0, 0)
+			border-right-color: rgba(0, 0, 0, 0)
+			border-bottom-color: #CCCCCC
+	&.checkbox, &.radio
+		display: inline
+		label
+			display: inline
+			font-weight: 500
+			position: relative
+			bottom: auto
+			top: auto
+			pointer-events: cursor
+			z-index: auto
+			font-size: auto
+			padding: auto
+			padding-left: auto
+			padding-bottom: auto
+			transition: none
+		input
+			font-family: Roboto
+			width: auto
+			display: inline
+			// font-weight: 200
+			font-size: auto
+			border: auto
+			padding: auto
+			padding-bottom: auto
+			padding-left: auto
+			border-bottom: auto
+			background: auto
+			transition: auto
+	toggle.show-password
+		position: absolute
+		right: 0.6em
+		cursor: pointer
+		i
+			opacity: 0.2
+			line-height: 2em
+	.icon
+		position: absolute
+		right: 0.6em
+		cursor: pointer
+		i
+			line-height: 2em
+				

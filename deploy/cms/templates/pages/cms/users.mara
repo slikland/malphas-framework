@@ -1,0 +1,36 @@
+button: {"type":"fab", "on":"card1", "href":"cms/user/add", "position": "TR"}
+	i.fa.fa-plus:
+	tooltip: {"html":"Adicionar usuário","align":"b"}
+card#card1: 
+	header: 
+		span: "Usuários"
+	content:
+		field: 
+			label: "Busca"
+			input: {"for":"user_list", "name":"search"}
+		group: {"service":"#{@apiPath}cms/user/getUsers", "id":"user_list"}
+			fieldset: #{items}
+				legend: "#{name}"
+				>userCard: #{items}
+<userCard
+	card.col-1_3.even-height:
+		content: 
+			div.left: {"style":"font-size: 50px;color: #CCCCCC;"}
+				i.fa.fa-user:
+			div.left
+				div: 
+					span: "#{name}"
+				tag: "#{role}"
+				div: "#{email}"
+				div.text-small: "Último acesso: #{last_login}"
+			div.right:
+				a.text-center: {"style":"width: 1em;display:inline-block;","href":"cms/user/edit/#{id}"}
+					i.fa.fa-pencil-square-o
+					tooltip: "Editar usuário"
+				(#{@user.data.id} == #{id})
+					a.text-center.text-3: {"style":"width: 1em;display:inline-block;"}
+						i.fa.fa-user
+				(#{@user.data.id} != #{id})
+					a.text-center.text-1: {"style":"width: 1em;display:inline-block;","confirm":"Deseja realmente remover este usuário?","action":"#{@apiPath}cms/user/remove/#{id}","success":"refresh"}
+						i.fa.fa-user-times
+						tooltip: "Remover usuário"

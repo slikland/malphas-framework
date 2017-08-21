@@ -1,0 +1,7 @@
+<h1>Behavior: Draggable</h1><div>Selector: '[draggable]'<br></div><div><br></div><div>The draggable attribute indicates that the HTMLElement can be dragged.</div><div>The attribute should be a unique name to the draggable elements.</div><h3><b>Drop area</b></h3><div>To tell where the draggable element can be dropped, the HTMLElement that accepts the drop need to have the attribute&nbsp;<b>draggableContext</b> equal to the <b>draggable</b>&nbsp;attribute.<br></div><div><br></div><pre>&lt;div draggableContext="dragger1"&gt;
+    &lt;div draggable="dragger1"&gt;Drag me&lt;/div&gt;
+    &lt;div draggable="dragger1"&gt;Drag me&lt;/div&gt;
+&lt;/div&gt;
+&lt;div draggableContext="dragger1"&gt;
+&lt;!-- Another drop area to the above elements --&gt;
+&lt;/div&gt;</pre>

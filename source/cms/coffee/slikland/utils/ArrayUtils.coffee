@@ -1,6 +1,10 @@
 #import slikland.utils.NumberUtils
 
-# Public: Bunch of utilities methods for {Array}
+###*
+Bunch of utilities methods for Array
+@class ArrayUtils
+@static
+###
 class ArrayUtils
 
 	# Public: Removes an item from an {Array}.
@@ -52,17 +56,17 @@ class ArrayUtils
 	# Returns
 	#    Returns a new merged {Array}.
 	@merge:(p_arrayA, p_arrayB)->
-		result = []
 		i = 0
 		j = 0
+		result = []
 		while (i < p_arrayA.length) || (j < p_arrayB.length)
-				if i < p_arrayA.length
-						result.push(p_arrayA[i])
-						i++
+			if i < p_arrayA.length
+				result.push(p_arrayA[i])
+				i++
 
-				if j < p_arrayB.length
-						result.push(p_arrayB[j])
-						j++
+			if j < p_arrayB.length
+				result.push(p_arrayB[j])
+				j++
 		return result
 
 	# Public: Returns a random index inside the range of the {Array}.
@@ -123,12 +127,10 @@ class ArrayUtils
 		first = p_array.slice(midLen, len)
 		last = p_array.slice(0, midLen).reverse()
 		merged = @merge first, last
-		merged
+		return merged
 
 	@fromEndToMiddle:(p_array) ->
-		newArray = @fromMiddleToEnd p_array
-		newArray.reverse()
-
+		return @fromMiddleToEnd(p_array).reverse()
 
 	@lastIndexOf:(p_array, p_value)->
 		i = 0
@@ -139,3 +141,10 @@ class ArrayUtils
 				index = i
 			i++
 		return index
+	@toArray:(items)->
+		newItems = []
+		if items.length
+			i = items.length
+			while i-- > 0
+				newItems[i] = items[i]
+		return newItems	

@@ -24,10 +24,15 @@ class ObjectUtils
 		result.push(p_source[k]) for k,v of p_source
 		return result
 
+	@merge:(a, b)->
+		if typeof(a) == 'object' && typeof(b) == 'object'
+			for k of b
+				if !a.hasOwnProperty(k)
+					a[k] = b[k]
+		return a
+
 	@clone:(p_target)->
 		try
-			return JSON.parse(JSON.stringify(p_target))
-		catch err
 			if !p_target or typeof p_target isnt 'object'
 				return p_target
 
@@ -40,6 +45,7 @@ class ObjectUtils
 					copy[i] = @clone(p_target[i])
 					i++
 				return copy
+
 			if p_target instanceof Object
 				copy = {}
 				for k, v of p_target
@@ -48,19 +54,16 @@ class ObjectUtils
 					else
 						copy[k] = @clone(v)
 				return copy
-			throw new Error('Unable to copy')
 
-	@findChild:(obj, query = null)->
-		if !query
-			return obj
-		query = query.split('.')
-		if query.length == 0
-			return obj
-		obj = obj[query[0]]
-		if query.length > 0
-			obj = @findChild(obj, query.splice(1).join('.'))
-		return obj
+		catch err
+			return JSON.parse(JSON.stringify(p_target))
 
+
+	@hasSameKey:(p_a, p_b)->
+		return if Object.getOwnPropertyNames(p_a)[0] == Object.getOwnPropertyNames(p_b)[0] then true else false
+
+	@isEqual:(p_a, p_b)->
+		return JSON.stringify(p_a) == JSON.stringify(p_b)
 
 	# Public: Return a mapped {Array} of a {Array} item.
 	#
@@ -88,9 +91,27 @@ class ObjectUtils
 			ret[i - 1] = o
 		return ret
 
-	@merge:(a, b)->
-		for k of b
-			if !a.hasOwnProperty(k)
-				a[k] = b[k]
-		return a
-
+	# Key could be in different formats
+	# key.subkey.moresub
+	# /key refer to root (initialObject needs to be set or object will be assumed)
+	@find:(object, key, initialObject = null, debug = false)->
+		if !object
+			return null
+		if /^\//.test(key)
+			key = key.replace(/^\//, '')
+			if !initialObject
+				initialObject = object
+			val = @find(object, key)
+		else
+			keys = key.split('.')
+			val = object[keys[0]]
+			if keys.length > 1 && val
+				keys.shift()
+				key = keys.join('.')
+				val = @find(val, key, debug)
+			else
+				if keys.length > 1
+					val = null
+		if debug
+			console.log('>>>>>', val)
+		return val

@@ -2,6 +2,7 @@
 #import slikland.utils.Prototypes
 #import slikland.core.App
 #import slikland.core.navigation.NavigationRouter
+#import slikland.anim.KTween
 
 #import slikland.utils.ObjectUtils
 #import slikland.utils.StringUtils
@@ -12,47 +13,74 @@
 #import slikland.core.template.Template
 #import slikland.loader.API
 
-#import cms.core.ServiceController
-#import cms.core.ComponentController
-#import cms.core.ViewController
-#import cms.core.User
-#import cms.core.Resizer
-
+#import cms.core.*
 #import cms.ui.*
-#import cms.components.standalone.StandaloneBase
-#import cms.components.*
+
+#import slikland.mara.Mara
 
 class Main
-
+	@RENDER_TEMPLATE: 'app_renderTemplate'
 	constructor:()->
+
+		@_history = []
+		new cms.ui.UI()
+		
 		app.body = new BaseDOM({element: document.body})
-
-		app.basePath = document.querySelector('base')?.getAttribute('href') || ''
-		Template.setRootPath(app.basePath + '../api/view/cms/')
-		Template.setExtension('')
-
-		app.blocker = new Blocker()
-
-		API.ROOT_PATH = app.basePath + '../api/cms/'
-
-		app.serviceController = ServiceController.getInstance()
+		app.rootPath = window.rootPath || '../';
+		app.apiPath = window.apiPath || app.rootPath + 'api/';
+		app.template = new slikland.Mara('templates/')
+		slikland.Mara.setGlobalObject('@', app)
+		app.templateContext = document.body
 		app.user = new User()
+		app.interface = new cms.core.InterfaceController()
 
-		app.router = new NavigationRouter()
-		app.router.init(app.basePath)
+		setTimeout(@_init, 0)
+
+		app.on(Main.RENDER_TEMPLATE, @_renderTemplate)
+
+		# app.basePath = document.querySelector('base')?.getAttribute('href') || ''
+		# Template.setRootPath(app.basePath + '../api/view/cms/')
+		# Template.setExtension('')
+
+		# app.blocker = new Blocker()
+
+		# API.ROOT_PATH = app.basePath + '../api/cms/'
+
+		# app.serviceController = ServiceController.getInstance()
+		# app.user = new User()
+
+		app.router = new NavigationRouter(app.basePath)
 		app.router.on(NavigationRouter.CHANGE, @_routeChange)
+		app.router.setup(app.basePath)
 
-		app.componentController = ComponentController.getInstance()
-
-		app.viewController = ViewController.getInstance()
-		app.viewController.getInterface()
+		# app.componentController = ComponentController.getInstance()
+		
+		# app.viewController = ViewController.getInstance()
+		# app.viewController.getInterface()
 
 		app.notification = new Notification()
-		app.componentController.parse()
+
+		app.main = @
+		app.on('back', @_goBack)
+		# app.componentController.parse()
 
 		# API.call({url: 'user/getSession', onComplete: @_indexComplete, onError: @_error})
+
+	@get hasHistory:()->
+		return @_history.length > 1
+
+	_init:()=>
+		app.body.css('visibility', '')
+
 	_routeChange:(e, data)=>
-		app.serviceController.call({url: data['path']})
+		@_history.push(data)
+		app.interface.show()
+	_goBack:()=>
+		if @_history.length < 2
+			return
+		p = @_history.pop()
+		p = @_history.pop()
+		app.router.goto(p.rawPath)
 	_indexComplete:()=>
 		# console.log(arguments)
 	_error:()=>
@@ -62,7 +90,15 @@ class Main
 
 		# console.log(jsyaml.load(@_template))
 
+	_renderTemplate:(e, data)=>
+		console.log('> render',data)
+		# app.currentPath = data.target
+		if data.target && data.currentTarget
+			target = data.currentTarget.findParents(data.target)
+			if !target
+				target = document.body.querySelector(data.target)
+		app.template.render(data.template, data.data || {}, target || app.templateContext)
 
-app.on(App.WINDOW_LOAD, ()->
+app.on('windowLoad', ()->
 	new Main()
 )

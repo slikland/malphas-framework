@@ -1,46 +1,59 @@
+#import slikland.loader.API
 class User extends EventDispatcher
-	@PING_TIMEOUT: 10
+	@STATUS_CHANGE: 'user_statusChange'
+	@API_PATH: 'api/cms/user/'
 	constructor:()->
-		@_firstTime = true
+		super
+		@_logged = false
+		API.intercept(/api\/cms\/user\/.+/g, @_userAPIIntercepted)
+		@_getUser()
+	_userAPIIntercepted:(data, url)=>
+		type = url.replace(/^.*?api\/cms\/user\/([^\?]*)\??.*$/, '$1')
+		if data.error?
+			switch data.code
+				when 100
+					"Not logged"
+					@_showLogin()
+				when 101
+					"Login error"
+				when 102
+					"No permission"
+		else
+			switch type
+				when 'getUser', 'login'
+					@_data = data
+					@_changeStatus(true)
+					app.interface.show()
+					params = app.router.getParsedPath()['params']
+					if params['__redirect__']
+						app.router.removeParam('__redirect__')
+						window.location = decodeURIComponent(params['__redirect__'])
 
-	@get name:()->
-		return @_name
-	@get id:()->
-		return @_id
-	@get role:()->
-		return @_role
-	@get roleName:()->
-		return @_roleName
+				when 'forgot'
+					2
+				when 'changePassword'
+					3
+				when 'logout'
+					@_changeStatus(false)
+					@_logged = false
+					@_showLogin()
+	@get data:()->
+		return @_data
 	@get logged:()->
-		return ~~@_id
-	setUser:(data = null)->
-		if !data
-			@_stopPing()
-			@_name = null
-			@_id = null
-			@_role = null
-		else if @_id != data['id']
-			@_startPing()
-			@_name = data['name']
-			@_id = data['id']
-			@_role = data['role']
-			@_roleName = data['roleName']
-			if !@_firstTime
-				app.viewController.getInterface()
-		@_firstTime = false
+		return @_logged
 
-	logout:()->
-		1
+	_changeStatus:(logged)->
+		@_logged = logged
+		@trigger(@constructor.STATUS_CHANGE, logged)
 
-	_startPing:()->
-		@_pingTimeout = setTimeout(@_ping, User.PING_TIMEOUT * 1000)
-	_stopPing:()->
-		clearTimeout(@_pingTimeout)
-		@_pingTimeout = null
-	_ping:()=>
-		if !@_pingTimeout
-			return
-		app.serviceController.call({url: 'user/ping', onComplete: @_pingComplete}, false)
-	_pingComplete:()=>
-		if @_pingTimeout
-			@_startPing()
+	_getUser:()->
+		API.call(app.rootPath + @constructor.API_PATH + 'getUser')
+
+	_showLogin:()->
+		if !app.template.isCurrent('user/login')
+			app.template.render('user/login', null, document.body)
+	_showLoginError:()->
+
+
+	_mouseDown:()=>
+		@_showLogin()

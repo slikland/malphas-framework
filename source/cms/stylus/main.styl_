@@ -1,0 +1,58 @@
+@import 'nib'
+global-reset()
+@import 'font-awesome.min'
+@import 'core/fonts'
+
+add-font('FontAwesome', 'font-awesome-webfont', normal, normal)
+add-font('helveticaneue', 'helveticaneuecondensed', normal, normal)
+add-font('helveticaneue', 'helveticaneuecondensedbold', normal, bold)
+add-font('helveticaneuebold', 'helveticaneuecondensedbold', normal, normal)
+add-font('helveticaneue', 'helveticaneuelightitalic', italic, normal)
+
+
+html, body
+	height: 100%
+
+body
+	font-family: helveticaneuebold
+	font-weight: bold
+	color: #000000
+	font-alias-fix(normal)
+	
+*
+	box-sizing: border-box
+	border-collapse: collapse
+	vertical-align: top
+	position: relative
+headerHeight = 48px
+menuWidth = 240px
+
+#wrapper
+	height: 100%
+
+p
+	font-family: helveticaneue
+	font-weight: normal
+	margin-bottom: 0.2em
+
+
+table
+	border-collapse: collapse
+
+a
+	color: inherit
+	text-decoration: none
+
+@import 'core/sizes'
+@import 'core/mixins'
+@import 'core/animations'
+@import 'components/standalone/*'
+@import 'core/form'
+@import 'ui/*'
+@import 'slikland/*'
+@import 'components/*'
+// @import 'component/*'
+
+for i in (1...length(bg-colors) + 1)
+	&.color{i}
+		generateTextColor(i - 1, 80%)

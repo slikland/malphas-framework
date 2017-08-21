@@ -1,6 +1,6 @@
 class Notification extends EventDispatcher
 
-	@DEFAULT_TIMEOUT: 8
+	@DEFAULT_TIMEOUT: 4
 
 	constructor:()->
 		super
@@ -16,16 +16,23 @@ class Notification extends EventDispatcher
 			else
 				@showNotification(item)
 	showNotification:(item)=>
+		if typeof(item) == 'string'
+			if item.length == 0
+				return
+		else if !item.message?
+			return
+		else if item.message.length == 0
+			return
 		target = document.querySelector('notification')
 		if !target
 			target = document.body
-		if !target.getInstance()
+		if !target.getInstance?()
 			target = new BaseDOM({element: target})
 		else
 			target = target.getInstance()
 		item = new NotificationItem(item)
 		target.appendChildAt(item)
-
+		item.element.scrollIntoView()
 
 	_showNotification:(e, data)=>
 		data = [].concat(data)
@@ -38,10 +45,15 @@ class Notification extends EventDispatcher
 	class NotificationItem extends BaseDOM
 		constructor:(data)->
 			super({element: 'div', className: 'notification-item show-down'})
+			if typeof(data) == 'string'
+				data = {message: data}
 			if data['message']
 				@text = data['message']
 			if data['type']
 				@addClass('p' + data['type'])
+			else
+				@addClass('p3')
+
 			@timeout = Notification.DEFAULT_TIMEOUT
 			if data['timeout']
 				@timeout = Number(data['timeout'])

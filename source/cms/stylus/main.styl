@@ -3,38 +3,37 @@ global-reset()
 @import 'font-awesome.min'
 @import 'core/fonts'
 
-add-font('FontAwesome', 'font-awesome-webfont', normal, normal)
-add-font('helveticaneue', 'helveticaneuecondensed', normal, normal)
-add-font('helveticaneue', 'helveticaneuecondensedbold', normal, bold)
-add-font('helveticaneuebold', 'helveticaneuecondensedbold', normal, normal)
-add-font('helveticaneue', 'helveticaneuelightitalic', italic, normal)
-
+add-font('FontAwesome', 'fontawesome-webfont', normal, normal)
+add-font('roboto', 'Roboto-Light', normal, 300)
+add-font('roboto', 'Roboto-Regular', normal, 400)
+add-font('roboto', 'Roboto-Medium', normal, 500)
+add-font('roboto', 'Roboto-Bold', normal, 600)
+add-font('roboto', 'Roboto-LightItalic', italic, 300)
+add-font('roboto', 'Roboto-Italic', italic, 400)
+add-font('roboto', 'Roboto-MediumItalic', italic, 500)
+add-font('roboto', 'Roboto-BoldItalic', italic, 600)
 
 html, body
 	height: 100%
-
+	font-family: Roboto
 body
-	font-family: helveticaneuebold
-	font-weight: bold
-	color: #000000
-	font-alias-fix(normal)
+	color: _color_text
+	background-color: rgb(250, 250, 250)
+sup
+	vertical-align: super
+	font-size: 0.7em
+	font-weight: 300
 	
 *
 	box-sizing: border-box
 	border-collapse: collapse
 	vertical-align: top
-	
+	position: relative
+	border-collapse: collapse
+	font-family: Roboto
+	line-height: 1.2em
 headerHeight = 48px
-menuWidth = 240px
-
-#wrapper
-	height: 100%
-
-p
-	font-family: helveticaneue
-	font-weight: normal
-	margin-bottom: 0.2em
-
+menuWidth = 200px
 
 table
 	border-collapse: collapse
@@ -42,17 +41,22 @@ table
 a
 	color: inherit
 	text-decoration: none
+i.fa
+	vertical-align: middle
 
-@import 'core/sizes'
+label
+	cursor: inherit
+
 @import 'core/mixins'
 @import 'core/animations'
-@import 'components/standalone/*'
-@import 'core/form'
+@import 'core/color'
+@import 'core/grid'
+@import 'core/basic/*'
+@import 'core/basic/*/*'
 @import 'ui/*'
-@import 'slikland/*'
 @import 'components/*'
 // @import 'component/*'
 
-for i in (1...length(bg-colors) + 1)
+generateColors(0)for i in (1...length(bg-colors) + 1)
 	&.color{i}
 		generateTextColor(i - 1, 80%)

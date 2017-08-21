@@ -17,20 +17,27 @@ class ShareUtils
 		return url
 
 	# Public: Facebook.
-	#
+	# OLD METHOD (DIALOG/FEED) IS DEPRECATED
+	# @facebook:(p_url, p_uri, p_title, p_description, p_image, p_appID=null, p_display=null, p_trigger=false)->
+	# 	url = 'https://www.facebook.com/dialog/feed?'
+	# 	if p_appID then url += '&app_id=' + p_appID
+	# 	if p_image then url += '&picture=' + p_image
+	# 	if p_title then url += '&name=' + encodeURIComponent(p_title)
+	# 	if p_description then url += '&description=' + encodeURIComponent(p_description)
+	# 	url += '&display=popup'
+	# 	url += '&link=' + encodeURIComponent(p_url)
+	# 	url += '&redirect_uri=' + encodeURIComponent(p_uri)
+	# 	if p_trigger then ShareUtils.open(url)
+	# 	return url
+	# 	
+	# Public: Facebook
+	# 
 	# url - {String}
-	@facebook:(p_url, p_uri, p_title, p_description, p_image, p_appID=null, p_display=null, p_trigger=false)->
-		url = 'https://www.facebook.com/dialog/feed?'
-		if p_appID then url += '&app_id=' + p_appID
-		if p_image then url += '&picture=' + p_image
-		if p_title then url += '&name=' + encodeURIComponent(p_title)
-		if p_description then url += '&description=' + encodeURIComponent(p_description)
-		url += '&display=popup'
-		url += '&link=' + encodeURIComponent(p_url)
-		url += '&redirect_uri=' + encodeURIComponent(p_uri)
+	# TODO: Test this
+	@facebook:(p_url, p_trigger=false)->
+		url = 'https://www.facebook.com/sharer/sharer.php?u=' + p_url
 		if p_trigger then ShareUtils.open(url)
 		return url
-
 	# Public: Google Plus
 	#
 	# url - {String}

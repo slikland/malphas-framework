@@ -1,0 +1,19 @@
+card.col-1_2: {"service":"#{@apiPath}cms/user/getUser/#{$0}"}
+	header: "Editar usuário"
+	form: {"action":"#{@apiPath}cms/user/edit", "success":"refresh"}
+		content:
+			(#{idSet})
+				group:
+					field.col-1_2:
+						label: "Nível"
+						(#{roles})
+							select: {"name":"role"}
+								option: {"html": "#{name}", "value":"#{id}","selected":#{selected}} #{roles}
+						(!#{roles})
+							select: {"service": "#{@apiPath}cms/user/getRoles", "name":"role"}
+								option: {"html": "#{name}", "value":"#{id}"}
+			(!#{idSet})
+				input: {"type": "hidden", name: "role", "value": "#{role}"}
+			@user/userFormContent 
+		footer.text-right:
+			button: "Atualizar"

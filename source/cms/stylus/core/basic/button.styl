@@ -1,0 +1,85 @@
+@keyframes button-active
+	0%
+		opacity: 0
+		transform: scale(0, 1)
+	50%
+		opacity: 1
+		transform: scale(1, 1)
+	100%
+		opacity: 0.8
+		transform: scale(1, 1)
+		
+back
+	vertical-align: middle
+	padding: 0.4em 0.4em 0.4em 0.4em
+	cursor: pointer
+	span
+		vertical-align: middle
+
+
+button, .button
+	padding: 0.4em 0.8em
+	font-weight: 500
+	border: 0
+	display: inline-block
+	vertical-align: middle
+	border-radius: 2px
+	box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12)
+	background-color: _color_primary_light
+	color: _color_text_primary_light
+	&:focus, &:hover
+		transition: box-shadow
+		transition-duration: 0.1s
+		box-shadow: 0 4px 4px 2px rgba(0,0,0,.14),0 5px 2px -4px rgba(0,0,0,.2),0 2px 6px 0 rgba(0,0,0,.12)
+		
+	&:active
+		&::after
+			border-radius: unquote('inherit')
+			content: ''
+			position: absolute
+			top: 0
+			bottom: 0
+			left: 0
+			right: 0
+			opacity: 0.8
+			background-color: rgba(0, 0, 0, 0.1)
+			transform-origin: 50% 0
+			animation-name: button-active
+			animation-duration: 0.3s
+	&[enabled="false"],&[enabled="0"]
+		opacity: 0.6
+		cursor: default
+		&:active
+			&::after
+				content: none
+button[type=fab],fab
+	@extend .button
+	z-index: 2
+	border: 0
+	border-radius: 2em
+	font-size: 24px
+	width: 56px
+	height: 56px
+	text-align: center
+	padding: 0
+	margin: 0
+	background-color: _color_secondary
+	color: _color_text_secondary
+	cursor: pointer
+
+	&:before
+		content: ''
+		vertical-align: middle
+		display: inline-block
+		height: 100%
+
+	&[on]
+		position: fixed
+	i
+		vertical-align: middle
+		text-align: center
+		margin-top: 2px;
+		transform: translateY(-1px)
+	&.small
+		width: 40px
+		height: 40px

@@ -1,9 +1,12 @@
-notification, .notification-item
-	position: absolute
-	z-index: 99999
-	width: 100%
+notification
+	overflow: visible
+	position: fixed
+	top: headerHeight
+	left: menuWidth
+	right: 0px
 	opacity: 0.9
-	top: 0px
+	z-index: 500
+	height: 0
 .notification-item
 	box-sizing: border-box
 	font-size: 0.8em
@@ -21,4 +24,3 @@ notification, .notification-item
 		&.p{i}
 			generateColor(i - 1, 80%)
 			border-width: 1px
-		

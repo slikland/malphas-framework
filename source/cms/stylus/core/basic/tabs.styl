@@ -1,0 +1,21 @@
+tabs
+	display: block
+	padding-top: 1em
+	padding-left: 0.4em
+	tab
+		transition: background-color 0.1s, top 0.1s, color 0.1s
+		background-color: #EFEFEF
+		color: #666666
+		margin: 0 0.4em
+		box-shadow: 2px -2px 0px 0px rgba(0,0,0,.08), -2px -2px 1px 1px rgba(0,0,0,.04)
+		padding: 0.2em 1em
+		cursor: pointer
+		z-index: 0
+		&:hover
+			background-color: #FFFFFF
+			color: _color_text
+			z-index: 1
+		&.selected
+			z-index: 1
+			background-color: #FFFFFF
+			color: _color_text

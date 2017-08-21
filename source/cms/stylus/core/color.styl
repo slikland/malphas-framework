@@ -1,0 +1,77 @@
+.bg-primary
+	background-color: _color_primary
+	color: _color_text_primary
+.bg-secondary
+	background-color: _color_secondary
+	color: _color_text_secondary
+.bg-primary-dark
+	background-color: _color_primary_dark
+	color: _color_text_primary_dark
+.bg-secondary-dark
+	background-color: _color_secondary_dark
+	color: _color_text_secondary_dark
+.bg-primary-light
+	background-color: _color_primary_light
+	color: _color_text_primary_light
+.bg-secondary-light
+	background-color: _color_secondary_light
+	color: _color_text_secondary_light
+.color-default
+	color: _color_text
+.color-primary
+	color: _color_text_primary
+.color-secondary
+	color: _color_text_secondary
+.color-primary-dark
+	color: _color_text_primary_dark
+.color-secondary-dark
+	color: _color_text_secondary_dark
+.color-primary-light
+	color: _color_text_primary_light
+.color-secondary-light
+	color: _color_text_secondary_light
+colors = (#d9534f #f0ad4e #5bc0de #337ab7 #5cb85c)
+
+generateColors(lightenAmount = 0)
+		for i in (1...length(colors) + 1)
+			color = colors[i - 1]
+			if lightenAmount != 0
+				color = lighten(color, lightenAmount)
+			+prefix-classes('border-')
+				&.{i}
+					border-color: color
+			+prefix-classes('bg-')
+				&.{i}
+					background-color: color
+			+prefix-classes('text-')
+				&.{i}
+					color: color
+			+prefix-classes('button-')
+				&.{i}, &.{i}[type=fab]
+					background-color: color
+					if lightness(color) > 75%
+						color: #666666
+					else
+						color: #FFFFFF
+
+			+prefix-classes('tag-')
+				&.{i}
+					background-color: lighten(color, 10)
+					border-color: darken(color, 10)
+					border-style: solid
+					border-width: 1px
+					if lightness(color) > 75%
+						color: #666666
+					else
+						color: #FFFFFF
+
+getColor(index, lightenAmount = 0, opacity = 1)
+	color = colors[index - 1]
+	if lightenAmount != 0
+		color = lighten(color, lightenAmount)
+	if opacity < 1
+		color = alpha(color, opacity)
+	color
+color = getColor(1)
+
+generateColors(0)
