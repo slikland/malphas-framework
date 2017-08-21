@@ -2,7 +2,6 @@ class components.ImageGrid extends BaseDOM
 	@SELECTOR: '.image-grid'
 	constructor:()->
 		super
-		console.log(arguments)
 		@css('position', 'relative')
 		@_templateNode = @element.templateNode
 		@_checkAttributes()
@@ -194,6 +193,7 @@ class components.ImageGrid extends BaseDOM
 			i = @_items.length
 			while i-- > 0
 				item = @_items[i]
+				console.log(item)
 				x = item.x
 				y = item.y
 				gridItem = @_findGridItem(item.x, item.y)
@@ -206,6 +206,7 @@ class components.ImageGrid extends BaseDOM
 					while ++py < h
 						if !(px == 0 && py == 0)
 							@_findGridItem(px + x, py + y).hide()
+		console.log(@_items)
 	_findGridItem:(x, y)->
 		i = @_grid.length
 		while i-- > 0
@@ -236,7 +237,6 @@ class components.ImageGrid extends BaseDOM
 				'top': @_y * @_height + 'px'
 			})
 		setData:(data)->
-
 			@_data = data
 			if @_data?
 				@_w = data.w
@@ -246,7 +246,7 @@ class components.ImageGrid extends BaseDOM
 					'background-image': 'url('+data.thumb+')'
 				})
 				if !@_edit
-					@_edit = new BaseDOM({className: 'edit'})
+					@_edit = new BaseDOM({className: 'edit test-' + Math.random()})
 					@_editIcon = new BaseDOM({element: 'i', 'className': 'icon edit-icon'})
 					@_editIcon.element.on('mousedown', @_editClick)
 					@_removeIcon = new BaseDOM({element: 'i', 'className': 'icon remove-icon'})
@@ -292,6 +292,7 @@ class components.ImageGrid extends BaseDOM
 			@_itemWidth = itemWidth
 			@_itemHeight = itemHeight
 		show:(ix, iy, ex, ey)->
+			console.log("SHOW")
 			@_x = ix
 			@_y = iy
 			@_w = ex - ix

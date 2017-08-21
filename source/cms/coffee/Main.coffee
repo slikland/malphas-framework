@@ -25,7 +25,6 @@
 class Main
 
 	constructor:()->
-
 		app.body = new BaseDOM({element: document.body})
 
 		app.basePath = document.querySelector('base')?.getAttribute('href') || ''
