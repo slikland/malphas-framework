@@ -12,3 +12,9 @@ user_duplicated_email: "Email já cadastrado"
 200 //Products
 product_not_found: "Product not found"
 product_not_found2: "Product not found"
+
+1000 //GeneralValidation
+validation_error: "Please fill in the fields correctly"
+
+2005 //Validations
+duplicateEmail: "Email já cadastrado"

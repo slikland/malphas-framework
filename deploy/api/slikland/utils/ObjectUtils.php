@@ -57,34 +57,64 @@ class ObjectUtils
 		return $response;
 	}
 
-	public static function findInObject($object, $match)
+	public static function findInObject($object, $match, $deep = FALSE)
 	{
-		$matched = TRUE;
-		foreach($match as $mk=>$mv)
+		$matched = FALSE;
+		$matches = array();
+		if(isAssoc($match))
 		{
-			if(!isset($object[$mk]) || $object[$mk] != $mv)
+			foreach($match as $mk=>$mv)
 			{
-				$matched = FALSE;
-				break;
-			}
-		}
-		if($matched)
-		{
-			return $object;
-		}
-
-		foreach($object as $v)
-		{
-			if(is_array($v))
-			{
-				$ret = self::findInObject($v, $match);
-				if($ret)
+				if(isset($object[$mk]) && $object[$mk] == $mv)
 				{
-					return $ret;
+					$matched = TRUE;
+					$matches[] = $object;
+					break;
+				}
+			}
+		}else{
+			foreach($match as $mk)
+			{
+				if(isset($object[$mk]))
+				{
+					$matched = TRUE;
+					$matches[] = $object;
+					break;
 				}
 			}
 		}
-		return NULL;
+
+		if($deep || (!$deep && !$matched))
+		{
+			foreach($object as $v)
+			{
+				if(is_array($v))
+				{
+					$matches = array_merge($matches, self::findInObject($v, $match, $deep));
+				}
+			}
+		}
+		return $matches;
+	}
+
+	public static function clearEmpty($object)
+	{
+		if(is_array($object))
+		{
+			foreach($object as $k=>$v)
+			{
+				if(is_array($v))
+				{
+					$v = static::clearEmpty($v);
+				}
+				
+				if(empty($v))
+				{
+					unset($object[$k]);
+				}
+			}
+		}
+		return $object;
 	}
 
 }

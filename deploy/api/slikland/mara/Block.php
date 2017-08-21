@@ -260,7 +260,7 @@ class Block
 		{
 			if(strlen($replaceObject) > 0)
 			{
-				$replacedObject = @eval('return '.$replaceObject.';');
+				$replacedObject = NULL;
 				if($replacedObject)
 				{
 					$object = $replacedObject;
@@ -580,13 +580,3 @@ class Block
 	}
 
 }
-
-
-
-
-
-// 	_render_CONDITIONAL:(data, context)->
-// 		if @_parseObjectString(@_condition, data, true)
-// 			return [[data, context]]
-// 		else
-// 			return false

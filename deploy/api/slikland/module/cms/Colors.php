@@ -99,14 +99,14 @@ class Colors
 
 	}
 
-	private function getColors()
+	public function getColors()
 	{
 		$cmsColors = Setting::getAll('_color_%');
 		$colors = self::$defaultColors;
-		foreach($cmsColors as $color)
+		foreach($cmsColors as $k=>$color)
 		{
-			$name = preg_replace('/^_color_/', '', $color['name']);
-			$colors[$name] = $color['value'];
+			$name = preg_replace('/^_color_/', '', $k);
+			$colors[$name] = $color;
 		}
 		$fullColors = array();
 		foreach($colors as $k=>$color)
@@ -133,6 +133,14 @@ class Colors
 		return $fullColors;
 	}
 
+	public function setColors($colors)
+	{
+		foreach($colors as $k=>$color)
+		{
+			Setting::set('_color_' . $k, $color);
+		}
+	}
+
 	function replaceColors($data)
 	{
 		$colors = array('_color_primary', '#FF0000');
@@ -146,6 +154,7 @@ class Colors
 	{
 		$response = '';
 		$name = $matches[1];
+
 		if(isset($this->colors[$name]))
 		{
 			$color = $this->colors[$name];
@@ -160,16 +169,3 @@ class Colors
 		return $response;
 	}
 }
-
-// function replaceCMSColors($data)
-// {
-// 	$hardcodedColors = array(
-// 		'_color_primary'=>''
-// 	);
-// 	$colors = Setting::getAll('_color_%');
-// 	foreach($colors as $color)
-// 	{
-// 		$data = str_replace($color['name'], $color['value'], $data);
-// 	}
-// 	return $data;
-// }

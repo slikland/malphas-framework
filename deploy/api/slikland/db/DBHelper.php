@@ -65,7 +65,7 @@ class DBHelper
 		return $db->fetch_all($queryData['query'], $queryData['values']);
 	}
 
-	function paginate($data, $viewName = NULL, $searchFields = array(),$order = array())
+	function paginate($data, $viewName = NULL, $searchFields = array(), $order = array())
 	{
 		$index = 0;
 		$numItems = 20;
@@ -100,7 +100,9 @@ class DBHelper
 		{
 			if(preg_match('/^filter_(.+)$/', $k, $match))
 			{
-				$where[$match[1]] = explode(',', $v);
+				if(!is_array($v)) $v = explode(',', $v);
+				if(empty($v)) continue;
+				$where[$match[1]] = $v;
 			}
 		}
 

@@ -34,16 +34,23 @@ class UID
 	
 	public static function decode($k)
 	{
+		if(!is_string($k)) return NULL;
 		$charLength = strlen(self::$chars) - 1;
 		$i = 0;
 		$l = self::$keyLength;
 		$key = substr($k, 0, $l);
 		$val = substr($k, $l);
+		if(strlen($key) < $l) return NULL;
 		
 		$keyIndexes = array();
-		for($i = 0; $i < $l; $i++)
+		try{
+			for($i = 0; $i < $l; $i++)
+			{
+				$keyIndexes[] = strpos(self::$chars, $key[$i]);
+			}
+		}catch(\Exception $e)
 		{
-			$keyIndexes[] = strpos(self::$chars, $key[$i]);
+			return NULL;
 		}
 		
 		$l = strlen($val);

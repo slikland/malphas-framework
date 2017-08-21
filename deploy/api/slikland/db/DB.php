@@ -100,7 +100,7 @@ class DB{
 		return $results;
 	}
 
-	public function query($sql, $params = NULL)
+	public function query($sql, $params = NULL, $collate = NULL)
 	{
 		$this->initMySQLi();
 		if(!$params)
@@ -109,54 +109,18 @@ class DB{
 		}else
 		{
 			$sql = preg_replace('/;+$/', '', $sql);
+			if($collate)
+			{
+				$sql .= ' collate ' . $collate;
+			}
+
 			$statement = $this->mysqli->prepare($sql);
 			if(!$statement)
 			{
 				return FALSE;
 			}
-			$type = '';
-			$values = array();
-			foreach($params as $param)
-			{
-				if(is_array($param))
-				{
-					$type .= $param['type'];
-					$values[] = $param['value'];
-				}else{
-					if(is_string($param))
-					{
-						$type .= 's';
-					}else if(is_numeric($param))
-					{
-						if(is_int($param))
-						{
-							$type .= 'i';
-						}else{
-							$type .= 'd';
-						}
-					}else if(is_bool($param))
-					{
-						$type .= 'i';
-						if($param)
-						{
-							$param = 1;
-						}else{
-							$param = 0;
-						}
-					}else
-					{
-						$type .= 's';
-					}
-					$values[] = $param;
-				}
-			}
-			array_unshift($values, $type);
-			foreach($values as $k=>$v)
-			{
-				$values[$k] = &$values[$k];
-			}
 			
-			$a = call_user_func_array(array($statement, 'bind_param'), $values);
+			$a = call_user_func_array(array($statement, 'bind_param'), $this->buildValues($params));
 			$statement->execute();
 			if($result = $statement->get_result())
 			{
@@ -164,6 +128,52 @@ class DB{
 			}
 			return $statement;
 		}
+	}
+
+	private function buildValues($params = NULL)
+	{
+		$type = '';
+		$values = array();
+		foreach($params as $param)
+		{
+			if(is_array($param))
+			{
+				$type .= $param['type'];
+				$values[] = $param['value'];
+			}else{
+				if(is_string($param))
+				{
+					$type .= 's';
+				}else if(is_numeric($param))
+				{
+					if(is_int($param))
+					{
+						$type .= 'i';
+					}else{
+						$type .= 'd';
+					}
+				}else if(is_bool($param))
+				{
+					$type .= 'i';
+					if($param)
+					{
+						$param = 1;
+					}else{
+						$param = 0;
+					}
+				}else
+				{
+					$type .= 's';
+				}
+				$values[] = $param;
+			}
+		}
+		array_unshift($values, $type);
+		foreach($values as $k=>$v)
+		{
+			$values[$k] = &$values[$k];
+		}
+		return $values;
 	}
 
 	public function getColumns($table)
@@ -298,18 +308,18 @@ class DB{
 		}
 	}
 
-	public function fetch_value($sql, $params = NULL)
+	public function fetch_value($sql, $params = NULL, $collate = NULL)
 	{
-		$resource = $this->query($sql, $params);
+		$resource = $this->query($sql, $params, $collate);
 		if(!$resource) return NULL;
 		if($resource->num_rows == 0) return NULL;
 		$row = $resource->fetch_array();
 		return $row[0];
 	}
 
-	public function fetch_one($sql, $params = NULL, $array = false)
+	public function fetch_one($sql, $params = NULL, $array = false, $collate = NULL)
 	{
-		$resource = $this->query($sql, $params);
+		$resource = $this->query($sql, $params, $collate);
 		if(!$resource) return NULL;
 		if($resource->num_rows == 0) return NULL;
 		if($array)
@@ -321,9 +331,9 @@ class DB{
 		}		
 	}
 
-	public function fetch_all($sql, $params = NULL, $array = false)
+	public function fetch_all($sql, $params = NULL, $array = false, $collate = NULL)
 	{
-		$resource = $this->query($sql, $params);
+		$resource = $this->query($sql, $params, $collate);
 		$response = array();
 		if($array)
 		{

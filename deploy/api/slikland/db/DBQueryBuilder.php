@@ -67,7 +67,7 @@ class DBQueryBuilder
 			{
 				if(preg_match('/\?$/', $k))
 				{
-					$selectFields[] = "{$v} as " . preg_replace('/\?$/', '', $k);
+					$selectFields[] = "{$v} as `" . preg_replace('/\?$/', '', $k) . '`';
 					continue;
 				}else{
 					$fieldData = self::getField($v);
@@ -81,7 +81,7 @@ class DBQueryBuilder
 				continue;
 			}
 
-			$selectFields[] = "`{$fieldData['schema']}`.`{$fieldData['field']}` as {$fieldData['alias']}";
+			$selectFields[] = "`{$fieldData['schema']}`.`{$fieldData['field']}` as `{$fieldData['alias']}`";
 
 			if(isset($fieldData['ref']) && !empty($fieldData['ref']))
 			{
@@ -94,8 +94,15 @@ class DBQueryBuilder
 
 		if(!$where)
 		{
-			$where = $schemaData['where'];
+			$where = array();
+		}else{
+			if(!is_array($where))
+			{
+				$where = array($where);
+			}
 		}
+
+		$where = array_merge($where, $schemaData['where']);
 
 		if(!$order)
 		{
@@ -457,7 +464,7 @@ class DBQueryBuilder
 								$cond = $value;
 								$value = NULL;
 							}else{
-								$cond .= " = " . $value;
+								$cond = $match[2] . " = " . $value;
 								$value = NULL;
 							}
 							break;

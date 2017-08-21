@@ -18,9 +18,17 @@ class Html
 		$this->children = array();
 	}
 
-	function attr($name, $value)
+	function attr($name, $value = NULL)
 	{
-		$this->attributes[$name] = $value;
+		if(is_null($value) && isAssoc($name))
+		{
+			foreach($name as $k=>$v)
+			{
+				$this->attr($k, $v);
+			}
+		}else{
+			$this->attributes[$name] = $value;
+		}
 	}
 
 	function content($value)
@@ -36,7 +44,8 @@ class Html
 	function addChild($child)
 	{
 		$this->children[] = $child;
-		$this->_numChildren++;		
+		$this->_numChildren++;
+		return $child;
 	}
 
 	function render($return = FALSE)
@@ -54,7 +63,7 @@ class Html
 					$out .= ' ' . $k . '="' . str_replace("\/", "/", $v) . '"';
 				}
 			}
-			if($this->tag != 'iframe' && empty($this->content) && $this->_numChildren == 0)
+			if(in_array($this->tag, array('meta', 'img')) && empty($this->content) && $this->_numChildren == 0)
 			{
 				$out .= '/>';
 			}else{

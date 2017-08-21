@@ -40,6 +40,10 @@ class dashboard
 		$response['options'] = array();
 		return $response;
 	}
+
+	/**
+	@permission
+	*/
 	function usersBar($data)
 	{
 		// http://www.chartjs.org/docs/

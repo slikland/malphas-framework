@@ -64,7 +64,7 @@ class CodedError extends \slikland\error\Error
 		parent::__construct($message['message'], $message['code'], $data);
 	}
 
-    public function toObject()
+	public function toObject()
 	{
 		$response = array('error'=>true, 'message'=>self::getMessage(), 'code'=>self::getCode());
 		if(isset($this->data) && !empty($this->data))

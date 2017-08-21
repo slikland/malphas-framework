@@ -39,10 +39,37 @@ class cms
 	*/
 	function updateMenu($data)
 	{
-		$this->module->updatePages($data['data']['pages'][0], 'pages');
-		$this->module->updatePages($data['data']['menu'][0], 'menu');
-		$this->module->updatePages($data['data']['config'][0], 'config');
+		$this->module->updatePages($data['pages'][0], 'pages');
+		$this->module->updatePages($data['menu'][0], 'menu');
+		$this->module->updatePages($data['config'][0], 'config');
 		return TRUE;
+	}
+
+	/**
+	@permission [1]
+	*/
+	function getColors()
+	{
+		$colorModule = get_module('cms/Colors');
+		return $colorModule->getColors();
+	}
+
+	/**
+	@method POST
+	@permission [1]
+	@validation
+		primary_color:
+			Data.required
+		secondary_color:
+			Data.required
+	*/
+	function setColors($data)
+	{
+		$colorModule = get_module('cms/Colors');
+		$colors = array();
+		$colors['primary'] = $data['primary_color'];
+		$colors['secondary'] = $data['secondary_color'];
+		return $colorModule->setColors($colors);
 	}
 
 }

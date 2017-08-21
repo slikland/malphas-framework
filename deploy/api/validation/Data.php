@@ -6,11 +6,11 @@ class Data
 
 	/**
 	@message
-		*{validation_required}
+		Campo obrigatório
 	*/
 	public static function required($value)
 	{
-		return isset($value) && !empty($value);
+		return isset($value) && (is_numeric($value) || !empty($value));
 	}
 
 }

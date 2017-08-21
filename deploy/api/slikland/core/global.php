@@ -43,7 +43,7 @@ function set_header($value, $rewrite = TRUE, $code = NULL)
 		$i = count($_headers);
 		while(--$i > 0)
 		{
-			if($_headers[$i]['name'] == $name)
+			if(@$_headers[$i]['name'] == $name)
 			{
 				unset($_headers[$i]);
 			}
@@ -58,7 +58,7 @@ function print_headers()
 	global $_headers;
 	foreach($_headers as $value)
 	{
-		header($value['value'], $value['rewrite'], $value['code']);
+		@header($value['value'], $value['rewrite'], $value['code']);
 	}
 }
 
@@ -94,19 +94,19 @@ function setOutputFormat($format = 'json')
 	{
 		case 'html':
 			set_header('Content-type: text/html; charset=utf-8');
-			header('Content-type: text/html');
+			@header('Content-type: text/html');
 			break;
 		case 'download':
 			set_header('Content-type: application/octet-stream; charset=utf-8');
-			header('Content-type: application/octet-stream');
+			@header('Content-type: application/octet-stream');
 			break;
 		case 'json':
 			set_header('Content-type: text/json; charset=utf-8');
-			header('Content-type: text/json');
+			@header('Content-type: text/json');
 			break;
 		default:
 			set_header('Content-type: text/plain; charset=utf-8');
-			header('Content-type: text/plain');
+			@header('Content-type: text/plain');
 			break;
 	}
 
@@ -159,7 +159,7 @@ function uid_decode($uid)
 	return \slikland\utils\crypt\UID::decode($uid);
 }
 
-function get_module($moduleName, $newInstance = FALSE)
+function get_static_module($moduleName)
 {
 	$modulePath = '/module/';
 	$module = preg_replace('/\//', '\\', $modulePath . $moduleName);
@@ -171,6 +171,14 @@ function get_module($moduleName, $newInstance = FALSE)
 	{
 		return;
 	}
+
+	return $module;
+}
+
+function get_module($moduleName, $newInstance = FALSE)
+{
+	$module = get_static_module($moduleName);
+	if(!$module) return;
 
 	try{
 		if(!$newInstance && method_exists($module, 'getInstance'))
@@ -247,4 +255,10 @@ function add_annotation_callback($annotation, $callback, $order = \slikland\core
 function remove_annotation_callback()
 {
 	\slikland\core\AnnotationParser::removeAnnotationCallback($annotation);
+}function sendProgress($progress = 0, $total = 1)
+{
+	print '__p'.$progress.'__';
+	print PHP_EOL;
+	ob_flush();
+	flush();
 }

@@ -6,6 +6,19 @@ class Validator
 	{
 		$validationRoot = '\\validation\\';
 		$validation = array();
+		if(isset($info['*']))
+		{
+			$catchAll = $info['*'];
+			foreach($data as $k=>$v)
+			{
+				if(!isset($info[$k]))
+				{
+					$info[$k] = array();
+				}
+				$info[$k] = array_merge($info[$k], $catchAll);
+			}
+			unset($info['*']);
+		}
 		foreach($info as $k=>$v)
 		{
 			if(!is_array($v))

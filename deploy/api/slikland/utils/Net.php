@@ -19,6 +19,8 @@ class Net
 			$ipaddress = $_SERVER['REMOTE_ADDR'];
 		else
 			$ipaddress = 'UNKNOWN';
+		$ipaddress = explode(',', $ipaddress);
+		$ipaddress = trim($ipaddress[0]);
 		return $ipaddress;
 	}
 }

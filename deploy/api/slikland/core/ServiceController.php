@@ -7,6 +7,10 @@ class ServiceController
 {
 	public static function execute($servicePath = NULL, $data = NULL, $output = FALSE)
 	{
+		if(@$_SERVER['REQUEST_METHOD'] == 'OPTIONS')
+		{
+			return NULL;
+		}
 		$response = NULL;
 		$format = 'json';
 		try{
@@ -25,12 +29,27 @@ class ServiceController
 
 			$params = array('data' => (array)$_REQUEST);
 
-			foreach($annotations[\slikland\core\AnnotationParser::BEFORE] as $annotation)
+			if($inputData = file_get_contents('php://input'))
 			{
-				call_user_func_array($annotation['callback'], array($annotation['data'], &$params));
+				try{
+					$data = json_decode($inputData, TRUE);
+					$isJSON = TRUE;
+				}catch(\Exception $e)
+				{
+					$isJSON = FALSE;
+				}
+				if(!$data)
+				{
+					$data = array('data'=>$inputData);
+				}
 			}
 
-			$data = $params['data'];
+			if(!@$isJSON)
+			{
+				$data = (array)$_REQUEST;
+			}else{
+				$data = array_merge((array)$_GET, $data);
+			}
 
 			if(isset($service['params']) && !empty($service['params']))
 			{
@@ -42,10 +61,11 @@ class ServiceController
 				$data = array_merge($data, $_FILES);
 			}
 
-			if($inputData = file_get_contents('php://input'))
+			$params['data'] = $data;
+
+			foreach($annotations[\slikland\core\AnnotationParser::BEFORE] as $annotation)
 			{
-				$inputData = json_decode($inputData, TRUE);
-				$data = array_merge($data, array('data'=>$inputData));
+				call_user_func_array($annotation['callback'], array($annotation['data'], &$params));
 			}
 
 			$response = $class->$method($data);
@@ -99,6 +119,13 @@ class ServiceController
 			}
 
 		}catch(\slikland\error\Error $e)
+		{
+			// if(DEBUG)
+			// {
+			// 	var_dump($e);
+			// }
+			$response = $e->toObject();
+		}catch(\Error $e)
 		{
 			// if(DEBUG)
 			// {
@@ -167,6 +194,9 @@ class ServiceController
 				{
 					$response['method'] = $method;
 					array_shift($methodArr);
+				}else if(method_exists($service, 'index'))
+				{
+					$response['method'] = 'index';
 				}
 				$response['params'] = $methodArr;
 
