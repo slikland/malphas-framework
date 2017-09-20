@@ -1,6 +1,6 @@
 #namespace cms.ui.tag.attributes
 class FAB extends cms.ui.Base
-	@SELECTOR: 'fab,button[type="fab"]'
+	@SELECTOR: 'fab,button[type="fab"],button.fab'
 	_update:(data)->
 		for item in data.add
 			@_plugins[item] = new Plugin(item)

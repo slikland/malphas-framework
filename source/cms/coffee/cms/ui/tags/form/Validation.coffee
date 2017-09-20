@@ -44,7 +44,7 @@ class Validation extends cms.ui.Base
 			@_parseValidations()
 			@_form = @findParents('form')
 			@_field = new BaseDOM(@findParents('field'))
-			@_input = @_field.find('input')
+			@_input = @_field.find('input,textarea')
 
 			@_input.on('blur', @_blur)
 			@_input.on('change', @_change)
