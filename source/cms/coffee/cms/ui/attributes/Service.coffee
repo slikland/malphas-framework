@@ -31,22 +31,27 @@ class Service extends cms.ui.Base
 
 		constructor:(element)->
 			super({element: element})
+			@_refreshInterval = Number(@attr('serviceRefreshInterval'))
 			@_element.on('update', @_update)
 			@_element.on('abort', @_abort)
 			@_loadServiceTimeout = setTimeout(@_loadService, 1)
 		_abort:()=>
-			clearTimeout(@_loadServiceTimeout)
+			@_clearTimeout()
 			@_api?.abort()
 			@_removeProgress()
 
 		_update:(e, data)=>
-			clearTimeout(@_loadServiceTimeout)
 			@_loadServiceTimeout = setTimeout(@_loadService, 300)
 
 		_loadService:()=>
-			clearTimeout(@_loadServiceTimeout)
+			if @_isLoading
+				return
+			@_clearTimeout()
+			@_isLoading = true
 			data = @_parseData()
 			@_api = API.call(@_element.getAttribute('service'), data, @_serviceLoaded, @_serviceError)
+			if @_element.hasAttribute('loadingRatio') && !isNaN(@_element.getAttribute('loadingRatio'))
+				@_api.loadingRatio = Number(@_element.getAttribute('loadingRatio'))
 			@_api.on(API.PROGRESS, @_onProgress)
 			@_showProgress()
 		_removeEventListeners:()->
@@ -115,6 +120,14 @@ class Service extends cms.ui.Base
 					app.router.removeParam(id)
 			return params
 
+		_checkTimeout:()->
+			console.log(@_refreshInterval)
+			if @_refreshInterval
+				@_loadServiceTimeout = setTimeout(@_loadService, @_refreshInterval * 1000)
+
+		_clearTimeout:()->
+			clearTimeout(@_loadServiceTimeout)
+
 		_serviceLoaded:(e, data)=>
 			app.template.renderBlock(@_element, data)
 			if @attr('id')
@@ -130,6 +143,8 @@ class Service extends cms.ui.Base
 			@_element.trigger('updated', data)
 			@_removeEventListeners()
 			@_removeProgress()
+			@_checkTimeout()
+			@_isLoading = false
 		_serviceError:(e, data)=>
 			if data?.message?.length > 0
 				if !data.type
@@ -139,6 +154,8 @@ class Service extends cms.ui.Base
 				app.router.goto(@_element.getAttribute('onError'))
 			@_removeEventListeners()
 			@_removeProgress()
+			@_checkTimeout()
+			@_isLoading = false
 		_sortByOrder:(a, b)=>
 			if a.sortOrder < b.sortOrder
 				return -1

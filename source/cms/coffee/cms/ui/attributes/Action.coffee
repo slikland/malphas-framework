@@ -5,7 +5,7 @@ class Action extends cms.ui.Base
 		for item in data.add
 			if item.hasAttribute('action') && !item.getAttribute('target')
 				action = item.getAttribute('action')
-				if /\/api\/.*?$/.test(action)
+				if /\/api\/.*?$/.test(action) || /\[[^\[\]]+\]/.test(action)
 					@_plugins[item] = new Plugin(item)
 
 		for item in data.remove
@@ -23,18 +23,32 @@ class Action extends cms.ui.Base
 			@_element.on('click', @_click)
 			@_element.on('abort', @_abort)
 		_click:(e)=>
-			@_api = API.call(@_element.getAttribute('action'), null, @_apiComplete, @_apiError)
-			if @_element.getAttribute('globalLoading')
-				@_api.on(API.PROGRESS, @_progress)
-				@_loading = new cms.ui.Loading()
-				@_loading.css({'position': 'fixed'})
-				@_loading.show()
-				window.addEventListener('resize', @_loadingResize)
+			console.log(e)
+			action = @_element.getAttribute('action')
+			if /\[[^\[\]]+\]/.test(action)
+				re = /\[([^\[\]]+)\]/g
+				while o = re.exec(action)
+					params = o[1].split(',')
+					targets = [app]
+					if params[1]
+						targets = document.querySelectorAll(params[1])
+					evt = params[0]
+					params = params.splice(2)
+					for target in targets
+						target.trigger?.apply(target, [].concat(evt, params))
+			else
+				@_api = API.call(action, null, @_apiComplete, @_apiError)
+				if @_element.getAttribute('globalLoading')
+					@_api.on(API.PROGRESS, @_progress)
+					@_loading = new cms.ui.Loading()
+					@_loading.css({'position': 'fixed'})
+					@_loading.show()
+					window.addEventListener('resize', @_loadingResize)
 
-				app.interface.context.appendChildAt(@_loading, 0)
-				setTimeout(@_loadingResize, 0)
-			if @attr('prevent') && @attr('prevent') == 'false'
-				return
+					app.interface.context.appendChildAt(@_loading, 0)
+					setTimeout(@_loadingResize, 0)
+				if @attr('prevent') && @attr('prevent') == 'false'
+					return
 			e.preventDefault()
 			e.stopImmediatePropagation()
 

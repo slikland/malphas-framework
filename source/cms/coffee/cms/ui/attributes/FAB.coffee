@@ -15,6 +15,8 @@ class FAB extends cms.ui.Base
 
 		constructor:(element)->
 			super({element: element})
+			@addClass('fab')
+			@attr('type', 'button')
 			if @attr('on')
 				@css('visibility', 'hidden')
 				setTimeout(@_setPosition, 100)

@@ -24,11 +24,14 @@ if !EventDispatcher
 			var ed = new EventDispatcher()
 			ed.on('someEvent', someEventHandler);
 		###
-		on:(p_event, p_handler)->
+		on:(p_event, p_handler, useCapture = false)->
 			if !@_events then @_events = {}
 			if !@_events[p_event] then @_events[p_event] = []
 			if !(p_handler in @_events[p_event])
-				@_events[p_event].unshift(p_handler)
+				if useCapture
+					@_events[p_event].push(p_handler)
+				else
+					@_events[p_event].unshift(p_handler)
 
 		###*
 		Remove an event listener.

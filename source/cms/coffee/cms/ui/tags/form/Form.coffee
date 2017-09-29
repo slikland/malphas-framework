@@ -42,7 +42,7 @@ class Form extends cms.ui.Base
 					@appendChild(@_dataElement)
 				@_dataElement.innerHTML = JSON.stringify(data)
 			else
-				@_clearFieldMessages()
+				# @_clearFieldMessages()
 				if e.defaultPrevented
 					e.stopImmediatePropagation()
 					return
@@ -62,15 +62,28 @@ class Form extends cms.ui.Base
 			@_element.reset()
 			success = @attr('success')
 			if success && success.length > 0
-				switch success
-					when 'update'
-						@_element.trigger('update')
-					when 'refresh'
-						app.interface.show()
-					when 'reload'
-						window.location.reload()
-					else
-						app.router.goto(success)
+				if /\[[^\[\]]+\]/.exec(success)
+					re = /\[([^\[\]]+)\]/g
+					while o = re.exec(success)
+						params = o[1].split(',')
+						targets = [app]
+						if params[1]
+							targets = document.querySelectorAll(params[1])
+						evt = params[0]
+						params = params.splice(2)
+						for target in targets
+							target.trigger?.apply(target, [].concat(evt, params))
+
+				else
+					switch success
+						when 'update'
+							@_element.trigger('update')
+						when 'refresh'
+							app.interface.show()
+						when 'reload'
+							window.location.reload()
+						else
+							app.router.goto(success)
 			if data?.notification?.message?.length > 0
 				if !data.notification.type
 					data.notification.type = 3

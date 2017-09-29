@@ -1,6 +1,6 @@
 #namespace cms.ui.attributes
 class Size extends cms.ui.Base
-	@SELECTOR: '[height],[width]'
+	@SELECTOR: '[height],[width],[min-width],[min-height]'
 	constructor:()->
 		super
 
@@ -19,3 +19,13 @@ class Size extends cms.ui.Base
 				if /^\s*[\d\.]+\s*$/.test(s)
 					s += 'px'
 				item.style.height = s
+			if item.hasAttribute('min-width')
+				s = item.getAttribute('min-width')
+				if /^\s*[\d\.]+\s*$/.test(s)
+					s += 'px'
+				item.style['min-width'] = s
+			if item.hasAttribute('min-height')
+				s = item.getAttribute('min-height')
+				if /^\s*[\d\.]+\s*$/.test(s)
+					s += 'px'
+				item.style['min-height'] = s

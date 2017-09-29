@@ -1,5 +1,6 @@
 #namespace cms.ui
 class Base
+	@_ID: 0
 	constructor:()->
 		@_instances = []
 		@_plugins = {}

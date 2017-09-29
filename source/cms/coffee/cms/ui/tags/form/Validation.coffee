@@ -1,6 +1,7 @@
 #namespace cms.ui.tags.form
 class Validation extends cms.ui.Base
 	@SELECTOR: 'field validation'
+	@_ID: 0
 
 	@_validate_email:(value)->
 		return /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+)+(\.[a-zA-Z0-9]{2,63})+$/.test(value)
@@ -28,14 +29,19 @@ class Validation extends cms.ui.Base
 		return field.value == value
 
 	_update:(data)->
+		if !@_pluginInstances
+			@_pluginInstances = []
 		for item in data.add
-			@_plugins[item] = new Plugin(item)
-
+			item.setAttribute('p_id', @constructor._ID++)
+			@_pluginInstances.push(new Plugin(item))
 		for item in data.remove
-			p = @_plugins[item]
-			if p
-				p.destroy?()
-
+			p_id = item.getAttribute('p_id')
+			i = @_pluginInstances.length
+			while i-- > 0
+				inst = @_pluginInstances[i]
+				if inst.attr('p_id') == p_id
+					inst.destroy()
+					@_pluginInstances.splice(i, 1)
 	class Plugin extends BaseDOM
 		@_destroyPlugin:(item)->
 
@@ -49,8 +55,13 @@ class Validation extends cms.ui.Base
 			@_input.on('blur', @_blur)
 			@_input.on('change', @_change)
 			@_input.on('input', @_change)
-			@_form.on('submit', @_submit)
+			@_form?.on('submit', @_submit, true)
 		destroy:()=>
+			@_input.off('blur', @_blur)
+			@_input.off('change', @_change)
+			@_input.off('input', @_change)
+			@_form.off('submit', @_submit, true)
+			super
 
 		_parseValidations:()=>
 			validations = []

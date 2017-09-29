@@ -16,21 +16,12 @@ class ShowModal extends cms.ui.Base
 		constructor:(element)->
 			super({element: element})
 			@_modalRef = @attr('showModal')
+			if /^\>/.test(@_modalRef)
+				@_modalRef = app.template.currentFile + @_modalRef
 			setTimeout(@_addEventListener, 1)
-		_addEventListener:()=>
-			@_element.on('click', @_click)
+		_addEventListener:(e)=>
+			@_element.on('click', @_click, true)
 		_click:(e)=>
-			app.template.renderBlockByReference(@_modalRef, null, null, @_modalRendered)
+			cms.ui.tags.Modal.show(@_modalRef)
 			e.preventDefault()
 			e.stopImmediatePropagation()
-
-		_modalRendered:(items, block)=>
-			@_target = items[0][1]
-			buttons = @_target.querySelectorAll('button')
-			for button in buttons
-				button.on('click', @_buttonClick)
-
-		_buttonClick:(e)=>
-			e.preventDefault()
-			e.stopImmediatePropagation()
-			@_target.parentNode.removeChild(@_target)

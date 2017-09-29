@@ -29,12 +29,17 @@ class Mara extends EventDispatcher
 
 	@get name:()->
 		return _name
+	@get currentFile:()->
+		return @_renderData?.file || ''
 
 	@get id:()->
 		return _id
 
 	@get children:()->
 		return [].concat(_children)
+
+	@get templates:()->
+		return @_templates
 
 	isCurrent:(file)->
 		f = @_renderData?.file || @_block?.file || ''
@@ -76,7 +81,8 @@ class Mara extends EventDispatcher
 		items = []
 		while i-- > 0
 			items[i] = children[i]
-			items[i].style.display = 'none'
+			try
+				items[i].style.display = 'none'
 		setTimeout(@_removeChildren, 0, target, items)
 	resetContext:(target)->
 		children = target.childNodes
@@ -92,9 +98,11 @@ class Mara extends EventDispatcher
 				continue
 			target.removeChild(children[i])
 
-	renderBlockByReference:(reference, data, reset = false, callback = null)->
+	renderBlockByReference:(reference, data, reset = false, callback = null, context)->
 		@_renderData.callback = callback
-		@_templates.get(@_renderData.file + reference, @_referenceLoaded)
+		if /^\>/.test(reference)
+			reference = @_renderData.file + reference
+		@_templates.get(reference, @_referenceLoaded)
 	_referenceLoaded:(block)=>
 		if !@_renderData
 			return
@@ -102,7 +110,7 @@ class Mara extends EventDispatcher
 		@_renderData.context.appendChild(items[0][1])
 		@_block = block
 		@_renderData.callback?(items, @_block)
-	renderBlock:(element, data, context = null)->
+	renderBlock:(element, data, context = null, onlyChild = true)->
 		if !(element instanceof HTMLElement) || !element.getAttribute('mara')
 			return
 		if !context
@@ -110,7 +118,7 @@ class Mara extends EventDispatcher
 			context = element
 		block = slikland.mara.Block.findBlock(element.getAttribute('mara'))
 
-		renderData = block.render(data, context, true)
+		renderData = block.render(data, context, onlyChild)
 		app.trigger('redraw')
 		return renderData
 

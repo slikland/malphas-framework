@@ -137,6 +137,11 @@ class API extends EventDispatcher
 		throw new Error('Not implemented yet')
 		@_jsonp = Boolean(@_jsonp)
 
+	@get loadingRatio:()->
+		return @_loadingRatio
+	@set loadingRatio:(value)->
+		@_loadingRatio = Number(value)
+
 	@get data:()->
 		return @_data
 
@@ -188,7 +193,7 @@ class API extends EventDispatcher
 			if @_form.hasAttribute('type') && @_form.getAttribute('type') == 'json'
 				# @addHeader('Content-type', 'application/json;charset=UTF-8')
 				@addHeader('Content-type', 'application/x-www-form-urlencoded;charset=UTF-8')
-				data = JSON.stringify(@_parseJSON(@_form))
+				data = JSON.stringify(@constructor._parseJSON(@_form))
 			else
 				data = new FormData(@_form)
 		else
@@ -236,6 +241,10 @@ class API extends EventDispatcher
 			for k, v of @_headers
 				@_request.setRequestHeader(k, v)
 		if @_form && @_form.getAttribute('globalLoading')
+			if @_form.hasAttribute('globalLoading') && !isNaN(@_form.getAttribute('globalLoading'))
+				@_loadingRatio = Number(@_form.getAttribute('globalLoading'))
+			else
+				@_loadingRatio = 0.7
 			@_loading = new cms.ui.Loading()
 			@_loading.css({'position': 'fixed'})
 			@_loading.show()
@@ -271,7 +280,7 @@ class API extends EventDispatcher
 		p *= 0.5
 		if e.currentTarget != @_request.upload
 			p += 0.5
-		p *= 0.7
+		p *= @_loadingRatio
 		@_triggerProgress(p)
 	_triggerProgress:(progress)->
 		if progress > @_currentProgress
@@ -279,13 +288,14 @@ class API extends EventDispatcher
 		@_loading?.progress = @_currentProgress
 		@trigger(API.PROGRESS, {loaded: progress, total: 1, progress: @_currentProgress})
 	parseJSON:(form)->
-		return @_parseJSON(form)
-
-	_parseJSON:(form)->
+		return @constructor.parseJSON(form)
+	@parseJSON:(form)->
+		@_parseJSON(form)
+	@_parseJSON:(form)->
 		@_parsedElements = []
 		result = @_parseJSONElement(form)
 		return result
-	_parseJSONElement:(element, indent = 0)=>
+	@_parseJSONElement:(element, indent = 0)=>
 		items = element.querySelectorAll('[json-name]')
 		o = {}
 		ind = ''
@@ -339,7 +349,7 @@ class API extends EventDispatcher
 			p = 0
 			while o = re.exec(t)
 				p = Number(o[1])
-			@_triggerProgress(0.7 + p * 0.3)
+			@_triggerProgress(@_loadingRatio + p * (1 - @_loadingRatio))
 
 		if target.readyState == 4
 			@_submitting = false

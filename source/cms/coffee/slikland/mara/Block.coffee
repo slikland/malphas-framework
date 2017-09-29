@@ -185,7 +185,6 @@ class Block
 	render:(data, context = null, onlyChildren = false)->
 		if !context
 			context = document.createElement('div')
-
 		if onlyChildren
 			ret = [data, context]
 		else
@@ -196,12 +195,20 @@ class Block
 			for d in ret
 				data = d[0]
 				context = d[1]
-
-				if @_children
+				if @_children? && @_children.length > 0
 					for child in @_children
 						child.render(data, context)
+				else if context
+					@_update(data, context)
 		return ret
 
+	_update:(data, context)->
+		for k, v of data
+			if @_tag == 'tag'
+				if k in ['html', 'text', 'content']
+					context.innerHTML = v
+				else
+					context.setAttribute(k, v)
 	_render_NORMAL:(data, context)->
 		if !@_tag
 			return [data, context]
