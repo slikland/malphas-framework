@@ -808,8 +808,13 @@ if (!EventDispatcher) {
 var App, app, windowLoaded;
 App = (function(_super) {
   __extends(App, _super);
+<<<<<<< HEAD
   App.project_version_raw = "SL_PROJECT_VERSION:1.5.1";
   App.project_date_raw = "SL_PROJECT_DATE:1506365497075";
+=======
+  App.project_version_raw = "SL_PROJECT_VERSION:1.4.3";
+  App.project_date_raw = "SL_PROJECT_DATE:1505940750200";
+>>>>>>> e7ae198632b8f6dcb0244fdb7217c24fa9124aea
   App.FRAMEWORK_VERSION = "2.2.15";
   function App() {
     App.__super__.constructor.apply(this, arguments);
@@ -6002,6 +6007,68 @@ cms.ui.tag.attributes.ShowModal = (function(_super) {
   return ShowModal;
 })(cms.ui.Base);
 var __hasProp = {}.hasOwnProperty;
+<<<<<<< HEAD
+=======
+cms.ui.tag.attributes.Show = (function(_super) {
+  var Plugin;
+  __extends(Show, _super);
+  function Show() {
+    return Show.__super__.constructor.apply(this, arguments);
+  }
+  Show.SELECTOR = '[show]';
+  Show.prototype._update = function(data) {
+    var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
+    _ref = data.add;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      item = _ref[_i];
+      this._plugins[item] = new Plugin(item);
+    }
+    _ref1 = data.remove;
+    _results = [];
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      item = _ref1[_j];
+      p = this._plugins[item];
+      if (p) {
+        _results.push(typeof p.destroy === "function" ? p.destroy() : void 0);
+      } else {
+        _results.push(void 0);
+      }
+    }
+    return _results;
+  };
+  Plugin = (function(_super1) {
+    __extends(Plugin, _super1);
+    Plugin._destroyPlugin = function(item) {};
+    function Plugin(element) {
+      this._change = __bind(this._change, this);
+      Plugin.__super__.constructor.call(this, {
+        element: element
+      });
+      this._element.on('change', this._change);
+    }
+    Plugin.prototype._change = function(e) {
+      var container, currentTarget, input, inputs, selectedOption, _i, _len, _results;
+      currentTarget = e.target;
+      container = e.target.parentNode.parentNode;
+      inputs = container.querySelectorAll(this.attr('show'));
+      selectedOption = currentTarget.options[currentTarget.selectedIndex].value;
+      _results = [];
+      for (_i = 0, _len = inputs.length; _i < _len; _i++) {
+        input = inputs[_i];
+        if (selectedOption === '' || selectedOption === '0' || selectedOption === 0) {
+          _results.push(input.parentNode.style.display = 'block');
+        } else {
+          _results.push(input.parentNode.style.display = 'none');
+        }
+      }
+      return _results;
+    };
+    return Plugin;
+  })(BaseDOM);
+  return Show;
+})(cms.ui.Base);
+var __hasProp = {}.hasOwnProperty;
+>>>>>>> e7ae198632b8f6dcb0244fdb7217c24fa9124aea
 cms.ui.tag.attributes.Service = (function(_super) {
   var Plugin;
   __extends(Service, _super);
@@ -6065,29 +6132,44 @@ cms.ui.tag.attributes.Service = (function(_super) {
       Plugin.__super__.constructor.call(this, {
         element: element
       });
+<<<<<<< HEAD
       this._refreshInterval = Number(this.getAttribute('serviceRefreshInterval'));
+=======
+>>>>>>> e7ae198632b8f6dcb0244fdb7217c24fa9124aea
       this._element.on('update', this._update);
       this._element.on('abort', this._abort);
       this._loadServiceTimeout = setTimeout(this._loadService, 1);
     }
     Plugin.prototype._abort = function() {
       var _ref;
+<<<<<<< HEAD
       this._clearTimeout();
+=======
+      clearTimeout(this._loadServiceTimeout);
+>>>>>>> e7ae198632b8f6dcb0244fdb7217c24fa9124aea
       if ((_ref = this._api) != null) {
         _ref.abort();
       }
       return this._removeProgress();
     };
     Plugin.prototype._update = function(e, data) {
+<<<<<<< HEAD
+=======
+      clearTimeout(this._loadServiceTimeout);
+>>>>>>> e7ae198632b8f6dcb0244fdb7217c24fa9124aea
       return this._loadServiceTimeout = setTimeout(this._loadService, 300);
     };
     Plugin.prototype._loadService = function() {
       var data;
+<<<<<<< HEAD
       if (this._isLoading) {
         return;
       }
       this._clearTimeout();
       this._isLoading = true;
+=======
+      clearTimeout(this._loadServiceTimeout);
+>>>>>>> e7ae198632b8f6dcb0244fdb7217c24fa9124aea
       data = this._parseData();
       this._api = API.call(this._element.getAttribute('service'), data, this._serviceLoaded, this._serviceError);
       this._api.on(API.PROGRESS, this._onProgress);
@@ -6185,6 +6267,7 @@ cms.ui.tag.attributes.Service = (function(_super) {
       }
       return params;
     };
+<<<<<<< HEAD
     Plugin.prototype._checkTimeout = function() {
       console.log(this._refreshInterval);
       if (this._refreshInterval) {
@@ -6194,6 +6277,8 @@ cms.ui.tag.attributes.Service = (function(_super) {
     Plugin.prototype._clearTimeout = function() {
       return clearTimeout(this._loadServiceTimeout);
     };
+=======
+>>>>>>> e7ae198632b8f6dcb0244fdb7217c24fa9124aea
     Plugin.prototype._serviceLoaded = function(e, data) {
       var i, id, items, _ref, _ref1;
       app.template.renderBlock(this._element, data);
@@ -6213,9 +6298,13 @@ cms.ui.tag.attributes.Service = (function(_super) {
       }
       this._element.trigger('updated', data);
       this._removeEventListeners();
+<<<<<<< HEAD
       this._removeProgress();
       this._checkTimeout();
       return this._isLoading = false;
+=======
+      return this._removeProgress();
+>>>>>>> e7ae198632b8f6dcb0244fdb7217c24fa9124aea
     };
     Plugin.prototype._serviceError = function(e, data) {
       var _ref;
@@ -6229,9 +6318,13 @@ cms.ui.tag.attributes.Service = (function(_super) {
         app.router.goto(this._element.getAttribute('onError'));
       }
       this._removeEventListeners();
+<<<<<<< HEAD
       this._removeProgress();
       this._checkTimeout();
       return this._isLoading = false;
+=======
+      return this._removeProgress();
+>>>>>>> e7ae198632b8f6dcb0244fdb7217c24fa9124aea
     };
     Plugin.prototype._sortByOrder = function(a, b) {
       if (a.sortOrder < b.sortOrder) {
