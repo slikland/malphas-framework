@@ -1,8 +1,6 @@
 paths:
 	root: '../../'
 	deploy: '{paths.root}deploy/cms/'
-	deploy: '../../../s448.Ford.FacebookLeadAds/deploy/manager/admin/'
-	deploy: '../../../s427.Ford.OfertasFord/deploy/manager/admin/'
 	source: '{paths.root}source/cms/'
 	coffee: '{paths.source}coffee/'
 	stylus: '{paths.source}stylus/'
