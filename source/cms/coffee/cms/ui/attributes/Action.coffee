@@ -23,7 +23,6 @@ class Action extends cms.ui.Base
 			@_element.on('click', @_click)
 			@_element.on('abort', @_abort)
 		_click:(e)=>
-			console.log(e)
 			action = @_element.getAttribute('action')
 			if /\[[^\[\]]+\]/.test(action)
 				re = /\[([^\[\]]+)\]/g
@@ -35,6 +34,10 @@ class Action extends cms.ui.Base
 					evt = params[0]
 					params = params.splice(2)
 					for target in targets
+						if !params[0]
+							params[0] = {}
+						try
+							params[0].target = e.currentTarget
 						target.trigger?.apply(target, [].concat(evt, params))
 			else
 				@_api = API.call(action, null, @_apiComplete, @_apiError)

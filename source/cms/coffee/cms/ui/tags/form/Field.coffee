@@ -29,7 +29,9 @@ class Field extends cms.ui.Base
 			@_input = @_element.querySelector('input:not([type="hidden"]),select,textarea')
 			nameAttr = @_input.getAttribute("type")
 			if(nameAttr == 'date' || nameAttr == 'time')
+				@_isDateField = true
 				@_checkFilled(true)
+				@_input?.on('blur', @_blur)
 			else
 				if @_input?.tagName.toLowerCase() in ['select', 'textarea']
 					@_input?.setAttribute('type', @_input?.tagName.toLowerCase())
@@ -67,12 +69,15 @@ class Field extends cms.ui.Base
 			@_checkFilled()
 		_blur:()=>
 			@_focused = false
-			@_checkFilled()
+			@_checkFilled(@_isDateField)
+			if !@find('validation')
+				if @find('.validation-message')
+					@removeClass('invalid')
+					@find('.validation-message').style['display'] = 'none'
 		_change:()=>
 			@_checkFilled()
 
 		_checkFilled:(focusStarts = false)=>
-
 			if @_focused || focusStarts
 				@addClass('filled')
 				return

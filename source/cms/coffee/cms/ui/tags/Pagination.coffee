@@ -257,8 +257,13 @@ class Pagination extends cms.ui.Base
 
 		_update:(e)=>
 			data = e.data
-			if !data || !data.total? || !data.numItems?
+			if data.pagination
+				data = data.pagination
+			if !data || !data._total? || !data._numItems?
 				return
+			data.index = data._index
+			data.total = data._total
+			data.numItems = data._numItems
 			@_pageContainer.removeAll()
 			@_pages.length = 0
 

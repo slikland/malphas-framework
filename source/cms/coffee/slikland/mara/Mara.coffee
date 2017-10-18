@@ -30,7 +30,8 @@ class Mara extends EventDispatcher
 	@get name:()->
 		return _name
 	@get currentFile:()->
-		return @_renderData?.file || ''
+		file = @_renderData?.file.replace(/\>.*?$/, '')
+		return file
 
 	@get id:()->
 		return _id
@@ -45,7 +46,7 @@ class Mara extends EventDispatcher
 		f = @_renderData?.file || @_block?.file || ''
 		return file == f
 
-	render:(file, data = {}, context = null, callback = null)->
+	render:(file, data = {}, context = null, callback = null, clearContext = true)->
 		if context?.element
 			context = context.element
 		@_renderData = {
@@ -53,6 +54,7 @@ class Mara extends EventDispatcher
 			data: data
 			context: context
 			callback: callback
+			clearContext: clearContext
 		}
 		if context
 			context.setAttribute('loading', 'true')
@@ -64,7 +66,8 @@ class Mara extends EventDispatcher
 			return
 		if @_renderData.context
 			@_renderData.context.removeAttribute('loading')
-			@_resetContext(@_renderData.context)
+			if @_renderData.clearContext
+				@_resetContext(@_renderData.context)
 			@_holdContextToRender(@_renderData.context)
 		items = block.render(@_renderData.data, @_renderData.context)
 		@_block = block
@@ -82,7 +85,8 @@ class Mara extends EventDispatcher
 		while i-- > 0
 			items[i] = children[i]
 			try
-				items[i].style.display = 'none'
+				if !items[i]?.removable is false
+					items[i].style.display = 'none'
 		setTimeout(@_removeChildren, 0, target, items)
 	resetContext:(target)->
 		children = target.childNodes

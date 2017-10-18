@@ -13,4 +13,7 @@ class Figure extends cms.ui.Base
 	class Plugin extends BaseDOM
 		constructor:(element)->
 			super({element: element})
-			@css('background-image', 'url(' + @attr('src') + ')')
+			src = @attr('src')
+			if src
+				src = src.replace(/(?:\?(.*?))?$/, '?$1&r=' + Math.random())
+				@css('background-image', 'url(' + src + ')')

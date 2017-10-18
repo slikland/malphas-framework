@@ -49,6 +49,7 @@ class Service extends cms.ui.Base
 			@_clearTimeout()
 			@_isLoading = true
 			data = @_parseData()
+			console.log(data)
 			@_api = API.call(@_element.getAttribute('service'), data, @_serviceLoaded, @_serviceError)
 			if @_element.hasAttribute('loadingRatio') && !isNaN(@_element.getAttribute('loadingRatio'))
 				@_api.loadingRatio = Number(@_element.getAttribute('loadingRatio'))
@@ -64,6 +65,7 @@ class Service extends cms.ui.Base
 				return
 			if !@_loading
 				@_loading = new cms.ui.Loading()
+				@_loading.attr('removable': false)
 			@_loading.reset()
 			@_loading.show()
 			@appendChildAt(@_loading, 0)
@@ -118,10 +120,20 @@ class Service extends cms.ui.Base
 					app.router.setParam(id, params)
 				else
 					app.router.removeParam(id)
+			if @attr('serviceData')
+				itemParams = {}
+				items = document.querySelectorAll(@attr('serviceData'))
+				for item in items
+					itemData = API.parseJSON(item)
+					itemParams = ObjectUtils.merge(itemParams, itemData)
+				if !params
+					params = itemParams
+				else
+					params = ObjectUtils.merge(params, itemParams)
+
 			return params
 
 		_checkTimeout:()->
-			console.log(@_refreshInterval)
 			if @_refreshInterval
 				@_loadServiceTimeout = setTimeout(@_loadService, @_refreshInterval * 1000)
 

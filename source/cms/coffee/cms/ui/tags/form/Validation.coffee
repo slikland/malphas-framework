@@ -57,10 +57,10 @@ class Validation extends cms.ui.Base
 			@_input.on('input', @_change)
 			@_form?.on('submit', @_submit, true)
 		destroy:()=>
-			@_input.off('blur', @_blur)
-			@_input.off('change', @_change)
-			@_input.off('input', @_change)
-			@_form.off('submit', @_submit, true)
+			@_input?.off('blur', @_blur)
+			@_input?.off('change', @_change)
+			@_input?.off('input', @_change)
+			@_form?.off('submit', @_submit, true)
 			super
 
 		_parseValidations:()=>

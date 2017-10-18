@@ -22,6 +22,15 @@ class ShowModal extends cms.ui.Base
 		_addEventListener:(e)=>
 			@_element.on('click', @_click, true)
 		_click:(e)=>
-			cms.ui.tags.Modal.show(@_modalRef)
+			data = {}
+			if @attr('modalData')
+				target = @find(@attr('modalData'))
+				if !target
+					target = @findClosest(@attr('modalData'))
+				if !target
+					target = document.querySelector(@attr('modalData'))
+				if target
+					data = JSONUtils.fromHTML(target)
+			cms.ui.tags.Modal.show(@_modalRef, data)
 			e.preventDefault()
 			e.stopImmediatePropagation()

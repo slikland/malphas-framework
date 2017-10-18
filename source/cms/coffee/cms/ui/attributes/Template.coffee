@@ -16,11 +16,16 @@ class Template extends cms.ui.Base
 
 		constructor:(element)->
 			super({element: element})
+			@_template = @attr('template')
+			if /^\>/.test(@_template)
+				@_template = app.template.currentFile + @_template
 			@_element.on('click', @_click)
 		_click:()=>
 			o = {
-				template: @attr('template')
+				template: @_template
 				target: @attr('templateTarget')
-				currentTarget: @
+				currentTarget: @element
+				clearContext: false
 			}
+			console.log(o)
 			app.trigger(Main.RENDER_TEMPLATE, o)

@@ -81,7 +81,6 @@ class API extends EventDispatcher
 		scope.submit(scope._data)
 
 
-
 	# FORM
 	# URL
 	# Object
@@ -96,14 +95,18 @@ class API extends EventDispatcher
 		@_type = 'normal'
 		if arg instanceof HTMLElement && arg.tagName.toLowerCase() == 'form'
 			@_form = arg
-			setTimeout(@_addEventListeners, 10)
+			if !(@_form.hasAttribute('autosubmit') && (@_form.getAttribute('autosubmit') == '0' || @_form.getAttribute('autosubmit') == 'false'))
+				@_addEventListeners()
 		else if BaseDOM? && arg instanceof BaseDOM && arg.element.tagName.toLowerCase == 'form'
 			@_form = arg
-			setTimeout(@_addEventListeners, 10)
+			if !(@_form.hasAttribute('autosubmit') && (@_form.getAttribute('autosubmit') == '0' || @_form.getAttribute('autosubmit') == 'false'))
+				@_addEventListeners()
 		else if typeof(arg) == 'string'
 			@_url = arg
 		else if arg?
 			throw new Error('The API constructor argument needs to be a URL string or a Form element.')
+	destroy:()->
+		app.off('redraw', @_redraw)
 
 	@get url:()->
 		return @_url
@@ -149,8 +152,7 @@ class API extends EventDispatcher
 		return @_requestURL
 
 	_addEventListeners:()=>
-		if @_form
-			@_form.on('submit', @_submitForm)
+		@_form?.on('submit', @_submitForm)
 	_submitForm:(e)=>
 		@submit()
 
@@ -295,13 +297,10 @@ class API extends EventDispatcher
 		@_parsedElements = []
 		result = @_parseJSONElement(form)
 		return result
-	@_parseJSONElement:(element, indent = 0)=>
+	@_parseJSONElement:(element)=>
 		items = element.querySelectorAll('[json-name]')
 		o = {}
 		ind = ''
-		i = indent
-		while i-- > 0
-			ind += ' '
 		addC = 0
 		for item in items
 			if @_parsedElements.indexOf(item) >= 0
@@ -310,11 +309,11 @@ class API extends EventDispatcher
 
 			name = item.getAttribute('json-name')
 			
-			if data = @_parseJSONElement(item, indent + 2)
+			if data = @_parseJSONElement(item)
 				if !o[name]
 					o[name] = []
 				o[name].push(data)
-		inputs = element.querySelectorAll('input,textarea,select')
+		inputs = element.querySelectorAll('input,textarea,select,[type=input]')
 		for input in inputs
 			if @_parsedElements.indexOf(input) >= 0
 				continue

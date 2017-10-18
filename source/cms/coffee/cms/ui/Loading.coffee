@@ -50,12 +50,13 @@ class Loading extends BaseDOM
 
 		@_background.css({opacity: op})
 		@_progressBar.css({height: (value * 4) + 'px'})
+
 	reset:()->
 		KTween.remove(@)
 		@showPosition = 0
 		@progress = @_position = 0
 	show:()->
-		@css({visibility: ''})
+		@css({visibility: '', display: ''})
 		@reset()
 		@removeClass('disabled')
 		KTween.tween(@, {showPosition: 1}, 'easeOutQuart', 0.1)

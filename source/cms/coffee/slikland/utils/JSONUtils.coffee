@@ -58,3 +58,37 @@ class JSONUtils
 			if typeof(v) == 'array' || typeof(v) == 'object'
 				resp = [].concat(resp, @filterObject(v, name, type, ignore, getParent))
 		return resp
+	@fromHTML:(element)->
+		data = @_parseHTMLToJSON(element)
+		console.log(data)
+		return data
+
+	@_parseHTMLToJSON:(element)->
+		if element.nodeType != 1
+			return element.toString()
+		children = element.childNodes
+		data = {}
+		arrayData = []
+		for child in children
+			if child.nodeType == 1
+				childData = @_parseHTMLToJSON(child)
+				for attr in child.attributes
+					if attr.name.toLowerCase() == 'mara'
+						continue
+					if attr.value.toString().length == 0
+						continue
+					childData[attr.name] = attr.value
+				if child.localName == '_'
+					arrayData.push(childData)
+				else
+					if data[child.localName]
+						if !Array.isArray(data[child.localName])
+							data[child.localName] = [data[child.localName]]
+						data[child.localName].push(childData)
+					else
+						data[child.localName] = childData
+			else
+				return child.data
+		for k, v of arrayData
+			data[Number(k)] = v
+		return data

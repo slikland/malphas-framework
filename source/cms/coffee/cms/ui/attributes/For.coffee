@@ -40,7 +40,7 @@ class For extends cms.ui.Base
 				else
 					@_element.value = data
 					@_value = data
-		_change:()=>
+		_updateTarget:()=>
 			@_target = document.querySelector('#' + @attr('for'))
 			changed = false
 			newValue = null
@@ -56,3 +56,8 @@ class For extends cms.ui.Base
 					@_value = newValue
 			if changed
 				@_target?.trigger('update')
+		_updateDelayed:()->
+			clearTimeout(@_updateTimeout)
+			@_updateTimeout = setTimeout(@_updateTarget, 250)
+		_change:(e)=>
+			@_updateDelayed()

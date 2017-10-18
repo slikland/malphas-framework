@@ -18,7 +18,7 @@ class Remove extends cms.ui.Base
 			@_element.on('click', @_click)
 		_click:(e)=>
 			e.preventDefault()
-			e.stopImmediatePropagation()
+			# e.stopImmediatePropagation()
 			target = @findParents(@attr('remove'))
 			if target
 				target.parentNode.removeChild(target)

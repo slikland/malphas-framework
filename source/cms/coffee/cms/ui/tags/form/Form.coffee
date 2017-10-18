@@ -3,22 +3,36 @@
 class Form extends cms.ui.Base
 	@SELECTOR: 'form'
 	_update:(data)->
+		if !@_pluginInstances
+			@_pluginInstances = []
 		for item in data.add
-			@_plugins[item] = new Plugin(item)
-
+			item.setAttribute('p_id', @constructor._ID++)
+			@_pluginInstances.push(new Plugin(item))
 		for item in data.remove
-			p = @_plugins[item]
-			if p
-				p.destroy?()
+			p_id = item.getAttribute('p_id')
+			i = @_pluginInstances.length
+			while i-- > 0
+				inst = @_pluginInstances[i]
+				if inst.attr('p_id') == p_id
+					inst.destroy()
+					@_pluginInstances.splice(i, 1)
 
 	class Plugin extends BaseDOM
 		@_destroyPlugin:(item)->
 
 		constructor:(element)->
 			super({element: element})
-			setTimeout(@_addListeners, 50)
+			app.on('redraw', @_redraw, true)
+			@_redraw()
+		destroy:()->
+			app.off('redraw', @_redraw)
+			@_removeListeners()
+			super
+
 		_addListeners:()=>
-			@_api = new API(@_element)
+			@attr('autosubmit', false)
+			@_api ?= new API(@_element)
+
 			if !(@_element.getAttribute('target') && @_element.getAttribute('target').toLowerCase() == '_blank')
 				@_api.on(API.START, @_apiStart)
 				@_api.on(API.COMPLETE, @_apiComplete)
@@ -27,12 +41,23 @@ class Form extends cms.ui.Base
 			@_element.on('change', @_change)
 			@_element.on('reset', @_reset)
 			@_element.on('abort', @_abort)
+		_removeListeners:()=>
+			@_element?.off('submit', @_submit)
+			@_element?.off('change', @_change)
+			@_element?.off('reset', @_reset)
+			@_element?.off('abort', @_abort)
+
+		_redraw:()=>
+			@_removeListeners()
+			setTimeout(@_addListeners, 10)
+
 		_abort:()=>
 			@_api?.abort()
 		_change:()=>
 			@_clearMessage()
 
 		_submit:(e)=>
+			console.log("SUBMIT")
 			if @attr('target')?.toLowerCase?() == '_blank'
 				data = @_api.parseJSON(@_element)
 				if !@_dataElement
@@ -46,6 +71,7 @@ class Form extends cms.ui.Base
 				if e.defaultPrevented
 					e.stopImmediatePropagation()
 					return
+				@_api._submitForm()
 				e.preventDefault()
 		_reset:()=>
 			setTimeout(@_resetFields, 0)
@@ -71,6 +97,7 @@ class Form extends cms.ui.Base
 							targets = document.querySelectorAll(params[1])
 						evt = params[0]
 						params = params.splice(2)
+						params.unshift(data)
 						for target in targets
 							target.trigger?.apply(target, [].concat(evt, params))
 

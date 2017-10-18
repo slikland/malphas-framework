@@ -1,6 +1,6 @@
 #namespace cms.ui.tag.attributes
 class Update extends cms.ui.Base
-	@SELECTOR: '[update]'
+	@SELECTOR: ':not(modal)[update]'
 	_update:(data)->
 		for item in data.add
 			@_plugins[item] = new Plugin(item)
@@ -56,7 +56,7 @@ class Update extends cms.ui.Base
 					items[j].trigger(params[1], value)
 		_updateDelayed:()->
 			clearTimeout(@_updateTimeout)
-			@_updateTimeout = setTimeout(@_updateTargets, 200)
+			@_updateTimeout = setTimeout(@_updateTargets, 250)
 		_change:(e)=>
 			@_updateTargets()
 

@@ -31,6 +31,30 @@ Node::findParents = (query) ->
 			return @parentNode.findParents(query)
 	return null
 
+Node::getDOMTree = () ->
+	tree = [@]
+	if @parentNode
+		tree = [].concat(@parentNode.getDOMTree(), tree)
+	return tree
+
+Node::findClosest = (query) ->
+	tree = @getDOMTree()
+	targets = document.body.querySelectorAll(query)
+	numClosest = Number.MIN_VALUE
+	closest = null
+	for target in targets
+		targetTree = target.getDOMTree()
+		i = -1
+		l = Math.min(tree.length, targetTree.length)
+		while i++ < l
+			if tree[i] != targetTree[i]
+				break
+		if i > numClosest
+			numClosest = i
+			closest = target
+	return closest
+
+
 # 
 # TODO: FIX IE8+
 # Node.get({instance: ()-> return @__instance__})
@@ -210,6 +234,14 @@ class BaseDOM extends EventDispatcher
 	##	Find parent nodes for a matching query selector
 	findParents:(query)->
 		return @element.findParents(query)
+	##--------------------------------------
+	##	Find parent nodes for a matching query selector
+	findClosest:(query)->
+		return @element.findClosest(query)
+	##--------------------------------------
+	##	Find parent nodes for a matching query selector
+	getDOMTree:()->
+		return @element.findParents(getDOMTree)
 	##--------------------------------------
 	##	Query selector
 	##	@onlyInstances: If return only BaseDOM instances

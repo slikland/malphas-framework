@@ -91,13 +91,16 @@ class Main
 		# console.log(jsyaml.load(@_template))
 
 	_renderTemplate:(e, data)=>
-		console.log('> render',data)
 		# app.currentPath = data.target
 		if data.target && data.currentTarget
-			target = data.currentTarget.findParents(data.target)
+			target = data.currentTarget.findClosest(data.target)
 			if !target
 				target = document.body.querySelector(data.target)
-		app.template.render(data.template, data.data || {}, target || app.templateContext)
+		if data.clearContext?
+			clearContext = data.clearContext
+		else
+			clearContext = true
+		app.template.render(data.template, data.data || {}, target || app.templateContext, null, clearContext)
 
 app.on('windowLoad', ()->
 	new Main()

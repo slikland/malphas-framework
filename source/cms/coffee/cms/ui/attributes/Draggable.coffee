@@ -19,7 +19,14 @@ class Draggable extends cms.ui.Base
 			@_draggableName = @attr('draggable')
 			@_dragHandler = document.createElement('i')
 			@_dragHandler.className = 'drag-handle fa fa-ellipsis-h'
+			if @attr('draggableStyle')
+				@_dragHandler.style = @attr('draggableStyle')
 			@_dragHandler.on('mousedown', @_mouseDown)
+			@_target = null
+			if @attr('draggableTarget')
+				@_target = @findClosest(@attr('draggableTarget'))
+			if !@_target
+				@_target = @_element
 			@_draggableContextSelector = '[draggableContext="'+@_draggableName+'"]'
 			@appendChild(@_dragHandler)
 			@_parentContexts = @_findParentContext()
@@ -47,12 +54,13 @@ class Draggable extends cms.ui.Base
 			@_items = null
 			@_removeEventListeners()
 			@_cloned.parentNode.removeChild(@_cloned)
-			@_element.style.opacity = ''
+			@_target.style.opacity = ''
 			@element.trigger('update')
 		_mouseDown:(e)=>
 			@_updateDraggableItems()
 			e.preventDefault()
-			@_cloned = @_element.cloneNode(true)
+			console.log(@_target)
+			@_cloned = @_target.cloneNode(true)
 			@_cloned.setAttribute('cloned', '1')
 			@_cloned.style.position = 'absolute'
 			@_cloned.style.opacity = '0.4'
@@ -69,8 +77,8 @@ class Draggable extends cms.ui.Base
 			bounds = @getBounds()
 			@_cloned.style.width = bounds.width + 'px'
 			@_cloned.style.height = bounds.height + 'px'
-			@_element.style.opacity = '0.6'
-			@_element.parentNode.appendChild(@_cloned)
+			@_target.style.opacity = '0.6'
+			@_target.parentNode.appendChild(@_cloned)
 			@_moveCloned(e)
 			@_addEventListeners()
 
@@ -104,7 +112,7 @@ class Draggable extends cms.ui.Base
 				children = context.children
 				i = children.length
 				while i-- > 0
-					if children[i] != @_element && !children[i].hasAttribute('cloned')
+					if children[i] != @_target && !children[i].hasAttribute('cloned')
 						items.push({element: children[i]})
 			return items
 
@@ -175,7 +183,7 @@ class Draggable extends cms.ui.Base
 						a = Math.atan2(dy, dx)
 						closest = item
 						closestPos = ipos
-			if closest == @_element
+			if closest == @_target
 				return null
 
 			if closest
@@ -199,16 +207,16 @@ class Draggable extends cms.ui.Base
 				child = children[i]
 				if child == element
 					targetIndex = i
-				if child == @_element
+				if child == @_target
 					currentIndex = i
 			if after
 				targetIndex = targetIndex + 1
 			if currentIndex == targetIndex
 				return
 			if targetIndex >= children.length - 1
-				parent.appendChild(@_element)
+				parent.appendChild(@_target)
 			else
-				parent.insertBefore(@_element, children[targetIndex])
+				parent.insertBefore(@_target, children[targetIndex])
 			@_updateDraggableItems()
 		_sortPosition:(a, b)=>
 			return 0

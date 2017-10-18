@@ -49,7 +49,6 @@ class Viewstack extends cms.ui.Base
 				try
 					if @matches(k)
 						found = true
-						console.log(v)
 						@show(v)
 			if !found
 				@reset()

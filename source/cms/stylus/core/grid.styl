@@ -5,10 +5,12 @@ buildGrid(numGrid = 12, prefix = 'col-')
 			cardMargin = m * 2
 			&.{i}
 				width: unquote('calc(' + (i / numGrid * 100) % + ' - ' + cardMargin + ')')
+				max-width: unquote('calc(' + (i / numGrid * 100) % + ' - ' + cardMargin + ')')
 				float: left
 			for j in (1...numGrid + 1)
 				&.{i}_{j}
 					width: unquote('calc(' + (i / j * 100) % + ' - ' + cardMargin + ')')
+					max-width: unquote('calc(' + (i / j * 100) % + ' - ' + cardMargin + ')')
 					float: left
 	
 .col-clear

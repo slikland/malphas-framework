@@ -1,7 +1,7 @@
 #namespace cms.ui.tags
 #import slikland.utils.MouseUtils
-class Card extends cms.ui.Base
-	@SELECTOR: 'card'
+class EvenHeight extends cms.ui.Base
+	@SELECTOR: '.even-height'
 	constructor:()->
 		super
 		window.addEventListener('resize', @_resize)
@@ -10,7 +10,7 @@ class Card extends cms.ui.Base
 		setTimeout(@_resize, 0)
 		setTimeout(@_resize, 500)
 	_resize:()=>
-		cards = document.querySelectorAll('card.even-height')
+		cards = document.querySelectorAll('.even-height')
 		parents = []
 		childs = []
 		i = cards.length
