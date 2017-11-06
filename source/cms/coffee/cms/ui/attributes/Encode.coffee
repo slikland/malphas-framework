@@ -18,18 +18,22 @@ class Encode extends cms.ui.Base
 			super({element: element})
 			@_form = @findParents('form')
 			@_form.on('submit', @_submit, true)
+			@_element.setAttribute('rawname', @_element.name)
 		destroy:()->
 			super
 		_submit:()=>
 			@submit()
 		submit:()->
-			console.log("SUBMITT")
 			@_cleanup()
 			@_tempElement = @_element.cloneNode(true)
 			@_element.name = ''
 			@_tempElement.style.display = 'none'
 			@_element.parentNode.appendChild(@_tempElement)
-			@_tempElement.value = slikland.crypt.Philo.encode(@_element.value)
+			console.log(">>>", @_element.value.trim().length)
+			if @_element.value.trim().length == 0
+				@_tempElement.value = ''
+			else
+				@_tempElement.value = slikland.crypt.Philo.encode(@_element.value)
 		_cleanup:()=>
 			clearTimeout(@_cleanupTimeout)
 			if @_tempElement

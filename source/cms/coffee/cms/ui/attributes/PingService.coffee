@@ -143,6 +143,8 @@ class PingService extends cms.ui.Base
 					targets = document.querySelectorAll(item.target)
 					for target in targets
 						app.template.renderBlock(target, item.data)
+				if item.event
+					app.trigger(item.event, item.data)
 			@_removeEventListeners()
 			@_removeProgress()
 			@_checkTimeout()

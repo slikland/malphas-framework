@@ -259,11 +259,14 @@ class Pagination extends cms.ui.Base
 			data = e.data
 			if data.pagination
 				data = data.pagination
-			if !data || !data._total? || !data._numItems?
+			total = data._total || data.total
+			numItems = data._numItems || data.numItems
+			index = data.iIndex || data.index
+			if !data || !numItems
 				return
-			data.index = data._index
-			data.total = data._total
-			data.numItems = data._numItems
+			data.index = index
+			data.total = total
+			data.numItems = numItems
 			@_pageContainer.removeAll()
 			@_pages.length = 0
 

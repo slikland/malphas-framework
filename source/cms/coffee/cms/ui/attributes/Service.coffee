@@ -1,6 +1,6 @@
 #namespace cms.ui.tag.attributes
 class Service extends cms.ui.Base
-	@SELECTOR: '[service]'
+	@SELECTOR: '[service]:not(suggestion)'
 
 	@_queue: []
 	_update:(data)->

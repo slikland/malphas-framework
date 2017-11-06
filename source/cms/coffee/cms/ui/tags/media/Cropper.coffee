@@ -529,7 +529,7 @@ class Cropper extends cms.ui.Base
 			@_input.name = 'size'
 			@_input.setAttribute('type', 'input')
 			@_input.style.display = 'none'
-			@_input.value = @_data
+			@_input.value = JSON.stringify(@_data)
 
 			@appendChild(@_input)
 
@@ -597,13 +597,13 @@ class Cropper extends cms.ui.Base
 					@_data['cropSet'] = true
 			@_data['crop'] = [].concat(crop)
 			@_redraw()
-			@_input.value = @_data
+			@_input.value = JSON.stringify(@_data)
 
 		updateSrc:(src, id = null)->
 			@_data['src'] = src
 			@_data['id'] = id
 			@_load(src)
-			@_input.value = @_data
+			@_input.value = JSON.stringify(@_data)
 		resize:()->
 			@_container.css({
 				'width': ''

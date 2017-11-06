@@ -12,12 +12,16 @@ class InterfaceController
 		return @_context
 
 	_apiRedirectInterceptor:(data, url)=>
-		if data?.goto
-			app.router.goto(data.goto)
-		else if data?.redirect
-			app.router.goto(data.redirect)
-		else if data?.refresh
-			1
+		if typeof(data) == 'string'
+			return
+		for k, v of data
+			switch k
+				when 'goto'
+					app.router.goto(data.goto)
+				when 'redirect'
+					app.router.goto(data.redirect)
+				when 'refresh'
+					1
 
 	show:(page = null)->
 		if !app.user.logged

@@ -69,6 +69,7 @@ class Main
 	@get hasHistory:()->
 		return @_history.length > 1
 
+
 	_init:()=>
 		app.body.css('visibility', '')
 
@@ -101,6 +102,7 @@ class Main
 		else
 			clearContext = true
 		app.template.render(data.template, data.data || {}, target || app.templateContext, null, clearContext)
+
 
 app.on('windowLoad', ()->
 	new Main()

@@ -21,11 +21,15 @@ class Template extends cms.ui.Base
 				@_template = app.template.currentFile + @_template
 			@_element.on('click', @_click)
 		_click:()=>
+			clearContext = false
+			if @attr('templateClearContext')
+				clear = @attr('templateClearContext')
+				if clear == 'true' or clear == 1 or clear is true
+					clearContext = true
 			o = {
 				template: @_template
 				target: @attr('templateTarget')
 				currentTarget: @element
-				clearContext: false
+				clearContext: clearContext
 			}
-			console.log(o)
 			app.trigger(Main.RENDER_TEMPLATE, o)

@@ -7,6 +7,8 @@ class User extends EventDispatcher
 		@_logged = false
 		API.intercept(/api\/cms\/user\/.+/g, @_userAPIIntercepted)
 		@_getUser()
+
+		app.on('check_user', @_checkUser)
 	_userAPIIntercepted:(data, url)=>
 		type = url.replace(/^.*?api\/cms\/user\/([^\?]*)\??.*$/, '$1')
 		if data.error?
@@ -46,11 +48,25 @@ class User extends EventDispatcher
 		@_logged = logged
 		@trigger(@constructor.STATUS_CHANGE, logged)
 
+	_checkUser:()=>
+		@_getUser()
+
 	_getUser:()->
 		API.call(app.rootPath + @constructor.API_PATH + 'getUser')
 
 	_showLogin:()->
 		if !app.template.isCurrent('user/login')
+			pathObj = {}
+			parsedPath = app.router.getParsedPath()
+			page = parsedPath['path']
+			page = page.replace(/(\?|\#).*?$/, '')
+			pageParts = page.trim('/').split('/')
+			for k, v of pageParts
+				pathObj[k] = v
+			for k, v of parsedPath.params
+				pathObj[k] = v
+			slikland.Mara.setGlobalObject('$', pathObj)
+
 			app.template.render('user/login', null, document.body)
 	_showLoginError:()->
 

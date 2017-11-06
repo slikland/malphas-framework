@@ -90,21 +90,23 @@ class Action extends cms.ui.Base
 		_apiComplete:(e, data)=>
 			success = @attr('success')
 			if success && success.length > 0
-				switch success
-					when 'update'
-						@_element.trigger('update')
-					when 'refresh'
-						app.interface.show()
-					when 'reload'
-						window.location.reload()
-					else
-						if o = /^update\:(.*?)$/.exec(success)
-							items = document.body.querySelectorAll(o[1])
-							i = items.length
-							while i-- > 0
-								items[i].trigger('update')
+				successes = success.split(',')
+				for success in successes
+					switch success
+						when 'update'
+							@_element.trigger('update')
+						when 'refresh'
+							app.interface.show()
+						when 'reload'
+							window.location.reload()
 						else
-							app.interface.show(success)
+							if o = /^update\:(.*?)$/.exec(success)
+								items = document.body.querySelectorAll(o[1])
+								i = items.length
+								while i-- > 0
+									items[i].trigger('update')
+							else
+								app.interface.show(success)
 			if data?.notification?.message?.length > 0
 				if !data.notification.type
 					data.notification.type = 3

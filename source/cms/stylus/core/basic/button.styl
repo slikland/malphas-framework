@@ -30,6 +30,8 @@ button, .button
 	box-shadow: 0 2px 2px 0 rgba(0,0,0,.14),0 3px 1px -2px rgba(0,0,0,.2),0 1px 5px 0 rgba(0,0,0,.12)
 	background-color: _color_primary_light
 	color: _color_text_primary_light
+	&>*
+		pointer-events: none
 	&:focus, &:hover
 		transition: box-shadow
 		transition-duration: 0.1s
@@ -49,6 +51,7 @@ button, .button
 			transform-origin: 50% 0
 			animation-name: button-active
 			animation-duration: 0.3s
+			pointer-events: none
 	&[enabled="false"],&[enabled="0"]
 		opacity: 0.6
 		cursor: default
@@ -70,6 +73,8 @@ button[type=fab],fab,button.fab
 	color: _color_text_secondary
 	cursor: pointer
 
+	&>*
+		pointer-events: none
 	&:before
 		content: ''
 		vertical-align: middle

@@ -23,6 +23,7 @@ class Validation extends cms.ui.Base
 		field = data?.item?.getAttribute('field')
 		field = form[field]
 		if !field
+			field = data?.item?.getAttribute('field')
 			field = form.querySelector(field)
 		if !field
 			return false
