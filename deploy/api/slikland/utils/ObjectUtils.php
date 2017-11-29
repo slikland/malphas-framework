@@ -2,6 +2,33 @@
 namespace slikland\utils;
 class ObjectUtils
 {
+
+	// convert stdobj to array recursive.
+	public static function toArray($data)
+	{
+		return json_decode(json_encode($data), TRUE);
+	}
+
+	public static function filterObject($object, $keys)
+	{
+
+		$object = static::flattenObject($object);
+		$newObject = [];
+		foreach($object as $k=>$v)
+		{
+			foreach($keys as $key)
+			{
+				if(preg_match('/^'.$key.'(\..*?)?$/', $k))
+				{
+					continue 2;
+				}
+			}
+			unset($object[$k]);
+		}
+
+		return static::unflattenObject($object);
+	}
+
 	public static function flattenObject($object, $keys = array())
 	{
 		$response = array();
@@ -13,12 +40,31 @@ class ObjectUtils
 				$response = array_merge($response, self::flattenObject($v, $k));
 			}else
 			{
-				$response[] = array(
-					'key'=>implode('.', $k),
-					'keys'=>$k,
-					'value'=>$v
-				);
+				$response[implode('.', $k)] = $v;
 			}
+		}
+		return $response;
+	}
+
+	public static function unflattenObject($object)
+	{
+		$response = array();
+		foreach($object as $k=>$v)
+		{
+			$current = &$response;
+			$keys = preg_split('/(?<!\\\\)\./', $k);
+			foreach($keys as $k)
+			{
+				$k = preg_replace('/\\\\\./', '.', $k);
+				if(!isset($current[$k]) || !is_array($current[$k])) $current[$k] = [];
+				$current = &$current[$k];
+			}
+			if(is_array($v))
+			{
+				$v = static::unflattenObject($v);
+			}
+			$current = $v;
+			unset($current);
 		}
 		return $response;
 	}

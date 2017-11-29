@@ -43,7 +43,7 @@ class Upload
 		$path = DYNAMIC_PATH . static::$UPLOAD_PATH . $uid . '/';
 		if(!file_exists($path))
 		{
-			throw new Error('Invalid ID');
+			throw new ServiceError('Invalid ID');
 		}
 
 		$file = fopen($path . 'chunk', 'a');
@@ -59,7 +59,7 @@ class Upload
 		$path = DYNAMIC_PATH . static::$UPLOAD_PATH . $uid . '/';
 		if(!file_exists($path))
 		{
-			throw new Error('Invalid ID');
+			throw new ServiceError('Invalid ID');
 		}
 
 		$db = db();
@@ -116,7 +116,7 @@ class Upload
 		$path = DYNAMIC_PATH . static::$UPLOAD_PATH . $uid . '/';
 		if(!file_exists($path))
 		{
-			throw new Error('Invalid ID');
+			throw new ServiceError('Invalid ID');
 		}
 		$files = \slikland\fs\File::listDir($path);
 		if($url)

@@ -7,7 +7,7 @@ $cofig['db_host'] = '';
 $config['cms_path'] = 'cms/';
 //TEMP
 
-define('CMS_SESSION_TIMEOUT', 100000000);
+define('CMS_SESSION_TIMEOUT', 7200);
 
 
 $host = strtolower($_SERVER['HTTP_HOST']);
@@ -15,7 +15,7 @@ $host = strtolower($_SERVER['HTTP_HOST']);
 $config['dynamic_url'] = '';
 switch($host)
 {
-	case ((bool)preg_match('/^(local\.?|localhost)/', $host)):
+	case ((bool)preg_match('/(local\.?|localhost)/', $host)):
 	case ((bool)preg_match('/^192\.168/', $host)):
 		if(@getenv('ENVIRONMENT') == 'sl_local')
 		{

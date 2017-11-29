@@ -2,6 +2,20 @@
 namespace module;
 class Image
 {
+	static $EXTENSIONS = array(
+		'jpg'=>'jpg', 
+		'jpeg'=>'jpg', 
+		'gif'=>'gif', 
+		'png'=>'png',
+	);
+
+	static $MIME_TYPES = array(
+		'jpg'=>'image/jpeg', 
+		'jpeg'=>'image/jpeg', 
+		'gif'=>'image/gif', 
+		'png'=>'image/png',
+	);
+
 	private function isGD($im)
 	{
 		if(is_resource($im))
@@ -17,12 +31,13 @@ class Image
 	}
 
 
-	function newImage($width, $height, $bgColor = NULL)
+	function newImage($width, $height, $bgColor = 0x00FFFFFF)
 	{
 		$im = imagecreatetruecolor($width, $height);
 
+		imagealphablending($im, false);
 		imagesavealpha($im, true);
-		$alpha = imagecolorallocatealpha($im, 255, 255, 255, 0); 
+		$alpha = imagecolorallocatealpha($im, 255, 255, 255, 127); 
 		imagefill($im, 0, 0, $alpha);
 
 		if(!is_null($bgColor))
@@ -30,7 +45,9 @@ class Image
 			$r = $bgColor >> 16 & 0xFF;
 			$g = $bgColor >> 8 & 0xFF;
 			$b = $bgColor & 0xFF;
-			$color = imagecolorallocatealpha($im, $r, $g, $b, 127); 
+			$a = $bgColor >> 24 & 0xFF;
+			$a = (0xFF - $a) >> 1;
+			$color = imagecolorallocatealpha($im, $r, $g, $b, $a); 
 			imagefill($im, 0, 0, $color);
 		}
 
@@ -39,6 +56,7 @@ class Image
 
 	public function save($im, $path, $quality = 75)
 	{
+		$im = $this->getImage($im);
 		$dir = dirname($path);
 		\slikland\utils\net\File::mkdir($dir);
 
@@ -46,7 +64,7 @@ class Image
 		switch($ext)
 		{
 			case 'png':
-				$result = imagepng($im, $path);
+				$result = imagepng($im, $path, 9);
 				break;
 			case 'jpg':
 			case 'jpeg':
@@ -81,6 +99,18 @@ class Image
 		$out = $this->newImage($size[0], $size[1]);
 		imagecopy($out, $im, 0, 0, 0, 0, $size[0], $size[1]);
 		return $out;
+	}
+
+	public function getMime($path)
+	{
+		$ext = $this->getExtension($path);
+		return @static::$MIME_TYPES[$ext];
+	}
+
+	public function getExtension($path)
+	{
+		$type = $this->getType($path);
+		return @static::$EXTENSIONS[$type];
 	}
 
 	public function getType($path)
@@ -132,6 +162,8 @@ class Image
 		{
 			case 'png':
 				$im = imagecreatefrompng($path);
+				imagealphablending($im, false);
+				imagesavealpha($im, true);
 				break;
 			case 'jpg':
 			case 'jpeg':
@@ -146,7 +178,7 @@ class Image
 		}
 		if(!$im)
 		{
-			throw new Error('Image format is not supported.');
+			throw new ServiceError('Image format is not supported.');
 		}
 		return $im;
 	}
@@ -175,7 +207,7 @@ class Image
 		$ratio = $w / $h;
 		if((is_nan($width) || $width <= 0) && (is_nan($height) || $height <= 0))
 		{
-			throw new Error('Image size is not set.');
+			throw new ServiceError('Image size is not set.');
 		}
 
 		if(is_nan($width) || $width <= 0)
@@ -239,7 +271,7 @@ class Image
 		$ratio = $w / $h;
 		if((is_nan($width) || $width <= 0) && (is_nan($height) || $height <= 0))
 		{
-			throw new Error('Image size is not set.');
+			throw new ServiceError('Image size is not set.');
 		}
 
 		if(is_nan($width) || $width <= 0)
@@ -293,7 +325,7 @@ class Image
 			$w = $bounds[2];
 			$h = $bounds[3];
 		}else{
-			throw new Error('Invalid bounds format.');
+			throw new ServiceError('Invalid bounds format.');
 		}
 
 		$source = $this->getImage($im);

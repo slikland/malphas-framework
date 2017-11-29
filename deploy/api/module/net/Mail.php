@@ -1,24 +1,18 @@
 <?php
 namespace module\net;
 
-class Mail extends \slikland\core\pattern\Singleton
+class Mail
 {
 	private $_settings = array(
-		'subject'=>'Assunto',
-		'email'=>'E-mail',
-		'name'=>'Nome',
-		'user'=>'Usuário',
-		'pass'=>'Senha',
-		'server'=>'Servidor SMTP',
-		'port'=>'Porta',
+		'name' => 'Name',
+		'email' => 'Email',
+		'user' => 'User',
+		'pass' => 'Pass',
+		'server' => 'Server',
+		'port' => 'Port',
 	);
 
 	private $_name = NULL;
-
-	function __construct()
-	{
-		$this->_mail = NULL;
-	}
 
 	public function name()
 	{
@@ -57,20 +51,19 @@ class Mail extends \slikland\core\pattern\Singleton
 		}
 	}
 
+	function __construct()
+	{
+		require 'vendors/phpmailer/PHPMailerAutoload.php';
+		$this->removeImages = array();
+	}
+
 	private function _initMail()
 	{
-		if($this->_mail)
-		{
-			$this->_mail->clearAddresses();
-			$this->_mail->clearAttachments();
-			$this->_mail->clearCustomHeaders();
-			$this->_mail->clearAllRecipients();
-			return $this->_mail;
-		}
-		require 'vendors/phpmailer/PHPMailerAutoload.php';
-		$mail = new PHPMailer();
-
 		$settings = $this->getSettings();
+
+		if(!@$settings['server'] || empty($settings['server'])) return FALSE;
+
+		$mail = new PHPMailer();
 		// $mail->SMTPDebug  = 2;
 		$mail->isSMTP();
 		$mail->CharSet = 'UTF-8';
@@ -82,20 +75,20 @@ class Mail extends \slikland\core\pattern\Singleton
 		$types = array('465'=>'ssl', '587'=>'tls', '2465'=>'ssl', '2587'=>'tls');
 
 		$port = $settings['port'];
-		$mail->Port = $port;
+		$mail->Port = $settings['port'];
 		if(isset($types[$port]))
 		{
 			$mail->SMTPSecure = $types[$port];
 		}
 
 		$mail->setFrom($settings['email'], $settings['name']);
-		$this->_mail = $mail;
 		return $mail;
 	}
 
-	function send($to, $subject, $message, $html = TRUE)
+	function send($to, $subject, $message, $replaceData = NULL, $html = TRUE)
 	{
 		$mail = $this->_initMail();
+		if(!$mail) return;
 		$addresses = $this->getAddresses($to);
 		foreach($addresses as $address)
 		{
@@ -107,26 +100,24 @@ class Mail extends \slikland\core\pattern\Singleton
 		}
 		$this->mail = $mail;
 
-		$pathRE = preg_replace('/\//', '\\/', ROOT_PATH);
-		$message = preg_replace_callback('/([\'\"])('.$pathRE.'[^\1]*?\/([^\/\1\.]+?)(\.[^\.\1]+?)?)\1/', array($this, 'replaceImages'), $message);
+		if($replaceData)
+		{
+			$message = $this->replacePlaceholders($message, $replaceData);
+		}
 
-		// if($replaceData)
-		// {
-		// 	$message = $this->replacePlaceholders($message, $replaceData);
-		// }
+		$message = preg_replace_callback('/(img src=([\'\"])?)([^\'\"\>]+)(\2)/', array($this, 'replaceMessage'), $message);
+		$message = preg_replace('/\{([^\}]*)\}/', '', $message);
 
-		// $message = preg_replace_callback('/\{image\=([^\}]*)\}/', array($this, 'replaceMessage'), $message);
-		// $message = preg_replace('/\{([^\}]*)\}/', '', $message);
 		$this->mail = NULL;
 
 		$mail->Subject = $subject;
 		$mail->Body = $message;
 		$sent = $mail->send();
 
-		// foreach($this->removeImages as $image)
-		// {
-		// 	unlink($image);
-		// }
+		foreach($this->removeImages as $image)
+		{
+			unlink($image);
+		}
 
 		return (bool)$sent;
 	}
@@ -144,16 +135,20 @@ class Mail extends \slikland\core\pattern\Singleton
 		$email = $db->fetch_one('SELECT * FROM email_template WHERE name = ? OR pk_email_template = ?', array($template, $template));
 		if(!$email)
 		{
-			throw new Error('Email template '.$template.' not found.');
+			throw new ServiceError('Email template '.$template.' not found.');
 		}
 		$subject = $email['subject'];
+		if(!@$data['image_url'])
+		{
+			$data['image_url'] = 'email/media/' . $template . '/';
+		}
 		if($data)
 		{
 			$subject = $this->replacePlaceholders($subject, $data);
 		}
 		$subject = preg_replace('/\{([^\}]*)\}/', '', $subject);
 
-		return $this->send($to, $subject, $email['message'], $data, $email['html']);
+		return $this->send($to, $subject, $email['content'], $data, TRUE);
 
 	}
 
@@ -187,14 +182,43 @@ class Mail extends \slikland\core\pattern\Singleton
 		return $response;
 	}
 
-	private function replaceImages($matches)
+	private function replaceMessage($matches)
 	{
-		if(file_exists($matches[2]))
+		$image = $matches[3];
+		$name = explode('/', $image);
+		$name = $name[count($name) - 1];
+		$path = $image;
+		$removeAfterUse = FALSE;
+		if(!preg_match('/^http/', $path))
 		{
-			$this->mail->AddEmbeddedImage($matches[2], $matches[3]);
-			return 'cid:' . $matches[3];
+			$path = ROOT_PATH . $path;
+		}else{
+			$image = file_get_contents($path);
+			\slikland\fs\File::mkdir(DYNAMIC_PATH . 'tmp/');
+			$path = DYNAMIC_PATH . 'tmp/' . $name;
+			file_put_contents($path, $image);
+			$this->removeImages[] = $path;
+		}
+		$this->mail->AddEmbeddedImage($path, $name);
+		return $matches[1] . 'cid:' . $name . $matches[4];
+	}
+
+	function replacePlaceholders($message, $data)
+	{
+		$this->replaceData = $data;
+		$message = preg_replace_callback('/\{([^\{\}]*)\}/', array($this, 'replacePlaceholder'), $message);
+		$this->replaceData = NULL;
+		return $message;
+	}
+
+	private function replacePlaceholder($matches)
+	{
+		if(isset($this->replaceData[$matches[1]]))
+		{
+			return $this->replaceData[$matches[1]];
 		}
 		return $matches[0];
 	}
+
 
 }

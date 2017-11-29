@@ -20,13 +20,37 @@ class StringUtils
 		return preg_replace('/^'.$tab.'(.*?)$/m', '$1', $content);		
 	}
 
-	static public function slugify($value)
+	static public function html_encode($value)
+	{
+		$value = mb_ereg_replace_callback('([\W]|[^a-z\s\b])', [__CLASS__, '_replaceHTMLSymbols'], $value);
+		return $value;
+	}
+
+	static private function _replaceHTMLSymbols($v)
+	{
+		$value = htmlentities($v[0]);
+		if($value == $v[0])
+		{
+			$value = '&#' . ord($v[0]) . ';';;
+		}
+
+		return $value;
+	}
+
+	static public function normalize($value)
 	{
 		$value = trim($value);
 		$value = static::removeAccents($value);
 		$value = strtolower($value);
 		$value = preg_replace('/\s+/', ' ', $value);
+		return $value;
+	}
+
+	static public function slugify($value)
+	{
+		$value = static::normalize($value);
 		$value = preg_replace('/\s/', '-', $value);
+		$value = preg_replace('/\./', '', $value);
 		return $value;
 	}
 
@@ -111,4 +135,24 @@ class StringUtils
 	{
 		return preg_replace('/\s*$/u', '', $text);
 	}
+
+	static public function escapeUnicode($value)
+	{
+		$value = preg_replace_callback('/[^\x20-\x7e\xa0-\xff]/u', function($values){
+			$v = $values[0];
+			try{
+				$v = dechex(unpack('N', mb_convert_encoding($v, 'UCS-4BE', 'UTF-8'))[1]);
+				$v = str_pad($v, 4, '0', STR_PAD_LEFT);
+			}catch(\Exception $e)
+			{
+
+			}
+
+			if(empty($v)) $v = $values[0];
+			return '&#x' . $v . ';';
+		}, $value);
+		return $value;
+	}
+
+
 }

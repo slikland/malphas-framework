@@ -18,6 +18,7 @@ class user
 		{
 			throw new CodedError('login_error');
 		}
+		log_activity('Login');
 		return $user;
 	}
 
@@ -26,6 +27,7 @@ class user
 	*/
 	function logout($data)
 	{
+		log_activity('Logout');
 		return $this->module->logout();
 	}
 
@@ -101,6 +103,7 @@ class user
 	*/
 	function edit($data)
 	{
+		log_activity('Edição de usuário', '', $data);
 		$response = array();
 		if(!isset($data['id']) || empty($data['id']) || !is_numeric($data['id']) || $data['id'] == 0)
 		{
@@ -118,6 +121,7 @@ class user
 	{
 		$response = FALSE;
 		$id = NULL;
+		log_activity('Remoção de usuário', '', $data);
 		if(isset($data))
 		{
 			if(isset($data['id']) && !empty($data['id']))

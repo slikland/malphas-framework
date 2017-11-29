@@ -38,7 +38,8 @@ class User extends \slikland\core\pattern\Singleton
 	function add($name, $email, $password, $role)
 	{
 		$user = $this->getCurrent();
-		if($role < $user['role']) $role = $user['role'];
+        $password = \slikland\crypt\Philo::decode($password);
+        if($role < $user['role']) $role = $user['role'];
 		if($this->db->fetch_one('SELECT pk_cms_user FROM cms_user WHERE email LIKE "'.$email.'" AND status = 1;'))
 		{
 			throw new CodedError('user_duplicated_email');
@@ -72,6 +73,7 @@ class User extends \slikland\core\pattern\Singleton
 		$fields['email'] = $email;
 		if(isset($password) && !empty($password))
 		{
+            $password = \slikland\crypt\Philo::decode($password);
 			$fields['pass'] = password($password, $id);
 		}
 		$fields['fk_cms_role'] = $role;
@@ -139,6 +141,7 @@ class User extends \slikland\core\pattern\Singleton
 
 	function login($email, $pass)
 	{
+        $pass = \slikland\crypt\Philo::decode($pass);
 		$id = NULL;
 		$user = $this->db->fetch_one('SELECT pk_cms_user id, fk_cms_role role FROM cms_user WHERE email LIKE ? AND status = ?', array($email, 1));
 		if($user)

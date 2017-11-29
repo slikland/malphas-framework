@@ -16,16 +16,10 @@ class S3
 
 	private $_name = NULL;
 	private $_client = NULL;
-
-	public function url()
-	{
-		if(!@$this->_url)
-		{
-			$settings = $this->getSettings();
-			$this->_url = $settings['url'];
-		}
-		return $this->_url;
-	}
+	private $_endpoint = NULL;
+	private $settings = NULL;
+	private $_active = NULL;
+	private $_url = NULL;
 
 	public function name()
 	{
@@ -38,17 +32,60 @@ class S3
 		return $this->_name;
 	}
 
+	public function active()
+	{
+		if($this->_active === NULL)
+		{
+			$settings = $this->getSettings();
+			$this->_active = isset($settings['secret']) && !empty(@$settings['secret']);
+		}
+
+		return $this->_active;
+	}
+
+	public function endpoint()
+	{
+		if($this->_endpoint === NULL)
+		{
+			$settings = $this->getSettings();
+			$this->_endpoint = @$settings['endpoint'];
+		}
+		return $this->_endpoint;
+	}
+
+	public function url()
+	{
+		if($this->_url === NULL)
+		{
+			$settings = $this->getSettings();
+			$this->_url = @$settings['url'];
+		}
+		return $this->_url;
+	}
+
 	function getSettings($fullObject = FALSE)
 	{
-		$prefix = $this->name();
-		$settings = array();
-		foreach($this->_settings as $k=>$v)
+		if(!$this->settings || $fullObject)
 		{
-			if($fullObject)
+			$prefix = $this->name();
+			$settings = array();
+			foreach($this->_settings as $k=>$v)
 			{
-				$settings[] = array('name'=>$prefix . '-' . $k, 'value'=>Setting::get($prefix . '-' . $k), 'label'=>$v);
+				if($fullObject)
+				{
+					$settings[] = array('name'=>$prefix . '-' . $k, 'value'=>Setting::get($prefix . '-' . $k), 'label'=>$v);
+				}else{
+					$settings[$k] = Setting::get($prefix . '-' . $k);
+				}
+			}
+		}
+		if(!$fullObject)
+		{
+			if(@$settings)
+			{
+				$this->settings = $settings;
 			}else{
-				$settings[$k] = Setting::get($prefix . '-' . $k);
+				$settings = $this->settings;
 			}
 		}
 		return $settings;
@@ -62,6 +99,27 @@ class S3
 			$value = @$data[$k];
 			Setting::set($prefix . '-' . $k, $value);
 		}
+
+		$this->updateBucketCors();
+	}
+
+	private function updateBucketCors()
+	{
+		$settings = $this->getSettings();
+
+		if($settings && @$settings['bucket'] && @$settings['secret'] && @$settings['key'])
+		{
+			$client = $this->getClient();
+			$client->putBucketCors([
+				'Bucket'=>$settings['bucket'],
+				'CORSRules'=>[
+					'AllowedHeaders'=>['*'],
+					'MaxAgeSeconds'=>3000,
+					'AllowedMethods'=>['GET'],
+					'AllowedOrigins'=>['*'],
+				],
+			]);
+		}
 	}
 
 	private function getClient()
@@ -69,6 +127,7 @@ class S3
 		if(!$this->_client)
 		{
 			$settings = $this->getSettings();
+			if(!$settings['url']) return;
 
 			$this->_url = $settings['url'];
 			$this->_endpoint = $settings['endpoint'];
@@ -89,15 +148,16 @@ class S3
 				]);
 			}catch(\Exception $e)
 			{
-				throw new Error('S3 error');
+				throw new ServiceError('S3 error');
 			}
 		}
 		return $this->_client;
 	}
 
-	function upload($file, $to)
+	function upload($file, $to, $gzip = TRUE, $public = TRUE)
 	{
-		$client = $this->getClient();
+		if(!$this->active()) return;
+
 		if(preg_match('/^http/', $file))
 		{
 			$headers = get_headers($file);
@@ -109,24 +169,65 @@ class S3
 					break;
 				}
 			}
+			$requestModule = get_module('net/Request');
+			$content = $requestModule->loadURL($file);
 		}else
 		{
 			$contentType = mime_content_type($file);
+			$content = file_get_contents($file);
 		}
-		$content = file_get_contents($file);
+
+		if(!$contentType || empty($contentType))
+		{
+			if(preg_match('/\.json$/', $file))
+			{
+				$contentType = 'text/json; charset=utf-8';
+			}
+		}
+
+		return $this->write($content, $to, $contentType, $gzip, $public);
+	}
+
+	function write($content, $to, $contentType = NULL, $gzip = TRUE, $public = TRUE)
+	{
+
+		$client = $this->getClient();
+		if(!$client) return;
+		$object = [
+			'Bucket' => $this->_bucket,
+		];
+
+		if($public)
+		{
+			$object['ACL'] = 'public-read';
+
+		}
+
+		if($gzip)
+		{
+			try{
+				$gzipped = gzencode($content, 9);
+				if(strlen($gzipped) > 0)
+				{
+					$content = $gzipped;
+					$object['ContentEncoding'] = 'gzip';
+				}
+			}catch(\Exception $e)
+			{
+
+			}
+		}
+
+		$object['Key'] = $to;
+		$object['Body'] = $content;
+		$object['ContentType'] = $contentType;
 
 		try {
-			$result = $client->putObject([
-				'Bucket' => $this->_bucket,
-				'Key'    => $to,
-				'Body'   => $content,
-				'ContentType' => $contentType,
-				'ACL' => 'public-read'
-			]);
+			$result = $client->putObject($object);
 		}catch(\Exception $e)
 		{
 			print($e->getMessage());
-			throw new Error('S3 error');
+			throw new ServiceError('S3 error');
 		}
 		
 		if(isset($result))
@@ -134,6 +235,28 @@ class S3
 			return $to;
 		}
 		return NULL;
+	}
+
+	function getURL($path, $downloadable = FALSE)
+	{
+		$client = $this->getClient();
+		if(!$client) return;
+
+		$commandData = [
+			'Bucket'=>$this->_bucket,
+			'Key'=>$path,
+		];
+
+		if($downloadable)
+		{
+			$pathName = preg_replace('/^.*?\/?([^\/]+)$/', '$1', $path);
+			$commandData['ResponseContentDisposition'] = 'attachment; filename="'.$pathName.'"';
+		}
+
+		$cmd = $client->getCommand('GetObject', $commandData);
+		$request = $client->createPresignedRequest($cmd, '+10 minutes');
+		$url = (string)$request->getUri();
+		return $url;
 	}
 
 	function delete($path)
@@ -146,7 +269,7 @@ class S3
 			]);
 		}catch(\Exception $e)
 		{
-			throw new Error('S3 error');
+			throw new ServiceError('S3 error');
 		}
 		return TRUE;
 	}

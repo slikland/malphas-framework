@@ -97,7 +97,7 @@ function setOutputFormat($format = 'json')
 			@header('Content-type: text/html');
 			break;
 		case 'download':
-			set_header('Content-type: application/octet-stream; charset=utf-8');
+			set_header('Content-type: application/octet-stream');
 			@header('Content-type: application/octet-stream');
 			break;
 		case 'json':
@@ -124,9 +124,9 @@ function debug()
 
 function error($error, $code, $data = NULL)
 {
-	if(!($error instanceof \slikland\error\Error))
+	if(!($error instanceof \slikland\error\ServiceError))
 	{
-		$error = new \slikland\error\Error($error, $code, $data);
+		$error = new \slikland\error\ServiceError($error, $code, $data);
 	}
 
 	switch($error->getCode())
@@ -149,14 +149,14 @@ function password($password, $key = NULL)
 	return \slikland\utils\crypt\Password::encode($password, $key);
 }
 
-function uid_encode($id)
+function uid_encode($id, $useSpecialChars = FALSE)
 {
-	return \slikland\utils\crypt\UID::encode($id);
+	return \slikland\utils\crypt\UID::encode($id, $useSpecialChars);
 }
 
-function uid_decode($uid)
+function uid_decode($uid, $useSpecialChars = FALSE)
 {
-	return \slikland\utils\crypt\UID::decode($uid);
+	return \slikland\utils\crypt\UID::decode($uid, $useSpecialChars);
 }
 
 function get_static_module($moduleName)
@@ -255,7 +255,9 @@ function add_annotation_callback($annotation, $callback, $order = \slikland\core
 function remove_annotation_callback()
 {
 	\slikland\core\AnnotationParser::removeAnnotationCallback($annotation);
-}function sendProgress($progress = 0, $total = 1)
+}
+
+function sendProgress($progress = 0, $total = 1)
 {
 	print '__p'.$progress.'__';
 	print PHP_EOL;

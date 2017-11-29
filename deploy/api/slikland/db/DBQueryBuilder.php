@@ -234,12 +234,12 @@ class DBQueryBuilder
 		$schema = self::getSchema($schemaName);
 		if(!$schema)
 		{
-			throw new Error("Schema `{$schemaName}` was not found.");
+			throw new ServiceError("Schema `{$schemaName}` was not found.");
 		}
 
 		if(!$schema['VIEWS'][$viewName])
 		{
-			throw new Error("View `{$viewName}` was not found on schema `{$schemaName}`.");
+			throw new ServiceError("View `{$viewName}` was not found on schema `{$schemaName}`.");
 		}
 
 		$view = $schema['VIEWS'][$viewName];

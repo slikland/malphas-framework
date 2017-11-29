@@ -1,6 +1,6 @@
 <?php
 namespace slikland\error;
-class CodedError extends \slikland\error\Error
+class CodedError extends ServiceError
 {
 	private static $messages = NULL;
 	private static function getErrorMessages()

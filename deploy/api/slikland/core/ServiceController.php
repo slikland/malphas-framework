@@ -27,38 +27,41 @@ class ServiceController
 			$method = $service['method'];
 			$annotations = \slikland\core\AnnotationParser::getAnnotations($class, $method);
 
-			$params = array('data' => (array)$_REQUEST);
-
-			if($inputData = file_get_contents('php://input'))
+			if(!$data)
 			{
-				try{
-					$data = json_decode($inputData, TRUE);
-					$isJSON = TRUE;
-				}catch(\Exception $e)
+				$params = array('data' => (array)$_REQUEST);
+
+				if($inputData = file_get_contents('php://input'))
 				{
-					$isJSON = FALSE;
+					try{
+						$data = json_decode($inputData, TRUE);
+						$isJSON = TRUE;
+					}catch(\Exception $e)
+					{
+						$isJSON = FALSE;
+					}
+					if(!$data)
+					{
+						$data = array('data'=>$inputData);
+						$isJSON = FALSE;
+					}
 				}
-				if(!$data)
+				if(!@$isJSON)
 				{
-					$data = array('data'=>$inputData);
+					$data = (array)$_REQUEST;
+				}else{
+					$data = array_merge((array)$_GET, $data);
 				}
-			}
 
-			if(!@$isJSON)
-			{
-				$data = (array)$_REQUEST;
-			}else{
-				$data = array_merge((array)$_GET, $data);
-			}
+				if(isset($service['params']) && !empty($service['params']))
+				{
+					$data = array_merge($data, $service['params']);
+				}
 
-			if(isset($service['params']) && !empty($service['params']))
-			{
-				$data = array_merge($data, $service['params']);
-			}
-
-			if(!empty($_FILES))
-			{
-				$data = array_merge($data, $_FILES);
+				if(!empty($_FILES))
+				{
+					$data = array_merge($data, $_FILES);
+				}
 			}
 
 			$params['data'] = $data;
@@ -118,7 +121,7 @@ class ServiceController
 				$format = $params['format'];
 			}
 
-		}catch(\slikland\error\Error $e)
+		}catch(\slikland\error\ServiceError $e)
 		{
 			// if(DEBUG)
 			// {
@@ -131,7 +134,7 @@ class ServiceController
 			// {
 			// 	var_dump($e);
 			// }
-			$response = $e->toObject();
+			$response = $e->__toString();
 		}catch(Exception $e)
 		{
 			if(DEBUG)
@@ -150,7 +153,7 @@ class ServiceController
 
 	private static function error()
 	{
-		throw new \slikland\error\Error('service not found');
+		throw new \slikland\error\ServiceError('service not found');
 	}
 
 	private static function findService($service)

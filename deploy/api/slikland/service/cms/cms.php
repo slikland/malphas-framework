@@ -46,6 +46,30 @@ class cms
 	}
 
 	/**
+	@method POST
+	@permission [1]
+	*/
+	function getGeneralConfig($data)
+	{
+		$response = [];
+		$colors = $this->getColors();
+		$response['colors'] = $colors;
+		$response['title'] = Setting::get('cms_title');
+		return $response;
+	}
+
+	/**
+	@method POST
+	@permission [1]
+	*/
+	function updateGeneralConfig($data)
+	{
+		$this->setColors($data);
+
+		return Setting::set('cms_title', $data['title']);
+	}
+
+	/**
 	@permission [1]
 	*/
 	function getColors()

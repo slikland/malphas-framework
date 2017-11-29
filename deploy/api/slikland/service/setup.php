@@ -85,7 +85,7 @@ class setup{
 		global $config;
 		if(!File::isWritable(API_PATH . 'schema/'))
 		{
-			throw new Error('Please change permission of ' . API_PATH . 'schema/');
+			throw new ServiceError('Please change permission of ' . API_PATH . 'schema/');
 		}
 		$schema = new \slikland\db\SchemaParser();
 		$data = $schema->parseTables();

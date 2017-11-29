@@ -2,6 +2,21 @@
 namespace slikland\fs;
 class File
 {
+	static function toHumanSize($bytes, $decimals = 2)
+	{
+		$units = ['B','kB','MB','GB','TB','PB','EB','ZB','YB'];
+		$maxUnits = count($units);
+		$step = 1 / 1024;
+		$i = 0;
+		while($bytes > 900 and $i < $maxUnits)
+		{
+			$bytes *= $step;
+			$i++;
+		}
+		$decimals = pow(10, $decimals);
+		return round($bytes * $decimals) / $decimals . $units[$i];
+	}
+
 	static function isWritable($path)
 	{
 		return is_writable($path);
@@ -9,7 +24,7 @@ class File
 
 	static function move($from, $to)
 	{
-		if(!file_exists($from)) throw new Error('File doesn\'t exist.');
+		if(!file_exists($from)) throw new ServiceError('File doesn\'t exist.');
 		static::remove($to);
 		static::mkdir(dirname($to), 0777);
 		rename($from, $to);
@@ -92,6 +107,9 @@ class File
 			$url = preg_replace('/^https?\:\\/\\//i', '', $url);
 			$rootURL = preg_replace('/^https?\:\\/\\//i', '', $rootURL);
 			return str_replace($rootURL, '', $url);
+		}else if(strpos($url, ROOT_PATH) !== FALSE)
+		{
+			return str_replace(ROOT_PATH, '', $url);
 		}
 		return $url;
 	}
@@ -170,12 +188,25 @@ class File
 
 	static function copyChunk($source, $target, $size = NULL, $offsetSource = 0, $offsetTarget = 0)
 	{
-		if(!file_exists($source)) throw new Error('Source file doesn\'t exist');
+		$isTemp = FALSE;
+		if(preg_match('/^http/', $source))
+		{
+			\slikland\fs\File::mkdir(DYNAMIC_PATH . 'tmp');
+			$f = time() . rand();
+			$requestModule = get_module('net/Request');
+			$data = $requestModule->loadURL($source);
+			$file = fopen(DYNAMIC_PATH . 'tmp/' . $f, 'w');
+			fwrite($file, $data);
+			fclose($file);
+			$source = DYNAMIC_PATH . 'tmp/' . $f;
+			$isTemp = TRUE;
+		}
+		if(!preg_match('/^http/', $source) && !file_exists($source)) throw new ServiceError('Source file doesn\'t exist');
 		if(file_exists($target))
 		{
-			if(!is_writable($target)) throw new Error('Target file is not writeable');
+			if(!is_writable($target)) throw new ServiceError('Target file is not writeable');
 		}else{
-			if(!is_writable(dirname($target))) throw new Error('Target file is not writeable');
+			if(!is_writable(dirname($target))) throw new ServiceError('Target file is not writeable');
 		}
 
 		$sizeLimit = @ini_get('memory_limit');
@@ -203,6 +234,11 @@ class File
 
 		fclose($sourceFile);
 		fclose($targetFile);
+
+		if($isTemp)
+		{
+			@unlink($source);
+		}
 	}
 
 	private static function _copyChunk($source, $target, $size, $offsetSource, $offsetTarget)

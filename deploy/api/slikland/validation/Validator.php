@@ -69,7 +69,7 @@ class Validator
 		}
 		if(!empty($validation) && count($validation) > 0)
 		{
-			throw new Error('validation error', 1001, $validation);
+			throw new ServiceError('Erro de validação', 1001, $validation);
 		}
 	}
 }

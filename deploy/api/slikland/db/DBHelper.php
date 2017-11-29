@@ -26,14 +26,14 @@ class DBHelper
 	{
 		if(!preg_match('/^([^\.]+)(?:\.(.*?))?$/', $tableName, $match))
 		{
-			throw new Error('Table name is not defined');
+			throw new ServiceError('Table name is not defined');
 		}
 
 		$table = $match[1];
 		$path = API_PATH . 'schema/' . $table . '.php';
 		if(!file_exists($path))
 		{
-			throw new Error("`{$table}` schema not found");
+			throw new ServiceError("`{$table}` schema not found");
 		}
 
 		// $this->schema = self::getSchema($table);
@@ -322,7 +322,7 @@ class DBHelper
 				$selectFields = $schema['FIELDS'];
 			}else
 			{
-				throw new Error("Error on building select query for `$view`");
+				throw new ServiceError("Error on building select query for `$view`");
 			}
 		}
 

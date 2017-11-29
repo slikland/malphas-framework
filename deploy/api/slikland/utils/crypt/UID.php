@@ -2,22 +2,26 @@
 namespace slikland\utils\crypt;
 class UID
 {
+	private static $specialChars = '!@$%^&*()_+#[]{}|?.,<>~0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 	private static $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 	private static $keyLength = 8;
 	
-	public static function encode($k)
+	public static function encode($k, $useSpecialChars = FALSE)
 	{
 		if(!$k || is_nan($k))
 		{
 			return NULL;
 		}
+		$chars = self::$chars;
+		if($useSpecialChars) $chars = self::$specialChars;
+
 		$key = '';
 		$keyIndexes = array();
-		$charLength = strlen(self::$chars) - 1;
+		$charLength = strlen($chars) - 1;
 		while(strlen($key) < self::$keyLength)
 		{
 			$i = rand(0, $charLength);
-			$key .= self::$chars[$i];
+			$key .= $chars[$i];
 			$keyIndexes[] = $i;
 		}
 		
@@ -27,15 +31,17 @@ class UID
 		for($i = 0; $i < $l; $i++)
 		{
 			$p = $i % self::$keyLength;
-			$value .= self::$chars[(intval($val[$i]) + $keyIndexes[$p]) % $charLength];
+			$value .= $chars[(intval($val[$i]) + $keyIndexes[$p]) % $charLength];
 		}
 		return $key . $value;
 	}
 	
-	public static function decode($k)
+	public static function decode($k, $useSpecialChars = FALSE)
 	{
 		if(!is_string($k)) return NULL;
-		$charLength = strlen(self::$chars) - 1;
+		$chars = self::$chars;
+		if($useSpecialChars) $chars = self::$specialChars;
+		$charLength = strlen($chars) - 1;
 		$i = 0;
 		$l = self::$keyLength;
 		$key = substr($k, 0, $l);
@@ -46,7 +52,7 @@ class UID
 		try{
 			for($i = 0; $i < $l; $i++)
 			{
-				$keyIndexes[] = strpos(self::$chars, $key[$i]);
+				$keyIndexes[] = strpos($chars, $key[$i]);
 			}
 		}catch(\Exception $e)
 		{
@@ -58,7 +64,7 @@ class UID
 		for($i = 0; $i < $l; $i++)
 		{
 			$p = $i % self::$keyLength;
-			$v = strpos(self::$chars, $val[$i]);
+			$v = strpos($chars, $val[$i]);
 			$v -= $keyIndexes[$p];
 			$v = ((($v % $charLength) + $charLength) % $charLength);
 			$value .= $v;

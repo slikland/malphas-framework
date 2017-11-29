@@ -53,8 +53,8 @@ class ExcelExporter extends \PHPExcel
 		foreach($header as $item)
 		{
 			$sheet->getStyleByColumnAndRow($i, 1)->getFont()->setBold(TRUE);
-			$sheet->setCellValueByColumnAndRow($i++, 1, $item);
-
+			$sheet->getCellByColumnAndRow($i, 1)->setValueExplicit(trim($item), PHPExcel_Cell_DataType::TYPE_STRING);
+			$i++;
 		}
 	}
 

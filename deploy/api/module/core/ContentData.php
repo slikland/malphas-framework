@@ -18,7 +18,7 @@ class ContentData extends slikland\core\pattern\Singleton
 			$path = DYNAMIC_PATH . 'data/';
 		}
 		$config = @json_decode(@file_get_contents($path . 'config.json'), TRUE);
-		if(!$config) throw new Error('Config JSON not found');
+		if(!$config) throw new ServiceError('Config JSON not found');
 
 		$this->_parsePaths($config['paths']);
 
@@ -101,7 +101,7 @@ class ContentData extends slikland\core\pattern\Singleton
 				$dataPath = DYNAMIC_PATH . 'data/';
 			}
 		}
-		if(!file_exists($dataPath . $path . '.json')) throw new Error('JSON doesn\'t exist');
+		if(!file_exists($dataPath . $path . '.json')) throw new ServiceError('JSON doesn\'t exist');
 		if(!isset($this->cache[$path]))
 		{
 			$data = @json_decode(@file_get_contents($dataPath . $path . '.json'), TRUE);

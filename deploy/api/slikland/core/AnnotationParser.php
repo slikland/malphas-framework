@@ -92,7 +92,7 @@ class AnnotationParser
 	{
 		if(!is_callable($callback))
 		{
-			throw new Error($annotation . ' callback is not a callable.');
+			throw new ServiceError($annotation . ' callback is not a callable.');
 		}
 		if($order != self::BEFORE && $order != self::AFTER)
 		{
