@@ -29,8 +29,10 @@ $rootPath .= '/';
 $relativeRootPath .= '/';
 $rootURL = $host . $relativeRootPath;
 $currentURL = rtrim($rootURL, '/') . $requestURI;
-
+$url = parse_url($domain);
 define('HOST', $domain);
+define('DOMAIN', @$url['host']);
+define('PORT', @$url['port']);
 define('API_PATH', $rootPath . 'api/');
 define('API_URL', $rootURL . 'api/');
 define('ROOT_PATH', $rootPath);

@@ -21,13 +21,20 @@ class Validation extends cms.ui.Base
 		return regex.test(value)
 	@_validate_match:(value, data, form)->
 		field = data?.item?.getAttribute('field')
+
 		field = form[field]
+
 		if !field
 			field = data?.item?.getAttribute('field')
 			field = form.querySelector(field)
 		if !field
 			return false
-		return field.value == value
+		if field.getAttribute('encode')?.toLowerCase?() == 'philo'
+			field.trigger('cleanup')
+			fvalue = field.rawValue
+		else
+			fvalue = field.value
+		return fvalue == value
 
 	_update:(data)->
 		if !@_pluginInstances

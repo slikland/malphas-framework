@@ -816,8 +816,8 @@ if (!EventDispatcher) {
 var App, app, windowLoaded;
 App = (function(_super) {
   __extends(App, _super);
-  App.project_version_raw = "SL_PROJECT_VERSION:1.6.0";
-  App.project_date_raw = "SL_PROJECT_DATE:1508527461354";
+  App.project_version_raw = "SL_PROJECT_VERSION:1.6.1";
+  App.project_date_raw = "SL_PROJECT_DATE:1512569134082";
   App.FRAMEWORK_VERSION = "2.2.15";
   function App() {
     App.__super__.constructor.apply(this, arguments);
@@ -5441,11 +5441,13 @@ User = (function(_super) {
   User.API_PATH = 'api/cms/user/';
   function User() {
     this._mouseDown = __bind(this._mouseDown, this);
+    this._checkUser = __bind(this._checkUser, this);
     this._userAPIIntercepted = __bind(this._userAPIIntercepted, this);
     User.__super__.constructor.apply(this, arguments);
     this._logged = false;
     API.intercept(/api\/cms\/user\/.+/g, this._userAPIIntercepted);
     this._getUser();
+    app.on('check_user', this._checkUser);
   }
   User.prototype._userAPIIntercepted = function(data, url) {
     var params, type;
@@ -5498,11 +5500,30 @@ User = (function(_super) {
     this._logged = logged;
     return this.trigger(this.constructor.STATUS_CHANGE, logged);
   };
+  User.prototype._checkUser = function() {
+    return this._getUser();
+  };
   User.prototype._getUser = function() {
     return API.call(app.rootPath + this.constructor.API_PATH + 'getUser');
   };
   User.prototype._showLogin = function() {
+    var k, page, pageParts, parsedPath, pathObj, v, _ref;
     if (!app.template.isCurrent('user/login')) {
+      pathObj = {};
+      parsedPath = app.router.getParsedPath();
+      page = parsedPath['path'];
+      page = page.replace(/(\?|\#).*?$/, '');
+      pageParts = page.trim('/').split('/');
+      for (k in pageParts) {
+        v = pageParts[k];
+        pathObj[k] = v;
+      }
+      _ref = parsedPath.params;
+      for (k in _ref) {
+        v = _ref[k];
+        pathObj[k] = v;
+      }
+      slikland.Mara.setGlobalObject('$', pathObj);
       return app.template.render('user/login', null, document.body);
     }
   };
@@ -5556,13 +5577,28 @@ cms.core.InterfaceController = (function() {
     }
   });
   InterfaceController.prototype._apiRedirectInterceptor = function(data, url) {
-    if (data != null ? data.goto : void 0) {
-      return app.router.goto(data.goto);
-    } else if (data != null ? data.redirect : void 0) {
-      return app.router.goto(data.redirect);
-    } else if (data != null ? data.refresh : void 0) {
-      return 1;
+    var k, v, _results;
+    if (typeof data === 'string') {
+      return;
     }
+    _results = [];
+    for (k in data) {
+      v = data[k];
+      switch (k) {
+        case 'goto':
+          _results.push(app.router.goto(data.goto));
+          break;
+        case 'redirect':
+          _results.push(app.router.goto(data.redirect));
+          break;
+        case 'refresh':
+          _results.push(1);
+          break;
+        default:
+          _results.push(void 0);
+      }
+    }
+    return _results;
   };
   InterfaceController.prototype.show = function(page) {
     if (page == null) {
@@ -5832,14 +5868,20 @@ cms.ui.attributes.Template = (function(_super) {
       this._element.on('click', this._click);
     }
     Plugin.prototype._click = function() {
-      var o;
+      var clear, clearContext, o;
+      clearContext = false;
+      if (this.attr('templateClearContext')) {
+        clear = this.attr('templateClearContext');
+        if (clear === 'true' || clear === 1 || clear === true) {
+          clearContext = true;
+        }
+      }
       o = {
         template: this._template,
         target: this.attr('templateTarget'),
         currentTarget: this.element,
-        clearContext: false
+        clearContext: clearContext
       };
-      console.log(o);
       return app.trigger(Main.RENDER_TEMPLATE, o);
     };
     return Plugin;
@@ -6198,7 +6240,7 @@ cms.ui.tag.attributes.Service = (function(_super) {
   function Service() {
     return Service.__super__.constructor.apply(this, arguments);
   }
-  Service.SELECTOR = '[service]';
+  Service.SELECTOR = '[service]:not(suggestion)';
   Service._queue = [];
   Service.prototype._update = function(data) {
     var item, p, _i, _j, _len, _len1, _ref, _ref1, _results;
@@ -6809,6 +6851,9 @@ cms.ui.tag.attributes.PingService = (function(_super) {
             app.template.renderBlock(target, item.data);
           }
         }
+        if (item.event) {
+          app.trigger(item.event, item.data);
+        }
       }
       this._removeEventListeners();
       this._removeProgress();
@@ -7293,7 +7338,12 @@ cms.ui.tag.attributes.Encode = (function(_super) {
       this._element.name = '';
       this._tempElement.style.display = 'none';
       this._element.parentNode.appendChild(this._tempElement);
-      return this._tempElement.value = slikland.crypt.Philo.encode(this._element.value);
+      console.log(">>>", this._element.value.trim().length);
+      if (this._element.value.trim().length === 0) {
+        return this._tempElement.value = '';
+      } else {
+        return this._tempElement.value = slikland.crypt.Philo.encode(this._element.value);
+      }
     };
     Plugin.prototype._cleanup = function() {
       var _ref;
@@ -8027,29 +8077,33 @@ cms.ui.tag.attributes.Action = (function(_super) {
       });
     };
     Plugin.prototype._apiComplete = function(e, data) {
-      var i, items, o, success, _ref, _ref1;
+      var i, items, o, success, successes, _i, _len, _ref, _ref1;
       success = this.attr('success');
       if (success && success.length > 0) {
-        switch (success) {
-          case 'update':
-            this._element.trigger('update');
-            break;
-          case 'refresh':
-            app["interface"].show();
-            break;
-          case 'reload':
-            window.location.reload();
-            break;
-          default:
-            if (o = /^update\:(.*?)$/.exec(success)) {
-              items = document.body.querySelectorAll(o[1]);
-              i = items.length;
-              while (i-- > 0) {
-                items[i].trigger('update');
+        successes = success.split(',');
+        for (_i = 0, _len = successes.length; _i < _len; _i++) {
+          success = successes[_i];
+          switch (success) {
+            case 'update':
+              this._element.trigger('update');
+              break;
+            case 'refresh':
+              app["interface"].show();
+              break;
+            case 'reload':
+              window.location.reload();
+              break;
+            default:
+              if (o = /^update\:(.*?)$/.exec(success)) {
+                items = document.body.querySelectorAll(o[1]);
+                i = items.length;
+                while (i-- > 0) {
+                  items[i].trigger('update');
+                }
+              } else {
+                app["interface"].show(success);
               }
-            } else {
-              app["interface"].show(success);
-            }
+          }
         }
       }
       if ((data != null ? (_ref = data.notification) != null ? (_ref1 = _ref.message) != null ? _ref1.length : void 0 : void 0 : void 0) > 0) {
@@ -8213,10 +8267,11 @@ cms.ui.tags.form.Validation = (function(_super) {
     return regex.test(value);
   };
   Validation._validate_match = function(value, data, form) {
-    var field, _ref;
+    var field, _ref, _ref1;
     field = data != null ? (_ref = data.item) != null ? _ref.getAttribute('field') : void 0 : void 0;
     field = form[field];
     if (!field) {
+      field = data != null ? (_ref1 = data.item) != null ? _ref1.getAttribute('field') : void 0 : void 0;
       field = form.querySelector(field);
     }
     if (!field) {
@@ -8835,6 +8890,240 @@ cms.ui.tags.form.Toggle = (function(_super) {
     return Plugin;
   })(BaseDOM);
   return Toggle;
+})(cms.ui.Base);
+var __hasProp = {}.hasOwnProperty;
+cms.ui.tags.form.Suggestion = (function(_super) {
+  var Plugin;
+  __extends(Suggestion, _super);
+  function Suggestion() {
+    return Suggestion.__super__.constructor.apply(this, arguments);
+  }
+  Suggestion.SELECTOR = 'suggestion';
+  Suggestion.prototype._update = function(data) {
+    var i, inst, item, p_id, _i, _j, _len, _len1, _ref, _ref1, _results;
+    if (!this._pluginInstances) {
+      this._pluginInstances = [];
+    }
+    _ref = data.add;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      item = _ref[_i];
+      item.setAttribute('p_id', this.constructor._ID++);
+      this._pluginInstances.push(new Plugin(item));
+    }
+    _ref1 = data.remove;
+    _results = [];
+    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+      item = _ref1[_j];
+      p_id = item.getAttribute('p_id');
+      i = this._pluginInstances.length;
+      _results.push((function() {
+        var _results1;
+        _results1 = [];
+        while (i-- > 0) {
+          inst = this._pluginInstances[i];
+          if (inst.attr('p_id') === p_id) {
+            inst.destroy();
+            _results1.push(this._pluginInstances.splice(i, 1));
+          } else {
+            _results1.push(void 0);
+          }
+        }
+        return _results1;
+      }).call(this));
+    }
+    return _results;
+  };
+  Plugin = (function(_super1) {
+    __extends(Plugin, _super1);
+    Plugin._destroyPlugin = function(item) {};
+    function Plugin(element) {
+      this._apiLoaded = __bind(this._apiLoaded, this);
+      this._resize = __bind(this._resize, this);
+      this._request = __bind(this._request, this);
+      this._change = __bind(this._change, this);
+      this._click = __bind(this._click, this);
+      this._keyDown = __bind(this._keyDown, this);
+      this._blur = __bind(this._blur, this);
+      this._focus = __bind(this._focus, this);
+      this._build = __bind(this._build, this);
+      Plugin.__super__.constructor.call(this, {
+        element: element
+      });
+      this._target = this.findClosest(this.attr('target'));
+      this._service = this.attr('service');
+      if (!this._target) {
+        return;
+      }
+      if (!this._service) {
+        return;
+      }
+      this._api = new API(this._service);
+      this._api.on(API.COMPLETE, this._apiLoaded);
+      this._api.reuse = true;
+      this._templateBlock = this.find('item');
+      this.removeChild(this._templateBlock);
+      this._currentIndex = -1;
+      this._build();
+    }
+    Plugin.prototype.destroy = function() {
+      this._target.off('change', this._change);
+      this._target.off('input', this._change);
+      this._target.off('keydown', this._keyDown);
+      this._target.off('focus', this._focus);
+      this._target.off('blur', this._blur);
+      window.removeEventListener('resize', this._resize);
+      return Plugin.__super__.destroy.apply(this, arguments);
+    };
+    Plugin.prototype._build = function() {
+      this._target.on('change', this._change);
+      this._target.on('input', this._change);
+      this._target.on('keydown', this._keyDown);
+      this._target.on('focus', this._focus);
+      this._target.on('blur', this._blur);
+      window.addEventListener('resize', this._resize);
+      window.addEventListener('scroll', this._resize);
+      document.body.addEventListener('scroll', this._resize);
+      return this._resize();
+    };
+    Plugin.prototype._focus = function() {
+      return this._change();
+    };
+    Plugin.prototype._blur = function(e) {
+      return this.clear();
+    };
+    Plugin.prototype._keyDown = function(e) {
+      switch (e.keyCode) {
+        case 38:
+          e.preventDefault();
+          return this.selectPrev();
+        case 40:
+          e.preventDefault();
+          return this.selectNext();
+        case 13:
+          if (this.commit()) {
+            e.preventDefault();
+            return e.stopImmediatePropagation();
+          }
+      }
+    };
+    Plugin.prototype.commit = function(selectedItem) {
+      var items;
+      if (selectedItem == null) {
+        selectedItem = null;
+      }
+      if (!this._hasSuggestions) {
+        return;
+      }
+      items = ArrayUtils.toArray(this.findAll('item'));
+      if (items[this._currentIndex]) {
+        selectedItem = items[this._currentIndex];
+        this._target.value = selectedItem.getAttribute('value');
+      }
+      this.clear();
+      return true;
+    };
+    Plugin.prototype._click = function(e) {
+      var i, items;
+      items = ArrayUtils.toArray(this.findAll('item'));
+      i = items.length;
+      while (i-- > 0) {
+        if (items[i] === e.currentTarget) {
+          this.select(i);
+          break;
+        }
+      }
+      return this.commit();
+    };
+    Plugin.prototype.clear = function() {
+      this.removeAll();
+      this._lastValue = '';
+      this._clearRequestQueue();
+      return this._hasSuggestions = false;
+    };
+    Plugin.prototype.select = function(index) {
+      var cl, i, item, items, l, p, _ref;
+      items = ArrayUtils.toArray(this.findAll('item'));
+      l = items.length;
+      this._hasSuggestions = l > 0;
+      if (!this._hasSuggestions) {
+        return;
+      }
+      this.css({
+        display: 'block'
+      });
+      index = ((index % l) + l) % l;
+      for (i in items) {
+        item = items[i];
+        i = Number(i);
+        cl = (_ref = item.className) != null ? _ref.toLowerCase().split(' ') : void 0;
+        if (!cl) {
+          cl = [];
+        }
+        if (i === index) {
+          if (cl.indexOf('selected') < 0) {
+            cl.push('selected');
+          }
+        } else {
+          while ((p = cl.indexOf('selected')) >= 0) {
+            cl.splice(p, 1);
+          }
+        }
+        item.className = cl.join(' ');
+      }
+      return this._currentIndex = index;
+    };
+    Plugin.prototype.selectNext = function() {
+      return this.select(this._currentIndex + 1);
+    };
+    Plugin.prototype.selectPrev = function() {
+      return this.select(this._currentIndex - 1);
+    };
+    Plugin.prototype._change = function() {
+      if (this._target.value === this._lastValue) {
+        return;
+      }
+      this._lastValue = this._target.value;
+      return this._queueRequest();
+    };
+    Plugin.prototype._queueRequest = function() {
+      this._api.abort();
+      this._clearRequestQueue();
+      return this._requestTimeout = setTimeout(this._request, 300);
+    };
+    Plugin.prototype._clearRequestQueue = function() {
+      return clearInterval(this._requestTimeout);
+    };
+    Plugin.prototype._request = function() {
+      return this._api.submit({
+        value: this._target.value
+      });
+    };
+    Plugin.prototype._resize = function() {
+      var bounds, pBounds, wh, ww, _ref;
+      bounds = this._target.getBoundingClientRect();
+      pBounds = (_ref = this._target.parentNode) != null ? _ref.getBoundingClientRect() : void 0;
+      ww = window.innerWidth;
+      wh = window.innerHeight;
+      return this.css({
+        top: (bounds.bottom - pBounds.top) + 'px',
+        left: (bounds.left - pBounds.left) + 'px',
+        width: (bounds.right - bounds.left) + 'px'
+      });
+    };
+    Plugin.prototype._apiLoaded = function(e, data) {
+      var i, items;
+      this.clear();
+      app.template.renderBlock(this.element, data, this.element);
+      items = ArrayUtils.toArray(this.findAll('item'));
+      i = items.length;
+      while (i-- > 0) {
+        items[i].on('mousedown', this._click);
+      }
+      return this.select(0);
+    };
+    return Plugin;
+  })(BaseDOM);
+  return Suggestion;
 })(cms.ui.Base);
 var __hasProp = {}.hasOwnProperty;
 cms.ui.tags.form.Select = (function(_super) {
@@ -11218,7 +11507,7 @@ cms.ui.tags.media.Cropper = (function(_super) {
       this._input.name = 'size';
       this._input.setAttribute('type', 'input');
       this._input.style.display = 'none';
-      this._input.value = this._data;
+      this._input.value = JSON.stringify(this._data);
       return this.appendChild(this._input);
     };
     Size.prototype._parseData = function(target) {
@@ -11299,7 +11588,7 @@ cms.ui.tags.media.Cropper = (function(_super) {
       }
       this._data['crop'] = [].concat(crop);
       this._redraw();
-      return this._input.value = this._data;
+      return this._input.value = JSON.stringify(this._data);
     };
     Size.prototype.updateSrc = function(src, id) {
       if (id == null) {
@@ -11308,7 +11597,7 @@ cms.ui.tags.media.Cropper = (function(_super) {
       this._data['src'] = src;
       this._data['id'] = id;
       this._load(src);
-      return this._input.value = this._data;
+      return this._input.value = JSON.stringify(this._data);
     };
     Size.prototype.resize = function() {
       var bounds, h, w;

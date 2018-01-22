@@ -21,7 +21,6 @@
 class Main
 	@RENDER_TEMPLATE: 'app_renderTemplate'
 	constructor:()->
-
 		@_history = []
 		new cms.ui.UI()
 		

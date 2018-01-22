@@ -208,7 +208,7 @@ class User extends \slikland\core\pattern\Singleton
 			{
 				$this->db->query("UPDATE cms_session SET updated = CURRENT_TIMESTAMP WHERE pk_cms_session = {$id}");
 				$_COOKIE['sl_cms_session'] = $uid;
-				setcookie('sl_cms_session', $uid, time() + CMS_SESSION_TIMEOUT, '/', $_SERVER['HTTP_HOST'], SECURE, TRUE);
+				setcookie('sl_cms_session', $uid, time() + CMS_SESSION_TIMEOUT, '/', DOMAIN, SECURE, TRUE);
 				$updated = TRUE;
 			}
 		}
@@ -260,8 +260,8 @@ class User extends \slikland\core\pattern\Singleton
 			}
 			unset($_COOKIE['sl_cms_session']);
 		}
-
-		setcookie('sl_cms_session', '', time()-1, '/', $_SERVER['HTTP_HOST'], SECURE, TRUE);
+		setcookie('sl_cms_session', '', time()-1, '/', DOMAIN, SECURE, TRUE);
+		
 		$this->user = NULL;
 	}
 
