@@ -1,20 +1,15 @@
 <?php
-include_once('../api/index.php');
-print '<!DOCTYPE html>';
-$mara = new \slikland\mara\Mara('templates/');
-$data = array();
+    // Load API Resources
+    require '../api/index.php';
 
-$data['base'] = CMS_URL;
-$data['meta'] = array();
-$data['meta'][] = array('name'=>'ROBOTS', 'content'=>'NOINDEX, NOFOLLOW');
+    // Composer Autoload
+    include 'vendor/autoload.php';
 
-$style = file_get_contents('css/main.css');
-$colorModule = get_module('cms/Colors');
-$style = $colorModule->replaceColors($style);
+    // CMS Configs
+    include 'configs/config.php';
 
-$data['style'] = $style;
-$data['styles'] = array('css/vendors.css');
-$data['scripts'] = array('js/Main.js', 'js/vendors.js');
-$data['injectScript'] = 'window.rootPath = "'.ROOT_URL.'";window.apiPath = "'.ROOT_URL.'api/";';
+    // Constants Paths
+    include 'configs/paths.php';
 
-$mara->render('index', $data);
+    // Routes / Run application
+    include 'routes.php';

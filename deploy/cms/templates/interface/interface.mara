@@ -1,6 +1,0 @@
-header
-	@interface/header:
-nav
-	@interface/menu: #{interface}
-notification
-main

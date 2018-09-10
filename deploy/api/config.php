@@ -1,18 +1,34 @@
 <?php
 
-$config = array();
-
-$cofig['db_host'] = '';
-
-$config['cms_path'] = 'cms/';
-//TEMP
-
 define('CMS_SESSION_TIMEOUT', 7200);
+
+set_include_path(__DIR__ . '/');
+set_time_limit(10);
+
+date_default_timezone_set('America/Sao_Paulo');
+header('Access-Control-Allow-Origin: *');
+header('Cache-Control: no-cache');
+header('Edge-Control: no-cache');
+
+$config = [];
+$debug = FALSE;
+
+if(isset($_SERVER['HTTP_HOST'])) {
+    $host = $_SERVER['HTTP_HOST'];
+}
+if(isset($_GET['__debug__']) || preg_match('/(127\.0\.0\.1|localhost|local\.slikland|dev\.s\d+\.slikland)/',$host)) {
+    $debug = TRUE;
+    @ini_set('display_errors', 'On');
+    @error_reporting(E_ALL ^ E_DEPRECATED);
+} else {
+    @ini_set('display_errors', 'Off');
+    @error_reporting(0);
+}
+
+define('DEBUG', $debug);
 
 
 $host = strtolower($_SERVER['HTTP_HOST']);
-
-$config['dynamic_url'] = '';
 switch($host)
 {
 	case ((bool)preg_match('/(local\.?|localhost)/', $host)):
@@ -20,7 +36,7 @@ switch($host)
 		if(@getenv('ENVIRONMENT') == 'sl_local')
 		{
 			$config['db_host'] = 'localhost';
-			$config['db_name'] = '';
+			$config['db_name'] = 'cms';
 			$config['db_user'] = 'root';
 			$config['db_pass'] = '';
 			$config['db_port'] = 3306;

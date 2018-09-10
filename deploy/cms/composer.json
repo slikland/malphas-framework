@@ -1,0 +1,15 @@
+{
+    "name": "slikland/cms",
+    "description": "slikland cms",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "controller\\": "controller",
+            "module\\": "../api/module"
+        }
+    },
+    "require": {
+        "twig/twig": "1.35.4",
+        "silex/silex": "2.2.4"
+    }
+}

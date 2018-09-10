@@ -1,9 +1,0 @@
-h1: 
-	a: {"html":"CMS", "href":"/"}
-aside:
-	tag: {"html":"#{user.roleName}"}
-	span: {"html":"#{user.name}"}
-	a.text-3:{"href":"cms/user/edit", "style":"margin-right: 1em"}
-		i.fa.fa-edit
-		tooltip: {"html":"Editar perfil", "align":"B"}
-	button.button-1: {"html":"Log out","action":"#{@apiPath}cms/user/logout"}

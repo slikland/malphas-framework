@@ -1,4 +1,0 @@
-card.col-1_4:
-	header: "Espaço em disco"
-	content:
-		chart: {"service":"#{@apiPath}charts/system/diskSpace"}

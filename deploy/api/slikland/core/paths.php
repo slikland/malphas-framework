@@ -43,7 +43,7 @@ define('ROOT_URL', rtrim($rootURL, '/') . '/');
 define('REQUEST_URI', $requestURI);
 define('CURRENT_URL', $currentURL);
 define('SECURE', $secure);
-define('CMS_PATH', $config['cms_path']);
+define('CMS_PATH', 'cms/');
 define('CMS_URL', ROOT_URL . CMS_PATH);
 define('DB_HOST', $config['db_host']);
 define('DB_NAME', $config['db_name']);
