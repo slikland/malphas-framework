@@ -9,7 +9,6 @@
         }
     },
     "require": {
-        "twig/twig": "1.35.4",
-        "silex/silex": "2.2.4"
+        "twig/twig": "1.35.4"
     }
 }
