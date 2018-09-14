@@ -1,16 +1,7 @@
 <?php
-include_once('config.php');
-include_once('slikland/AutoLoader.php');
-include('slikland/core/ServiceController.php');
+    require __DIR__ . '/app/config/requirement.php';
 
-class_alias('\slikland\core\Setting', 'Setting');
-class_alias('\slikland\error\ServiceError', 'ServiceError');
-class_alias('\slikland\error\CodedError', 'CodedError');
-class_alias('\slikland\fs\File', 'File');
+    require __DIR__ . '/app/config/config.php';
 
-
-
-if(realpath($_SERVER['SCRIPT_FILENAME']) == realpath(__FILE__)){
-	execute(NULL, NULL, TRUE);
-}
+    require __DIR__ . '/app/config/paths.php';
 
