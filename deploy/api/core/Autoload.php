@@ -1,18 +1,12 @@
 <?php
-namespace core;
 
 class Autoload
 {
-    public $dir;
 
-    public function load($dir)
+    public function load($namespaces)
     {
-        $this->dir = $dir;
-        if(isset($list["autoload"]["psr-4"])){
-            $this->loadPSR4($list['autoload']['psr-4']);
-        }
-        if(isset($list["autoload"]["files"])){
-            $this->loadFiles($list["autoload"]["files"]);
+        if(!empty($namespaces)){
+            $this->loadPSR4($namespaces);
         }
     }
     
@@ -30,29 +24,33 @@ class Autoload
         $this->loadPSR($namespaces, true);
     }
 
-    public function loadPSR($namespaces, $psr4)
+    public function loadPSR($namespaces)
     {
-        $dir = $this->dir;
-        // Foreach namespace specified in the composer, load the given classes
-        foreach ($namespaces as $namespace => $classpaths) {
-            if (!is_array($classpaths)) {
-                $classpaths = array($classpaths);
-            }
-            spl_autoload_register(function ($classname) use ($namespace, $classpaths, $dir, $psr4) {
-                // Check if the namespace matches the class we are looking for
-                if (preg_match("#^".preg_quote($namespace)."#", $classname)) {
-                    // Remove the namespace from the file path since it's psr4
-                    $classname = str_replace($namespace, "", $classname);
+        foreach ($namespaces as $namespace) {
 
-                    $filename = preg_replace("#\\\\#", "/", $classname).".php";
-                    foreach ($classpaths as $classpath) {
-                        $fullpath = $this->dir."/".$classpath."/$filename";
-                        if (file_exists($fullpath)) {
-                            include_once $fullpath;
-                        }
-                    }
+            $ls = $this->lsFiles($namespace);
+
+            foreach ($ls as $item) {
+                $fullpath = $namespace . $item;
+                if (is_file($fullpath)) {
+                    include_once $fullpath;
                 }
-            });
+            }
+
         }
+    }
+
+    protected function lsFiles($dir, $showHiddenFiles = false)
+    {
+        $ls = scandir($dir);
+        $remove = [
+            '.', '..', '.DS_Store'
+        ];
+
+        if(!$showHiddenFiles) {
+            return array_diff($ls, $remove);
+        }
+
+        return $ls;
     }
 }
