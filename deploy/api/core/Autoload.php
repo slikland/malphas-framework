@@ -2,20 +2,10 @@
 
 class Autoload
 {
-
     public function load($namespaces)
     {
         if(!empty($namespaces)){
             $this->loadPSR4($namespaces);
-        }
-    }
-    
-    public function loadFiles($files){
-        foreach($files as $file){
-            $fullpath = $this->dir."/".$file;
-            if(file_exists($fullpath)){
-                include_once($fullpath);
-            }
         }
     }
 

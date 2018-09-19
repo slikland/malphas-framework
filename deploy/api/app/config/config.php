@@ -2,10 +2,11 @@
     /*
      *  Database Config
      */
-    putenv('DB_HOST=host');
-    putenv('DB_DATABASE=database');
-    putenv('DB_USERNAME=user');
-    putenv('DB_PASSWORD=password');
+    define('DB_HOST', 'host');
+    define('DB_DATABASE', 'database');
+    define('DB_USERNAME', 'user');
+    define('DB_PASSWORD', 'password');
 
 
     define('DEBUG', true);
+    define('ENV', 'local');

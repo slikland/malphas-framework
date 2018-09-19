@@ -4,8 +4,9 @@
     $autoload = new Autoload();
 
     $directories = [
-        APP_PATH . 'model',
-        CORE_PATH
+        CORE_PATH . 'Utils' . DIRECTORY_SEPARATOR,
+        APP_PATH  . 'model',
+        CORE_PATH,
     ];
 
     $autoload->load($directories);
