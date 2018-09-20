@@ -41,4 +41,13 @@ class File
 
         return $ls;
     }
+
+    public static function load($fullPathFile)
+    {
+        if(is_file($fullPathFile)){
+            require_once $fullPathFile;
+            return true;
+        }
+        return false;
+    }
 }

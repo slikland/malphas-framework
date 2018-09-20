@@ -6,8 +6,6 @@
      *
      */
 
-    Route::get('/', function (){
-        echo "login Screen";
-    });
+    Route::add('/', 'Auth@login');
 
-//    RouteCms::run();
+    RouteCms::run();

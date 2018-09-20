@@ -3,23 +3,28 @@ namespace core;
 
 class Route
 {
-    public static $validRoutes = [];
+    public static $explicitRoute = [];
 
-    public static function get($route, $action)
+    public static function add($route, $action)
     {
-        self::addValidRoutes($route);
+        self::addExplicitRoute($route);
 
         if(self::getRequestUri() == $route) {
-            return $action();
+            if ($action instanceof \Closure) {
+                return $action();
+            } else {
+                self::parseAndExecute($action);
+            }
+            die();
         }
     }
 
-    private static function addValidRoutes($route)
+    private static function addExplicitRoute($route)
     {
-        self::$validRoutes[] = $route;
+        self::$explicitRoute[] = $route;
     }
 
-    private static function getRequestUri()
+    public static function getRequestUri()
     {
         $uri = $_SERVER['REQUEST_URI'];
 
@@ -31,7 +36,7 @@ class Route
         return $uri;
     }
 
-    protected static function getRequestParams()
+    public static function getRequestParams()
     {
         $request = self::getRequestUri();
         $explode = explode('/', $request);
@@ -63,6 +68,47 @@ class Route
         }
 
         return $response;
+    }
+
+    protected static function isExplicitRoute($route = false)
+    {
+        $lookingFor = self::getRequestUri();
+
+        if($route) {
+            $lookingFor = $route;
+        }
+
+        return in_array($lookingFor, self::$explicitRoute);
+    }
+
+    protected static function parseAndExecute($controllerAtMethod)
+    {
+        $explode = explode('@', $controllerAtMethod);
+
+        if(count($explode) < 2) {
+            throw new \Exception('Declaration isnt valid. Declare controller@method');
+        }
+
+        $controller = !empty($explode[0]) ? $explode[0] : false;
+        $method = !empty($explode[1]) ? $explode[1] : false;
+
+        return self::executeController($controller, $method);
+    }
+
+    protected static function executeController($controller, $method, $parameters = false)
+    {
+        $instance = Controller::load($controller);
+
+        if($method && $parameters) {
+            $instance->{$method}($parameters);
+        } elseif ($method) {
+            if(method_exists ($instance, $method)) {
+                $instance->{$method}();
+            } else {
+                http_response_code(404);
+                echo "404";
+            }
+        }
     }
 
 }

@@ -3,9 +3,14 @@ use core\Controller;
 
 class UserController extends Controller
 {
+    public function index()
+    {
+        echo "lista de usuarios";
+    }
+
     public function create()
     {
-        return $this->view('auth/login', ['name' => 'Sliklander']);
+        echo "crete a user";
     }
 
     public function delete($id)

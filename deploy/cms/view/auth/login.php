@@ -1,17 +1,49 @@
 <!DOCTYPE html>
 <html>
-<?php require_once VIEWS_PATH . 'common/head.php'; ?>
+<?php inc('_common/head.php') ?>
 </head>
 <body>
-<section class="section">
-    <div class="container">
-        <h1 class="title">
-            Hello <?php echo $name?>
-        </h1>
-        <p class="subtitle">
-            My first website with <strong>Bulma</strong>!
-        </p>
+<section class="hero is-dark is-fullheight">
+    <div class="hero-body">
+        <div class="container has-text-centered">
+            <div class="column is-4 is-offset-4">
+                <h3 class="title has-text-grey"><?php if(!empty($name)) { echo $name; }?></h3>
+                <p class="subtitle has-text-grey">
+                    Please login to proceed.
+                </p>
+                <div class="box">
+                    <form>
+                        <div class="field">
+                            <div class="control">
+                                <input class="input is-large" type="email" placeholder="Your Email" autofocus="">
+                            </div>
+                        </div>
+
+                        <div class="field">
+                            <div class="control">
+                                <input class="input is-large" type="password" placeholder="Your Password">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="checkbox">
+                                <input type="checkbox">
+                                Remember me
+                            </label>
+                        </div>
+                        <button class="button is-block is-info is-large is-fullwidth">Login</button>
+                    </form>
+                </div>
+                <p class="has-text-grey">
+                    <a href="../">Sign Up</a> &nbsp;·&nbsp;
+                    <a href="../">Forgot Password</a> &nbsp;·&nbsp;
+                    <a href="../">Need Help?</a>
+                </p>
+            </div>
+        </div>
     </div>
 </section>
 </body>
 </html>
+
+
+
