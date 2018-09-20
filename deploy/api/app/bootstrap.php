@@ -5,7 +5,7 @@
 
     $directories = [
         CORE_PATH . 'Utils' . DIRECTORY_SEPARATOR,
-        APP_PATH  . 'model',
+        APP_PATH  . 'model' . DIRECTORY_SEPARATOR,
         CORE_PATH,
     ];
 
