@@ -10,3 +10,4 @@
 
     define('DEBUG', true);
     define('ENV', 'local');
+    define('APP_NAME', 'Slikland CMS');
