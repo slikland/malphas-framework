@@ -1,0 +1,44 @@
+/**
+** PAGE AUTH
+** COLOR ICONS
+**/
+    .icon-success {
+        color: #007700 !important;
+    }
+    .icon-error {
+        color: #DD0000 !important;
+    }
+
+
+
+/**
+** PAGE AUTH
+** LOGIN
+**/
+    #login {
+
+    }
+        #loginBox {
+            width: 300px;
+            margin: 0 auto;
+        }
+        .loading #loginBox {
+            opacity: 0;
+        }
+
+
+
+/**
+** PAGE AUTH
+** FORGOT PASSWORD
+**/
+    #forgot {
+
+    }
+        #forgotBox {
+            width: 300px;
+            margin: 0 auto;
+        }
+        .loading #forgotBox {
+            opacity: 0;
+        }

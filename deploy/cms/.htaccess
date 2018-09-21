@@ -1,4 +1,7 @@
+Options +FollowSymLinks
+
 <IfModule mod_rewrite.c>
-	RewriteEngine On
-	RewriteRule ^(.*)$ index.php
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.php
 </IfModule>
