@@ -44,10 +44,10 @@ var animaScroll = function(_top, duration, callback) {
 };
 
 /**
- * RANDOM STRONG PASSOWRD
+ * GENERATE RANDOM STRONG PASSOWRD
  **/
 var randomPassword = function(length) {
-    var chars = "abcdefghijklmnopqrstuvwxyz!@#$%^&*-+ABCDEFGHIJKLMNOP1234567890";
+    var chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOP1234567890!@#$%^&*-+";
     var pass = "";
     for (var x = 0; x < length; x++) {
         var i = Math.floor(Math.random() * chars.length);
@@ -69,7 +69,6 @@ $.fn.extend({
                 MozAnimation: 'mozAnimationEnd',
                 WebkitAnimation: 'webkitAnimationEnd',
             };
-
             for (var t in animations) {
                 if (el.style[t] !== undefined) {
                     return animations[t];
@@ -87,200 +86,319 @@ $.fn.extend({
     }
 });
 
+
+
 /**
  * UTILS PLUGINS FOR CMS
  **/
 $.fn.extend({
 
 
-    formSubmit : function (pluginOptions, callback) {
+    /**
+     * AUTH FORMULARIO DE
+     * LOGIN E ESQUECI A SENHA
+     **/
+    formSubmitAuth : function(beforeSend, success, error, complete) {
 
-        setTimeout(function () {
+        this.on('submit', function () {
 
-            if (typeof callback === 'function') callback();
+            if($(this).cmsFormValidate()) {
 
-        }, 50);
+                $(this).cmsFormAjaxSend(beforeSend, success, error, complete);
 
-    },
-
-    formSubmitAuth : function (pluginOptions, callback) {
-
-        var $this = this;
-
-        $this.on('submit', function () {
-
-            $this._thisFormValidate();
+            }
 
         });
 
-        setTimeout(function () {
-            if (typeof callback === 'function') callback();
-        }, 50);
-
     },
-    
-    _thisFormValidate : function () {
 
-        var $this = this;
 
-        $this.find('.icon-error, .icon-success').hide();
 
+
+
+
+    /**
+     *
+     **/
+    cmsFormValidate : function () {
+
+        var $form = this;
         var validateAllInput = true;
 
-        $this.find('input, select, textarea').each(function(index, element) {
+        var _methods = {
+
+            isRequired : function () {},
+
+            /**
+             * VERIFICA SE O INPUT ESTÁ VAZIO
+             * OU É MENOR QUE O MÍNIMO
+             * DE CARACTERES NECESSÁRIO
+             **/
+            inputLengthEmpty : function($element) {
+                if(!$element.val().length) {
+                    return true;
+                }
+                if($element.attr('minlength') !== undefined) {
+                    if($element.val().length < $element.attr('minlength')) {
+                        return true;
+                    }
+                }
+                return false;
+            },
+
+
+            /**
+             * VERIFICA SE O INPUT ESTÁ VAZIO
+             * OU É MENOR QUE O MÍNIMO
+             * DE CARACTERES NECESSÁRIO
+             **/
+            inputIsEmailValid : function($element) {
+
+                if (!regex.email.test($element.val())) {
+                    _methods.inputAlertInvalid($element);
+                    return false;
+                }
+                return true;
+            },
+
+
+            /**
+             * SINALIZA QUE O INPUT ESTÁ INVÁLIDO
+             * E FAZ UM EFEITO DE "SHAKE" no FORM
+             **/
+            inputAlertInvalid : function ($element) {
+                $form.animateCss('shake');
+                $element.addClass('is-danger');
+                $element.focus().parent().find('.icon-error').show();
+                return false;
+            },
+
+
+
+
+        };
+
+        $form.find('.icon-error, .icon-success').hide();
+
+
+        /**
+         * PERCORRENDO TODOS ELEMENTOS DO FORMULARIO
+         **/
+        $form.find('input, select, textarea').each(function(index, element) {
+
             var $element = $(element);
 
-            /// VALIDAÇÃO
+
+            /**
+             * VALIDAÇÃO "REQUIRED"
+             **/
             if($element.attr('required') !== undefined) {
 
                 switch($element.attr('type')) {
 
+                    /**
+                     * VALIDANDO INPUT TYPE TEXT
+                     **/
                     case 'text':
-                        if($element.val().length < 1) {
-                            $this.animateCss('shake');
-                            $element.addClass('is-danger');
-                            $element.focus().parent().find('.icon-error').show();
-                            validateAllInput = false;
-                            return false;
-                        }
-                        break;
-
-                    case 'email':
-                        if(!$element.val().length) {
-                            $this.animateCss('shake');
-                            $element.addClass('is-danger');
-                            $element.focus().parent().find('.icon-error').show();
-                            validateAllInput = false;
-                            return false;
-                        }
-                        if (!regex.email.test($element.val())) {
-                            $this.animateCss('shake');
-                            $element.addClass('is-danger');
-                            $element.focus().parent().find('.icon-error').show();
-                            validateAllInput = false;
-                            return false;
-                        }
-                        break;
-
+                    case 'search':
                     case 'password':
-                        if($element.val().length < 8) {
-                            $this.animateCss('shake');
-                            $element.addClass('is-danger');
-                            $element.focus().parent().find('.icon-error').show();
+                        if(_methods.inputLengthEmpty($element)) {
+
+                            _methods.inputAlertInvalid($element);
                             validateAllInput = false;
+
                             return false;
                         }
                         break;
 
-                    case 'select':
-                        if(!$element.val().length) {
-                            $this.animateCss('shake');
-                            $element.parent().addClass('is-danger');
-                            $element.focus().parent().find('.icon-error').show();
+
+
+                    /**
+                     * VALIDANDO INPUT TYPE EMAIL
+                     **/
+                    case 'email':
+
+                        if(_methods.inputLengthEmpty($element)) {
+
+                            _methods.inputAlertInvalid($element);
                             validateAllInput = false;
+
                             return false;
                         }
+
+                        if (!_methods.inputIsEmailValid($element)) {
+
+                            _methods.inputAlertInvalid($element);
+                            validateAllInput = false;
+
+                            return false;
+                        }
+
                         break;
 
-                    case 'textarea':
-                        if($element.val().length < 3) {
-                            $this.animateCss('shake');
-                            $element.addClass('is-danger');
-                            $element.focus().parent().find('.icon-error').show();
-                            validateAllInput = false;
-                            return false;
-                        }
+
+
+                    /**
+                     * VALIDANDO INPUT TYPE CHECKBOX
+                     **/
+                    case 'checkbox':
+
+                        _methods.inputAlertInvalid($element);
+                        validateAllInput = false;
+                        return false;
+
                         break;
+
+
+                    /**
+                     * VALIDANDO INPUT TYPE RADIO
+                     **/
+                    case 'radio':
+
+                        _methods.inputAlertInvalid($element);
+                        validateAllInput = false;
+                        return false;
+
+                        break;
+
+
+                    // case 'select':
+                    //     if(!$element.val().length) {
+                    //         $form.animateCss('shake');
+                    //         $element.parent().addClass('is-danger');
+                    //         $element.focus().parent().find('.icon-error').show();
+                    //         validateAllInput = false;
+                    //         return false;
+                    //     }
+                    //     break;
+
+                    // case 'textarea':
+                    //     if($element.val().length < 3) {
+                    //         $form.animateCss('shake');
+                    //         $element.addClass('is-danger');
+                    //         $element.focus().parent().find('.icon-error').show();
+                    //         validateAllInput = false;
+                    //         return false;
+                    //     }
+                    //     break;
 
                     default:
-                        alert('INPUT DEFAULT');
+                        console.log('INPUT NÃO INDENTIFICADO');
                 }
+
+                console.log('INPUT PASSOU PELO SWITCH');
 
             }
 
             $element.addClass('is-success').removeClass('is-danger');
             $element.parent().find('.icon-success').show();
-            if($element.attr('type') === 'select') {
-                $element.parent().addClass('is-success').removeClass('is-danger');
-            }
 
+            // if($element.attr('type') === 'select') {
+            //     $element.parent().addClass('is-success').removeClass('is-danger');
+            // }
 
         });
 
-        // VALIDANDO SE JÁ FOI SUBMETIDO
-        if($this.hasClass('sending')) {
-            return false;
-        }
+        return validateAllInput;
 
-        //console.log('serializeArray : ', $this.serializeArray());
+    },
+    
+    
 
+    cmsFormAjaxSend : function (beforeSend, success, error, complete) {
 
+        var $form = this;
+        var $submit = this.find('button.is-submit');
+        var _methods = {
 
+            getPath : function ($form) {
 
-        if(validateAllInput) {
-
-            $.ajax({
-                url : 'https://api.diegosanches.me/data/submit/',
-                method : 'POST',
-                data : {
-                    form : $this.serializeArray()
-                },
-                beforeSend : function() {
-                    $this.addClass('sending');
-                    $submit.addClass('is-loading');
-                    $notification.slideUp(200, function() {
-                        $(this).attr('class', 'notification').find('p').html('');
-                    });
-                },
-                success : function(response) {
-                    console.log(response);
-
-                    swal({
-                        position: 'center',
-                        type: 'success',
-                        title: 'Usuário criado com sucesso!',
-                        showConfirmButton: false,
-                        timer: 2000
-                    });
-
-                    $this.find('input, select, textarea').each(function(index, element) {
-                        var $element = $(element);
-                        $(element).val('');
-                        $element.removeClass('is-success is-danger');
-                        $element.parent().find('.icon-error, .icon-success').hide();
-                        if($element.attr('type') === 'select') {
-                            $element.parent().removeClass('is-success is-danger');
-                        }
-                    });
-
-                },
-                error : function() {
-                    console.log('ERROR');
-
-                    swal({
-                        title: 'Ops!<br>Erro ao salvar os dados',
-                        text: 'Tente novamente.',
+                if(!$form.attr('data-action').length) {
+                    return swal({
+                        title: 'Ops!',
+                        text: 'Action do formulário não foi definida.',
                         type: 'error',
                         confirmButtonText: 'Okay'
                     });
-                },
-                complete : function() {
-                    $this.removeClass('sending');
-                    $submit.removeClass('is-loading');
-                },
-                statusCode : {
-                    200 : function() {console.log('200');},
-                    404 : function() {console.log('404');},
-                    500 : function() {console.log('500');}
                 }
-            });
 
+                return $form.attr('data-action');
+
+            },
+
+            getMethod : function ($form) {
+
+                if(!$form.attr('method').length) {
+                    return swal({
+                        title: 'Ops!',
+                        text: 'Method do formulário não foi definida.',
+                        type: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                }
+
+                return $form.attr('method');
+
+            },
+
+        };
+
+        // VALIDANDO SE JÁ FOI SUBMETIDO
+        if($form.hasClass('sending')) {
+            return false;
         }
 
+        // ENVIANDO O REQUEST EM AJAX
+        $.ajax({
+            url : _methods.getPath($form),
+            method : _methods.getMethod($form),
+            data : {
+                form : $form.serializeArray()
+            },
+            beforeSend : function() {
+                $form.addClass('sending');
+                $submit.addClass('is-loading');
 
+                if (typeof beforeSend === 'function') {
+                    beforeSend();
+                }
 
+            },
+            success : function(response) {
+                if (typeof success === 'function') {
+                    success(response);
+                }
+            },
+            error : function() {
+                console.log('ERROR');
+
+                swal({
+                    title: 'Ops!',
+                    text: 'Erro no servidor, tente novamente daqui alguns minutos.',
+                    type: 'error',
+                    confirmButtonText: 'Okay'
+                });
+
+                if (typeof error === 'function') {
+                    error();
+                }
+
+            },
+            complete : function() {
+                $form.removeClass('sending');
+                $submit.removeClass('is-loading');
+
+                if (typeof complete === 'function') {
+                    complete();
+                }
+            },
+            statusCode : {
+                200 : function() {console.log('200');},
+                404 : function() {console.log('404');},
+                500 : function() {console.log('500');}
+            }
+        });
 
     }
-
-
+    
 });

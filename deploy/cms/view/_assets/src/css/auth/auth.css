@@ -25,6 +25,10 @@
         .loading #loginBox {
             opacity: 0;
         }
+            #formLogin.sending {
+                opacity: 0.7;
+                cursor: wait;
+            }
 
 
 
@@ -42,3 +46,7 @@
         .loading #forgotBox {
             opacity: 0;
         }
+            #formForgot.sending {
+                opacity: 0.7;
+                cursor: wait;
+            }

@@ -24,8 +24,8 @@
 
                         <form id="formForgot"
                               action="javascript:void(0);"
-                              data-action="<?php echo baseUrl(); ?>"
-                              method="post" >
+                              data-action="https://api.diegosanches.me/login/forgot/"
+                              method="POST">
 
                             <div class="field">
 
@@ -33,6 +33,7 @@
 
                                     <input id="forgotEmail"
                                            class="input is-medium"
+                                           name="forgotEmail"
                                            type="email"
                                            placeholder="Email"
                                            autocomplete="off"
@@ -52,7 +53,7 @@
                             </div>
                             <div class="field">
                                 <p class="control">
-                                    <button id="forgotSubmit" class="button is-medium is-success is-fullwidth">
+                                    <button id="forgotSubmit" class="button is-medium is-success is-fullwidth is-submit">
                                         <span>Recuperar senha</span>
                                     </button>
                                 </p>

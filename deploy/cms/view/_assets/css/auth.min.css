@@ -1,1 +1,1 @@
-.icon-success{color:#070!important}.icon-error{color:#d00!important}#forgotBox,#loginBox{width:300px;margin:0 auto}.loading #forgotBox,.loading #loginBox{opacity:0}
+.icon-success{color:#070!important}.icon-error{color:#d00!important}#forgotBox,#loginBox{width:300px;margin:0 auto}.loading #loginBox{opacity:0}#formLogin.sending{opacity:.7;cursor:wait}.loading #forgotBox{opacity:0}#formForgot.sending{opacity:.7;cursor:wait}

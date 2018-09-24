@@ -24,13 +24,14 @@
 
                         <form id="formLogin"
                               action="javascript:void(0);"
-                              data-action="<?php echo baseUrl(); ?>"
-                              method="post" >
+                              data-action="https://api.diegosanches.me/login/"
+                              method="POST">
 
                             <div class="field">
                                 <p class="control has-icons-left has-icons-right">
                                     <input id="loginEmail"
                                            class="input is-medium"
+                                           name="loginEmail"
                                            type="email"
                                            placeholder="Email"
                                            autocomplete="off"
@@ -52,11 +53,13 @@
                                 <p class="control has-icons-left has-icons-right">
 
                                     <input id="loginPass"
+                                           name="loginPass"
                                            class="input is-medium"
                                            type="password"
                                            placeholder="Password"
                                            autocomplete="off"
-                                           required="required" >
+                                           required="required"
+                                           minlength="6">
 
                                     <span class="icon is-small is-left">
                                         <i class="fa fa-lock"></i>
@@ -73,7 +76,7 @@
 
                             <div class="field">
                                 <p class="control">
-                                    <button id="loginSubmit" class="button is-medium is-success is-fullwidth">
+                                    <button id="loginSubmit" class="button is-medium is-success is-fullwidth is-submit">
                                         <span>Login</span>
                                     </button>
                                 </p>
