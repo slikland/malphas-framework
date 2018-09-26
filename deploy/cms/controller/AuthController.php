@@ -14,4 +14,11 @@ class AuthController extends Controller
     {
         return $this->view('auth/forgot-password');
     }
+
+    public function logout()
+    {
+        return $this->view('auth/login', array(
+            'message' => 'Logout realizado com sucesso.'
+        ));
+    }
 }

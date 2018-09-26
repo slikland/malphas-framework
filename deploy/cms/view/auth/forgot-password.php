@@ -1,11 +1,13 @@
 <!doctype html>
 <html class="no-js" lang="pt-br">
     <head>
-        <?php inc('_common/head-meta-auth.php'); ?>
+        <?php inc('auth/head-meta.php'); ?>
     </head>
 
     <body class="loading">
-        <?php inc('_common/update-browser.php'); ?>
+        <!--[if lte IE 9]>
+        <p class="browserupgrade">Você está usando um navegador <strong>muito antigo</strong>. Por favor<a href="https://browsehappy.com/">atualize seu navegador</a> para ter uma melhor experiência..</p>
+        <![endif]-->
 
         <section id="forgot" class="hero is-dark is-fullheight">
             <div class="hero-body">
@@ -68,6 +70,6 @@
                 </div>
             </div>
         </section>
-        <?php inc('_common/footer-auth.php'); ?>
+        <?php inc('auth/footer.php'); ?>
     </body>
 </html>

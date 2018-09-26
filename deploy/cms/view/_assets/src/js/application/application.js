@@ -1,7 +1,9 @@
-$(document).ready(function () {
+var $loading;
+
+$(document).on('ready', function () {
     console.log('READY GLOBAL : ', Date());
 
-
+    $loading = $('#loading');
 
     $('.notification-close').each(function(index, element) {
         $(element).on('click', function() {
@@ -9,6 +11,8 @@ $(document).ready(function () {
         });
     });
 
+    /**
+    // ACTION FOR MAIL TO CLICK
     $('.link-mailto').each(function(index, element) {
         $(element).on('click', function() {
             var x = window.open("mailto:diego.sanches@slikland.com?subject=Hello&body=Escreva aqui . . .");
@@ -16,8 +20,7 @@ $(document).ready(function () {
             return false;
         });
     });
-
-
+    */
 
     $('#navbarTopBurger').on('click', function() {
         var $this = $(this);
@@ -27,12 +30,6 @@ $(document).ready(function () {
         var $this = $(this);
         $('html').removeClass('mobile-sidebar-show');
     });
-
-
-
-
-
-
 
 
 
@@ -65,6 +62,11 @@ $(document).ready(function () {
 
 
 
+
+    $('#navbarTopBrand').animateCss('bounceIn');
+
+
+
     $(window).on('scroll', function () {
         var _scaleY = $(document).scrollTop();
 
@@ -84,9 +86,6 @@ $(document).ready(function () {
         }
     });
 
-
-
-
 });
 
 $(window).on('load', function () {
@@ -100,17 +99,14 @@ $(window).on('load', function () {
     $('#wrap .page-content').css({
         'min-height' : ($(window).height() - 52)
     });
-
     //=========================
 
 
 
     setTimeout(function() {
-
         $loading.animateCss('slideOutUp faster', function() {
             $loading.hide();
         });
-
     }, 500);
 
     setTimeout(function() {
@@ -148,6 +144,6 @@ $(window).on('beforeunload', function () {
     $loading.slideDown(200);
     setTimeout(function() {
         window.location.reload();
-    }, 5000);
+    }, 2000);
 
 });

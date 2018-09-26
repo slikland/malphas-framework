@@ -10,10 +10,11 @@ $(document).on('ready', function () {
         $notification.hide();
 
 
-    /**
-     * FORM LOGIN
-     **/
     if($('#formLogin').length) {
+
+        if($notification.find('p').text().length) {
+            $notification.addClass('is-info').slideDown(200);
+        }
 
         var beforeSend = function() {
             $notification.slideUp(200, function() {
@@ -33,9 +34,6 @@ $(document).on('ready', function () {
     }
 
 
-    /**
-     * FORM ESQUECI A SENHA
-     **/
     if($('#formForgot').length) {
 
         var beforeSend = function() {
@@ -60,7 +58,6 @@ $(document).on('ready', function () {
 $(window).on('load', function () {
 
     $('#loginEmail, #forgotEmail').focus();
-
     $('body').removeClass('loading');
     $('#loginBox, #forgotBox').animateCss('bounceIn');
 

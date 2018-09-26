@@ -39,6 +39,7 @@ gulp.task('cssVendor', function () {
 
     gulp.src([
             './src/css/vendor/fontawesome-free-5.3.1/css/all.css',
+            './src/css/vendor/jquery.dataTables.min.css',
 
             './node_modules/bulma/css/bulma.css',
             './node_modules/animate.css/animate.css',
