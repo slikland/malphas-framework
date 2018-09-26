@@ -1,15 +1,14 @@
 <?php
 
-    /*********************
-          __   ____  __
-         / _\ (  _ \(  )
-        /    \ ) __/ )(
-        \_/\_/(__)  (__)
-           I N D E X
-     *********************/
+    #      __   ____  __
+    #     / _\ (  _ \(  )
+    #    /    \ ) __/ )(
+    #    \_/\_/(__)  (__)
+    #
+    #       I N D E X
 
     // App Paths
-    require_once '../api/app/config/paths.php';
+    require_once __DIR__ . DIRECTORY_SEPARATOR . 'app/config/paths.php';
 
     // Check system requirements
     require_once APP_PATH . 'config/requirement.php';
@@ -20,11 +19,5 @@
     // App Config (Database credentials, debug, etc...)
     require_once APP_PATH . 'config/config.php';
 
-
-    use core\Http;
-    Http::isDelete();
-
-    echo "awesome services are coming";
-
     // Routes
-    // require_once 'routes.php';
+     require_once 'routes.php';

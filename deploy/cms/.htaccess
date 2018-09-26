@@ -1,3 +1,11 @@
+
+#     ___  _  _  ____
+#    / __)( \/ )/ ___)
+#   ( (__ / \/ \\___ \
+#    \___)\_)(_/(____/
+#
+#     H T A C C E S S
+
 <IfModule mod_rewrite.c>
 	RewriteEngine On
 	RewriteRule ^(.*)$ index.php

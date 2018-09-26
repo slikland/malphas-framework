@@ -4,7 +4,7 @@
 #    /    \ ) __/ )(
 #    \_/\_/(__)  (__)
 #
-#  H T A C C E S S  A P I
+#    H T A C C E S S
 
 <IfModule mod_rewrite.c>
 	RewriteEngine On

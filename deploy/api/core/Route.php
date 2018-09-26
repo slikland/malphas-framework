@@ -27,9 +27,10 @@ class Route
     public static function getRequestUri()
     {
         $uri = $_SERVER['REQUEST_URI'];
-
+        
         if(ENV == 'local') {
-            $uri = preg_replace('/.*deploy\/cms\//', '', $uri);
+            $uri = preg_replace('/.*deploy\/'.MANAGEMENT_NAME.'\//', '', $uri);
+            $uri = preg_replace('/.*deploy\/'.SERVICES_NAME.'\//', '', $uri);
             if($uri == "") { $uri = "/"; }
         }
 
@@ -44,7 +45,7 @@ class Route
 
         foreach ($explode as $key => $item) {
             if($key == 0 && !empty($item)) {
-                $response['controller'] = $item;
+                $response['class'] = $item;
             } elseif($key == 1) {
                 $response['method'] = !empty($item) ? $item : 'index';
             } elseif(!empty($item)) {
@@ -98,6 +99,22 @@ class Route
     protected static function executeController($controller, $method, $parameters = false)
     {
         $instance = Controller::load($controller);
+
+        if($method && $parameters) {
+            $instance->{$method}($parameters);
+        } elseif ($method) {
+            if(method_exists ($instance, $method)) {
+                $instance->{$method}();
+            } else {
+                http_response_code(404);
+                echo "404";
+            }
+        }
+    }
+
+    protected static function executeService($service, $method, $parameters = false)
+    {
+        $instance = Service::load($service);
 
         if($method && $parameters) {
             $instance->{$method}($parameters);

@@ -1,7 +1,6 @@
 <?php
 namespace core;
 use core\Utils\File;
-use core\Route;
 
 class Controller
 {
@@ -49,7 +48,7 @@ class Controller
 
     public static function parseControllerName($controllerName = false, $withExtension = false)
     {
-        $name = !empty(Route::getRequestParams()['controller']) ? mb_strtolower(Route::getRequestParams()['controller']) . 'controller' : null;
+        $name = !empty(Route::getRequestParams()['class']) ? mb_strtolower(Route::getRequestParams()['class']) . 'controller' : null;
 
         if ($controllerName) {
             $name = mb_strtolower($controllerName) . 'controller';
