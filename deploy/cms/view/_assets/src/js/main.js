@@ -113,6 +113,25 @@ $.fn.extend({
     },
 
 
+    /**
+     * AUTH FORMULARIO DE
+     * LOGIN E ESQUECI A SENHA
+     **/
+    formSubmitGeneral : function(beforeSend, success, error, complete) {
+
+        this.on('submit', function () {
+
+            if($(this).cmsFormValidate()) {
+
+                $(this).cmsFormAjaxSend(beforeSend, success, error, complete);
+
+            }
+
+        });
+
+    },
+
+
 
 
 
@@ -352,9 +371,7 @@ $.fn.extend({
         $.ajax({
             url : _methods.getPath($form),
             method : _methods.getMethod($form),
-            data : {
-                form : $form.serializeArray()
-            },
+            data : $form.serializeArray(),
             beforeSend : function() {
                 $form.addClass('sending');
                 $submit.addClass('is-loading');
@@ -362,7 +379,6 @@ $.fn.extend({
                 if (typeof beforeSend === 'function') {
                     beforeSend();
                 }
-
             },
             success : function(response) {
                 if (typeof success === 'function') {
@@ -370,19 +386,17 @@ $.fn.extend({
                 }
             },
             error : function() {
-                console.log('ERROR');
-
-                swal({
-                    title: 'Ops!',
-                    text: 'Erro no servidor, tente novamente daqui alguns minutos.',
-                    type: 'error',
-                    confirmButtonText: 'Okay'
-                });
 
                 if (typeof error === 'function') {
                     error();
+                } else {
+                    swal({
+                        title: 'Ops!',
+                        text: 'Erro no servidor, tente novamente daqui alguns minutos.',
+                        type: 'error',
+                        confirmButtonText: 'Okay'
+                    });
                 }
-
             },
             complete : function() {
                 $form.removeClass('sending');
