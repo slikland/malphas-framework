@@ -8,7 +8,6 @@ class Service
 {
     public $isAuthenticable = true;
 
-
     public function index()
     {
         if(!Http::isGet()){
@@ -31,19 +30,35 @@ class Service
         return $this->model->insert($filteredData);
     }
 
-    public function read()
+    public function read($id)
     {
+        if(!Http::isGet()){
+            return $this->response(405);
+        }
 
+        $get = $this->model->get($id);
+
+        if(is_null($get)) {
+            return $this->response(404);
+        }
+
+        return $this->response(200, $this->model->get($id));
     }
 
-    public function update()
+    public function update($id)
     {
+        if(!Http::isPost()){
+            return $this->response(405);
+        }
 
+        $filteredData = Filter::vetor($this->model->fillable, $_POST);
+
+        return $this->model->update($id, $filteredData);
     }
 
-    public function delete()
+    public function delete($id)
     {
-
+        return $this->model->delete($id);
     }
 
     public static function load($serviceName)
@@ -81,12 +96,28 @@ class Service
         return false;
     }
 
-    public static function parseServiceName($controllerName = false, $withExtension = false)
+    public static function execute($service, $method, $parameters = false)
     {
-        $name = !empty(Route::getRequestParams()['class']) ? mb_strtolower(Route::getRequestParams()['class']) . 'controller' : null;
+        $instance = self::load($service);
 
-        if ($controllerName) {
-            $name = mb_strtolower($controllerName) . 'service';
+        if($method && $parameters) {
+            $instance->{$method}($parameters);
+        } elseif ($method) {
+            if(method_exists ($instance, $method)) {
+                $instance->{$method}();
+            } else {
+                http_response_code(404);
+                echo "404";
+            }
+        }
+    }
+
+    public static function parseServiceName($serviceName = false, $withExtension = false)
+    {
+        $name = !empty(RouteApi::getRequestApi()['class']) ? mb_strtolower(RouteApi::getRequestApi()['class']) . 'service' : null;
+
+        if ($serviceName) {
+            $name = mb_strtolower($serviceName) . 'service';
         }
 
         if($withExtension) {

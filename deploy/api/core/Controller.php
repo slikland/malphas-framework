@@ -46,9 +46,25 @@ class Controller
         return false;
     }
 
+    public static function execute($controller, $method, $parameters = false)
+    {
+        $instance = self::load($controller);
+
+        if($method && $parameters) {
+            $instance->{$method}($parameters);
+        } elseif ($method) {
+            if(method_exists ($instance, $method)) {
+                $instance->{$method}();
+            } else {
+                http_response_code(404);
+                echo "404";
+            }
+        }
+    }
+
     public static function parseControllerName($controllerName = false, $withExtension = false)
     {
-        $name = !empty(Route::getRequestParams()['class']) ? mb_strtolower(Route::getRequestParams()['class']) . 'controller' : null;
+        $name = !empty(RouteCms::getRequestCms()['class']) ? mb_strtolower(RouteCms::getRequestCms()['class']) . 'controller' : null;
 
         if ($controllerName) {
             $name = mb_strtolower($controllerName) . 'controller';

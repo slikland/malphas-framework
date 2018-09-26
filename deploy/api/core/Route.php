@@ -37,30 +37,9 @@ class Route
         return $uri;
     }
 
-    public static function getRequestParams()
-    {
-        $request = self::getRequestUri();
-        $explode = explode('/', $request);
-        $response = [];
-
-        foreach ($explode as $key => $item) {
-            if($key == 0 && !empty($item)) {
-                $response['class'] = $item;
-            } elseif($key == 1) {
-                $response['method'] = !empty($item) ? $item : 'index';
-            } elseif(!empty($item)) {
-                $response['parameters'][] = $item;
-            }
-        }
-
-        return self::sanitizeParams($response);
-    }
-
     protected static function sanitizeParams($ControllerMethodParams = [])
     {
         $response = $ControllerMethodParams;
-
-        $response['method'] = empty($response['method']) ? 'index' : $response['method'];
 
         if(!empty($response['parameters'])) {
             $qtdParams = count($response['parameters']);
@@ -95,37 +74,4 @@ class Route
 
         return self::executeController($controller, $method);
     }
-
-    protected static function executeController($controller, $method, $parameters = false)
-    {
-        $instance = Controller::load($controller);
-
-        if($method && $parameters) {
-            $instance->{$method}($parameters);
-        } elseif ($method) {
-            if(method_exists ($instance, $method)) {
-                $instance->{$method}();
-            } else {
-                http_response_code(404);
-                echo "404";
-            }
-        }
-    }
-
-    protected static function executeService($service, $method, $parameters = false)
-    {
-        $instance = Service::load($service);
-
-        if($method && $parameters) {
-            $instance->{$method}($parameters);
-        } elseif ($method) {
-            if(method_exists ($instance, $method)) {
-                $instance->{$method}();
-            } else {
-                http_response_code(404);
-                echo "404";
-            }
-        }
-    }
-
 }
