@@ -9,7 +9,7 @@ class RouteApi extends Route
         $service    = !empty($request['class']) ? $request['class'] : false;
         $method     = !empty($request['method']) ? $request['method'] : false;
         $parameters = !empty($request['parameters']) ? $request['parameters'] : false;
-        
+
         return Service::execute($service, $method, $parameters);
     }
 
@@ -27,9 +27,11 @@ class RouteApi extends Route
             }
         }
 
-        $response['method'] = self::chooseApiMethod($response);
+        if(!empty($response['class'])) {
+            $response['method'] = self::chooseApiMethod($response);
+        }
 
-        return self::sanitizeParams($response);
+        return parent::sanitizeParams($response);
     }
 
     private static function chooseApiMethod($request)

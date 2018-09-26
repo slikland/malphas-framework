@@ -37,9 +37,13 @@ class Route
         return $uri;
     }
 
-    protected static function sanitizeParams($ControllerMethodParams = [])
+    protected static function sanitizeParams($methodParams = [])
     {
-        $response = $ControllerMethodParams;
+        $response = $methodParams;
+
+        if(!empty($response['class'])) {
+            $response['method'] = !empty($response['method']) ? $response['method'] : 'index';
+        }
 
         if(!empty($response['parameters'])) {
             $qtdParams = count($response['parameters']);
@@ -72,6 +76,6 @@ class Route
         $controller = !empty($explode[0]) ? $explode[0] : false;
         $method = !empty($explode[1]) ? $explode[1] : false;
 
-        return self::executeController($controller, $method);
+        return Controller::execute($controller, $method);
     }
 }

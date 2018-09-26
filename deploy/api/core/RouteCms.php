@@ -23,12 +23,14 @@ class RouteCms extends Route
             if($key == 0 && !empty($item)) {
                 $response['class'] = $item;
             } elseif($key == 1) {
-                $response['method'] = !empty($item) ? $item : 'index';
+                if(!empty($response['class'])) {
+                    $response['method'] = !empty($item) ? $item : 'index';
+                }
             } elseif(!empty($item)) {
                 $response['parameters'][] = $item;
             }
         }
 
-        return self::sanitizeParams($response);
+        return parent::sanitizeParams($response);
     }
 }
