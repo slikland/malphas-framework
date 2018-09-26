@@ -19,24 +19,23 @@ $pageArea = array(
     array(
         'id' => 3,
         'label' => 'Usuários',
-        'path' => '#/open-submenu',
+        'path' => baseUrl('user'),
         'icon' => 'users',
-        'child' => array(
-            array(
-                'id' => 4,
-                'label' => 'Todos os Usuários',
-                'path' => baseUrl('user'),
-                'icon' => 'list-ul',
-                'child' => array(),
-            ),
-            array(
-                'id' => 6,
-                'label' => 'Grupos de Usuário',
-                'path' => baseUrl('user/gruposusuarios'),
-                'icon' => 'user-lock',
-                'child' => array(),
-            )
-        ),
+        'child' => array(),
+    ),
+    array(
+        'id' => 5,
+        'label' => 'Permissões',
+        'path' => baseUrl('role'),
+        'icon' => 'user-lock',
+        'child' => array(),
+    ),
+    array(
+        'id' => 3,
+        'label' => 'Usuários',
+        'path' => baseUrl('user'),
+        'icon' => 'users',
+        'child' => array(),
     ),
     array(
         'id' => 7,

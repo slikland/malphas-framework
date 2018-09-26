@@ -1,6 +1,8 @@
 <?php
 use model\User;
 use core\Controller;
+use core\Utils\Filter;
+use core\Http;
 
 class UserController extends Controller
 {
@@ -11,6 +13,9 @@ class UserController extends Controller
         $this->model = new User();
     }
 
+
+
+
     public function index()
     {
         return $this->view('user/index', array(
@@ -20,34 +25,78 @@ class UserController extends Controller
         ));
     }
 
+
+
+
     public function create()
     {
-        echo "show a form to crete a user";
+        return $this->view('user/create', array(
+            'pageTitle'     => 'Adicionar Usuário',
+            'pageSubTitle'  => ''
+        ));
     }
+
+
+
+
 
     public function insert()
     {
-        echo json_encode($this->model->insert($_POST));
+        $filteredData = Filter::vetor($this->model->fillable, $_POST);
+
+        if($this->model->insert($filteredData)) {
+            $return = array(
+                'action' => true,
+                'message' => 'Usuário adicionado com sucesso.'
+            );
+        } else {
+            $return = array(
+                'action' => false,
+                'message' => 'E-mail já cadastrado.'
+            );
+        }
+
+        Http::contentType('application/json');
+        print json_encode($return);
     }
+
+
+
+
 
     public function edit($id)
     {
-        echo "show a form to edit a user";
+        return $this->view('user/create', array(
+            'pageTitle'     => 'Editar Usuário',
+            'pageSubTitle'  => '',
+            'user'         => $this->model->get($id)
+        ));
     }
 
     public function update($id)
     {
-        echo json_encode($this->model->update($id, $_POST));
+        $filteredData = Filter::vetor($this->model->fillable, $_POST);
+
+        if($this->model->update($id, $filteredData)) {
+            $return = array(
+                'action' => true,
+                'message' => 'Usuário editado com sucesso.'
+            );
+        } else {
+            $return = array(
+                'action' => false,
+                'message' => 'Usuário não editado.'
+            );
+        }
+
+        Http::contentType('application/json');
+        print json_encode($return);
     }
 
     public function delete($id)
     {
-        echo json_encode($this->model->delete($id));
-    }
-
-    public function get($id)
-    {
-        echo json_encode($this->model->get($id));
+        $this->model->delete($id);
+        header("Location: " . BASE_URL . 'user/');
     }
     
 }
