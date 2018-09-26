@@ -1,0 +1,69 @@
+#dashboard {}
+
+    #dashboardGrid {
+
+    }
+        #dashboardGrid .dashboard-grid-item {
+            float: left;
+            box-shadow: 0px 10px 30px rgba(0,0,0,0.1);
+        }
+        #dashboardGrid .dashboard-grid-item.ui-sortable-placeholder {
+            background-color: #CCC;
+            border-radius: 4px 4px 0 0;
+            visibility: visible !important;
+            opacity: 1;
+        }
+        #dashboardGrid .dashboard-grid-item.ui-sortable-helper {
+            box-shadow: 0px 10px 30px rgba(0,0,0,0.3);
+        }
+        #dashboardGrid .dashboard-grid-item.is-full {
+            width: 98%;
+        margin: 1%;
+        }
+
+        #dashboardGrid .dashboard-grid-placeholder {
+            float: left;
+            background-color: #FFF;
+            height: 100px;
+        }
+            #dashboardGrid .dashboard-grid-handle {
+                cursor: move;
+            }
+            #dashboardGrid .dashboard-grid-handle span {
+                cursor: pointer;
+            }
+
+
+
+    @media screen and (max-width: 600px) {
+        #dashboardGrid .dashboard-grid-item {
+            width: 100%;
+            margin: 0 0 20px 0;
+        }
+    }
+
+    @media screen and (min-width: 600px) and (max-width: 1088px) {
+        #dashboardGrid .dashboard-grid-item {
+            width: 48%;
+            margin: 1%;
+        }
+        #dashboardGrid .dashboard-grid-item.is-double {
+            width: 98%;
+            margin: 1%;
+        }
+        #dashboardGrid .dashboard-grid-item.is-full {
+            width: 98%;
+            margin: 1%;
+        }
+    }
+
+    @media screen and (min-width: 1088px) {
+        #dashboardGrid .dashboard-grid-item {
+            width: 31.3%;
+            margin: 1%;
+        }
+        #dashboardGrid .dashboard-grid-item.is-double {
+            width: 64.6%;
+            margin: 1%;
+        }
+    }

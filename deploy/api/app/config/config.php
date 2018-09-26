@@ -9,6 +9,11 @@
     define('DB_PORT', 3306);
 
     /*
+     * Application
+     */
+    define('APP_NAME', 'Slikland CMS');
+
+    /*
      * Environment
      */
     define('DEBUG', true);

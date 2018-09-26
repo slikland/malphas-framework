@@ -7,6 +7,7 @@
 #     H T A C C E S S
 
 <IfModule mod_rewrite.c>
-	RewriteEngine On
-	RewriteRule ^(.*)$ index.php
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ index.php
 </IfModule>

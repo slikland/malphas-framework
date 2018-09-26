@@ -11,6 +11,10 @@
     define('DYNAMIC_PATH', ROOT . 'dynamic' . DIRECTORY_SEPARATOR);
 
 
-    define('CMS_PATH', ROOT . MANAGEMENT_NAME . DIRECTORY_SEPARATOR);
-    define('CONTROLLER_PATH', CMS_PATH . 'controller' . DIRECTORY_SEPARATOR);
+    define('CMS_PATH', ROOT . 'cms' . DIRECTORY_SEPARATOR);
+    define('CONTROLLER_PATH', ROOT . 'cms' . DIRECTORY_SEPARATOR . 'controller' . DIRECTORY_SEPARATOR);
     define('VIEWS_PATH', CMS_PATH . 'view' . DIRECTORY_SEPARATOR);
+
+    define('BASE_URL', 'http://local.slikland.com/slikland-cms-lab/deploy/cms/');
+    define('ASSETS_URL', BASE_URL . 'view' . DIRECTORY_SEPARATOR . '_assets' . DIRECTORY_SEPARATOR);
+

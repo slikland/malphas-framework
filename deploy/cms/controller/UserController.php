@@ -13,7 +13,11 @@ class UserController extends Controller
 
     public function index()
     {
-        echo json_encode($this->model->all());
+        return $this->view('user/index', array(
+            'pageTitle'     => 'Usuário',
+            'pageSubTitle'  => 'Todos',
+            'users'         => $this->model->all()
+        ));
     }
 
     public function create()
