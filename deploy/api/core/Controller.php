@@ -76,4 +76,19 @@ class Controller
 
         return $name;
     }
+
+    protected static function parseResponse($response)
+    {
+        if($response === true) {
+            $response = true;
+
+        } else {
+            $response = array(
+                'error' => true,
+                'message' => $response
+            );
+        }
+
+        return $response;
+    }
 }

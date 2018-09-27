@@ -127,11 +127,12 @@ class DB
 
             $a = call_user_func_array(array($statement, 'bind_param'), $this->buildValues($params));
             $statement->execute();
-            if($result = $statement->get_result())
-            {
-                return $result;
+
+            if(!empty($statement->error)) {
+                return $statement->error;
             }
-            return $statement;
+
+            return true;
         }
     }
 
@@ -198,21 +199,6 @@ class DB
 
     }
 
-    public function insert($sql, $params = NULL)
-    {
-        $result = $this->query($sql, $params);
-        if($result)
-        {
-            if(is_bool($result))
-            {
-                return $this->mysqli->insert_id;
-            }else{
-                return $result->insert_id;
-            }
-        }
-        return NULL;
-    }
-
     public function insertFields($tableName, $fields)
     {
         $sql = 'INSERT INTO ' . $tableName;
@@ -239,7 +225,7 @@ class DB
         }
 
         $sql .= ' (' . implode(', ', $columns) . ') VALUES (' . implode(', ', $params) . ');';
-        return $this->insert($sql, $values);
+        return $this->query($sql, $values);
     }
 
     public function updateFields($tableName, $fields, $condition)

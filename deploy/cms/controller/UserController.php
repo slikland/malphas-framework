@@ -4,6 +4,7 @@ use model\Role;
 use core\Controller;
 use core\Utils\Filter;
 use core\Http;
+use core\JsonResponse;
 
 class UserController extends Controller
 {
@@ -14,9 +15,6 @@ class UserController extends Controller
         $this->model = new User();
     }
 
-
-
-
     public function index()
     {
         return $this->view('user/index', array(
@@ -25,9 +23,6 @@ class UserController extends Controller
             'users'         => $this->model->all()
         ));
     }
-
-
-
 
     public function create()
     {
@@ -39,33 +34,15 @@ class UserController extends Controller
         ));
     }
 
-
-
-
-
     public function insert()
     {
         $filteredData = Filter::vetor($this->model->fillable, $_POST);
 
-        if($this->model->insert($filteredData)) {
-            $return = array(
-                'action' => true,
-                'message' => 'Usuário adicionado com sucesso.'
-            );
-        } else {
-            $return = array(
-                'action' => false,
-                'message' => 'E-mail já cadastrado.'
-            );
-        }
+        $insert = $this->model->insert($filteredData);
+        $response = parent::parseResponse($insert);
 
-        Http::contentType('application/json');
-        print json_encode($return);
+        return JsonResponse::set(200, $response);
     }
-
-
-
-
 
     public function edit($id)
     {
