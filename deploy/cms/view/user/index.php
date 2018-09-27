@@ -106,8 +106,8 @@
                                         <a class="link-mailto" href="mailto:<?php echo $value['email']; ?>"><?php echo $value['email']; ?></a>
                                     </th>
                                     <th><?php echo $value['cms_role_id']; ?></th>
-                                    <th><?php echo date('d/m/Y - H:i', strtotime($value['created_at'])); ?></th>
-                                    <th><?php echo date('d/m/Y - H:i', strtotime($value['updated_at'])); ?></th>
+                                    <th><?php echo dateFormatBR($value['created_at']); ?></th>
+                                    <th><?php echo dateFormatBR($value['updated_at']); ?></th>
                                     <th>
                                         <a class="edit-user button is-warning" href="<?php echo baseUrl("user/edit/{$value['id']}"); ?>">
                                             <i class="fa fa-edit"></i>

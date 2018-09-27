@@ -27,3 +27,16 @@ function image($file) {
 function title() {
     return APP_NAME;
 }
+
+function dateFormatBR($databaseTimeStamp)
+{
+    $date = null;
+
+    if(!empty($databaseTimeStamp)) {
+        $date = new \DateTime();
+        $date::createFromFormat('Y-m-d H:i:s', $databaseTimeStamp);
+        $date = $date->format('d/m/Y - H:s');
+    }
+
+    return $date;
+}
