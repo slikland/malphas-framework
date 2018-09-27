@@ -244,6 +244,8 @@ class DB
 
     public function updateFields($tableName, $fields, $condition)
     {
+        $fields['updated_at'] = date('Y-m-d H:i:s');
+
         $sql = 'UPDATE ' . $tableName . ' SET ';
         $columns = array();
         $params = array();
