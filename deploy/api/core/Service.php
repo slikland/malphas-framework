@@ -11,18 +11,18 @@ class Service
     public function index()
     {
         if(!Http::isGet()){
-            return $this->response(405);
+            return JsonResponse::set(405);
         }
 
         $all = $this->model->all();
 
-        return $this->response(200, $all);
+        return JsonResponse::set(200, $all);
     }
 
     public function create()
     {
         if(!Http::isPost()){
-            return $this->response(405);
+            return JsonResponse::set(405);
         }
 
         $filteredData = Filter::vetor($this->model->fillable, $_POST);
@@ -33,22 +33,22 @@ class Service
     public function read($id)
     {
         if(!Http::isGet()){
-            return $this->response(405);
+            return JsonResponse::set(405);
         }
 
         $get = $this->model->get($id);
 
         if(is_null($get)) {
-            return $this->response(404);
+            return JsonResponse::set(404);
         }
 
-        return $this->response(200, $this->model->get($id));
+        return JsonResponse::set(200, $this->model->get($id));
     }
 
     public function update($id)
     {
         if(!Http::isPost()){
-            return $this->response(405);
+            return JsonResponse::set(405);
         }
 
         $filteredData = Filter::vetor($this->model->fillable, $_POST);
@@ -127,15 +127,4 @@ class Service
         return $name;
     }
 
-    private function response($status, $data = false)
-    {
-        Http::status($status);
-        Http::contentType('application/json');
-
-        if(!$data) {
-            $data = Http::statusMessage($status);
-        }
-
-        print json_encode($data);
-    }
 }
