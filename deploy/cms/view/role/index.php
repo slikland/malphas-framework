@@ -53,7 +53,7 @@
 
                 <div class="box">
 
-                    <?php if(empty($roles)) : ?>
+                    <?php if(empty($role)) : ?>
                         <div class="notification">
                             <p class="has-text-centered">
                                 <strong class="is-size-4">Nenhum grupo de usuário cadastrado</strong>
@@ -74,6 +74,7 @@
                                 </th>
                                 <th>Nome</th>
                                 <th>Criado em :</th>
+                                <th>Atualizado em :</th>
                                 <th style="width: 130px;">Ação</th>
 
                             </tr>
@@ -86,18 +87,20 @@
                                 </th>
                                 <th>Nome</th>
                                 <th>Criado em :</th>
+                                <th>Atualizado em :</th>
                                 <th>Ação</th>
                             </tr>
                             </tfoot>
 
                             <tbody>
-                            <?php foreach ($roles as $value) : ?>
+                            <?php foreach ($role as $value) : ?>
                                 <tr>
                                     <th>
                                         <input type="checkbox" name="">
                                     </th>
                                     <th><?php echo $value['name']; ?></th>
                                     <th><?php echo date('d/m/Y - H:i', strtotime($value['created_at'])); ?></th>
+                                    <th><?php echo date('d/m/Y - H:i', strtotime($value['updated_at'])); ?></th>
                                     <th>
                                         <a class="edit-user button is-warning" href="<?php echo baseUrl("role/edit/{$value['id']}"); ?>">
                                             <i class="fa fa-edit"></i>

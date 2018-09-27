@@ -34,12 +34,11 @@
                     </div>
 
                     <div class="box">
-
-                    <?php if(empty($user)) : ?>
+                        <?php if(empty($user)) : ?>
                         <form id="formUserCreate" action="javascript:void(0);" data-action="<?php echo baseUrl('user/insert'); ?>" method="POST">
-                    <?php else : ?>
+                        <?php else : ?>
                         <form id="formUserCreate" action="javascript:void(0);" data-action="<?php echo baseUrl('user/update/' . $user['id']); ?>" method="POST">
-                    <?php endif; ?>
+                        <?php endif; ?>
 
                             <div class="field is-horizontal">
                                 <div class="field-label is-medium">
@@ -89,8 +88,6 @@
                                 </div>
                             </div>
 
-
-
                             <div class="field is-horizontal">
                                 <div class="field-label is-medium">
                                     <label class="label">Permissão</label>
@@ -99,16 +96,23 @@
 
                                     <div class="field">
                                         <div class="control has-icons-left">
+
+                                            <?php if(!empty($roles)) : ?>
                                             <div class="select is-medium is-fullwidth">
                                                 <select id="userPermissions" name="cms_role_id" type="select" required>
-                                                    <option value="" selected>Escolha a Permissão</option>
-                                                    <option value="1">Super Admin</option>
-                                                    <option value="2">Admin</option>
+                                                    <option value="">Escolha a Permissão</option>
+                                                    <?php foreach ($roles as $value) : ?>
+                                                    <option value="<?php echo $value['id']; ?>" <?php if(!empty($user) && $value['id'] == $user['cms_role_id']) { echo 'selected'; } ?>>
+                                                        <?php echo $value['name']; ?>
+                                                    </option>
+                                                    <?php endforeach; ?>
                                                 </select>
                                             </div>
                                             <span class="icon is-medium is-left">
-                                            <i class="fa fa-key"></i>
-                                        </span>
+                                                <i class="fa fa-key"></i>
+                                            </span>
+                                            <?php endif; ?>
+
                                         </div>
                                     </div>
 

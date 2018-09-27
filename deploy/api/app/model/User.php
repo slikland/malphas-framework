@@ -14,4 +14,5 @@ class User extends Model
         'cms_role_id'
     ];
 
+
 }
