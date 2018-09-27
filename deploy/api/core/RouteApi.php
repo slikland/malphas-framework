@@ -3,6 +3,20 @@ namespace core;
 
 class RouteApi extends Route
 {
+    public static function add($route, $action)
+    {
+        parent::addExplicitRoute($route);
+
+        if(parent::getRequestUri() == $route) {
+            if ($action instanceof \Closure) {
+                return $action();
+            } else {
+                self::parseAndExecute($action);
+            }
+            die();
+        }
+    }
+
     public static function run()
     {
         $request    = self::getRequestApi();
@@ -53,5 +67,19 @@ class RouteApi extends Route
         }
 
         return $method;
+    }
+
+    private static function parseAndExecute($controllerAtMethod)
+    {
+        $explode = explode('@', $controllerAtMethod);
+
+        if(count($explode) < 2) {
+            throw new \Exception('Declaration isnt valid. Declare service@method');
+        }
+
+        $controller = !empty($explode[0]) ? $explode[0] : false;
+        $method = !empty($explode[1]) ? $explode[1] : false;
+
+        return Service::execute($controller, $method);
     }
 }

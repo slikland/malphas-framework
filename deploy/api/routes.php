@@ -10,6 +10,6 @@ use core\RouteApi;
 #      R O U T E S
 
 
-//    Route::add('/', 'User@index');
+    RouteApi::add('/', 'User@index');
 
     RouteApi::run();
