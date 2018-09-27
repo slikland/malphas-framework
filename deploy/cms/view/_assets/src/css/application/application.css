@@ -157,7 +157,13 @@ body {
 
 
 
-
+#severalAction {}
+#severalAction.blocked {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+    #severalAction .button {}
+        #severalAction .button i {}
 
 
 
@@ -423,6 +429,20 @@ body {
 
 /** OVERWRITE BULMA **/
 
+
+
+table tr.odd {
+    background-color: #F5F5F5 !important;
+}
+table tr.is-selected {
+    background-color: #333 !important;
+}
+table tr th .label {
+    text-align: center;
+    display: block;
+    height: 30px;
+    cursor: pointer;
+}
 
 
 

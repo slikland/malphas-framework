@@ -44,7 +44,7 @@
                             </div>
                         </div>
                         <div class="column has-text-right">
-                            <a class="button is-primary" href="<?php echo baseUrl('role/create'); ?>">
+                            <a class="button is-dark" href="<?php echo baseUrl('role/create'); ?>">
                                 <strong>CRIAR NOVO GRUPO DE USUÁRIO</strong>
                             </a>
                         </div>
@@ -53,7 +53,7 @@
 
                 <div class="box">
 
-                    <?php if(empty($role)) : ?>
+                    <?php if(empty($roles)) : ?>
                         <div class="notification">
                             <p class="has-text-centered">
                                 <strong class="is-size-4">Nenhum grupo de usuário cadastrado</strong>
@@ -68,39 +68,41 @@
 
                         <table class="table is-fullwidth">
                             <thead>
-                            <tr>
-                                <th style="width: 20px;">
-                                    <input type="checkbox" name="">
-                                </th>
-                                <th>Nome</th>
-                                <th>Criado em :</th>
-                                <th>Atualizado em :</th>
-                                <th style="width: 130px;">Ação</th>
+                                <tr>
+                                    <th style="width: 20px;">
+                                        <input type="checkbox" name="">
+                                    </th>
+                                    <th>Nome</th>
+                                    <th>Criado em :</th>
+                                    <th>Atualizado em :</th>
+                                    <th style="width: 130px;">Ação</th>
 
-                            </tr>
+                                </tr>
                             </thead>
 
                             <tfoot>
-                            <tr>
-                                <th>
-                                    <input type="checkbox" name="">
-                                </th>
-                                <th>Nome</th>
-                                <th>Criado em :</th>
-                                <th>Atualizado em :</th>
-                                <th>Ação</th>
-                            </tr>
-                            </tfoot>
-
-                            <tbody>
-                            <?php foreach ($role as $value) : ?>
                                 <tr>
                                     <th>
                                         <input type="checkbox" name="">
                                     </th>
+                                    <th>Nome</th>
+                                    <th>Criado em :</th>
+                                    <th>Atualizado em :</th>
+                                    <th>Ação</th>
+                                </tr>
+                            </tfoot>
+
+                            <tbody>
+                            <?php foreach ($roles as $value) : ?>
+                                <tr>
+                                    <th>
+                                        <label class="label">
+                                            <input type="checkbox" name="">
+                                        </label>
+                                    </th>
                                     <th><?php echo $value['name']; ?></th>
-                                    <th><?php echo date('d/m/Y - H:i', strtotime($value['created_at'])); ?></th>
-                                    <th><?php echo date('d/m/Y - H:i', strtotime($value['updated_at'])); ?></th>
+                                    <th><?php echo dateFormatBR($value['created_at']); ?></th>
+                                    <th><?php echo dateFormatBR($value['updated_at']); ?></th>
                                     <th>
                                         <a class="edit-role button is-warning" href="<?php echo baseUrl("role/edit/{$value['id']}"); ?>">
                                             <i class="fa fa-edit"></i>
@@ -112,8 +114,6 @@
                                 </tr>
                             <?php endforeach; ?>
                             </tbody>
-
-
                         </table>
                     <?php endif; ?>
                 </div>

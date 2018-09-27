@@ -19,14 +19,14 @@ $pageArea = array(
     array(
         'id' => 3,
         'label' => 'Usuários',
-        'path' => baseUrl('user'),
+        'path' => baseUrl('user/'),
         'icon' => 'users',
         'child' => array(),
     ),
     array(
         'id' => 5,
         'label' => 'Permissões',
-        'path' => baseUrl('role'),
+        'path' => baseUrl('role/'),
         'icon' => 'user-lock',
         'child' => array(),
     ),
@@ -39,7 +39,7 @@ $pageArea = array(
             array(
                 'id' => 8,
                 'label' => 'Interface',
-                'path' => baseUrl('configuracoes/interface'),
+                'path' => baseUrl('configuracoes/interface/'),
                 'icon' => 'object-group',
                 'child' => array(),
             )

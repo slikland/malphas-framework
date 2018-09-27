@@ -36,15 +36,20 @@
                     <?php if(!empty($users)) : ?>
                     <div class="columns">
                         <div class="column">
-                            <div class="select">
-                                <select>
-                                    <option>Ação em massa</option>
-                                    <option>Deletar</option>
-                                </select>
+
+                            <div id="severalAction" class="blocked">
+                                <a class="button">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+
+                                <a class="button">
+                                    <i class="fas fa-sync-alt"></i>
+                                </a>
                             </div>
+
                         </div>
                         <div class="column has-text-right">
-                            <a class="button is-primary" href="<?php echo baseUrl('user/create'); ?>">
+                            <a class="button is-dark" href="<?php echo baseUrl('user/create'); ?>">
                                 <strong>CRIAR NOVO USUÁRIO</strong>
                             </a>
                         </div>
@@ -70,7 +75,9 @@
                             <thead>
                                 <tr>
                                     <th style="width: 20px;">
-                                        <input type="checkbox" name="">
+                                        <label class="label">
+                                            <input id="selectAllRows" class="" type="checkbox">
+                                        </label>
                                     </th>
                                     <th>Nome</th>
                                     <th>E-mail</th>
@@ -99,7 +106,9 @@
                             <?php foreach ($users as $value) : ?>
                                 <tr>
                                     <th>
-                                        <input type="checkbox" name="">
+                                        <label class="label">
+                                            <input class="select-this-row" type="checkbox" name="id[]" value="<?php echo $value['id']; ?>">
+                                        </label>
                                     </th>
                                     <th><?php echo $value['name']; ?></th>
                                     <th>

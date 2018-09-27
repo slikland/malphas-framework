@@ -74,7 +74,7 @@
                                         <a class="button is-medium" href="<?php echo baseUrl('role/'); ?>">
                                             CANCELAR
                                         </a>
-                                        <button id="formSubmit" class="button is-medium is-primary">
+                                        <button id="formSubmit" class="button is-medium is-dark">
                                             <?php echo empty($role) ? 'CRIAR NOVO GRUPO USUÁRIO' : 'EDITAR GRUPO USUÁRIO'; ?>
                                         </button>
                                     </div>

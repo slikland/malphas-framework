@@ -1,10 +1,24 @@
 $(document).on('ready', function () {
 
 
-    $('#generatePass').on('click', function() {
-        $('#userPassword, #userConfirmPassword').attr('type', 'text').val(randomPassword(8));
+    $('#selectAllRows').on('click', function () {
+        $('.select-this-row').each(function (index, element) {
+            $(element).trigger('click');
+        });
     });
+    $('.select-this-row').each(function (index, element) {
+        var $this = $(element);
 
+        $this.on('click', function() {
+            $this.parent().parent().parent().toggleClass('is-selected');
+            if($('.select-this-row:checked').length) {
+                $('#severalAction').removeClass('blocked');
+            } else {
+                $('#severalAction').addClass('blocked');
+            }
+        });
+
+    });
 
     $('.delete-user').each(function(index, element) {
         var $this = $(element);
@@ -16,8 +30,8 @@ $(document).on('ready', function () {
                 text: 'Tem certeza que vai deletar esse usuário?',
                 type: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Sim, deletar!'
             }).then(function(result) {
                 if (result.value) {
@@ -55,6 +69,14 @@ $(document).on('ready', function () {
     });
 
 
+
+
+
+
+
+    $('#generatePass').on('click', function() {
+        $('#userPassword, #userConfirmPassword').attr('type', 'text').val(randomPassword(8));
+    });
     $('#formUserCreate').formSubmitGeneral(
         '',
         function (response) {

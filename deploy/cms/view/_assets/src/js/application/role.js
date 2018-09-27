@@ -29,7 +29,7 @@ $(document).on('ready', function () {
                                     type: 'success',
                                     confirmButtonText: 'Okay'
                                 }).then(function(result) {
-                                    window.location.href = baseUrl+'user/';
+                                    window.location.href = baseUrl+'role/';
                                 });
                             } else {
                                 swal({
@@ -55,7 +55,7 @@ $(document).on('ready', function () {
         '',
         function (response) {
 
-            if(response.action) {
+            if(response === true) {
                 swal({
                     title: 'Sucesso',
                     text: response.message,

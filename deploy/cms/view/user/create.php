@@ -176,7 +176,7 @@
                                             <a class="button is-medium" href="<?php echo baseUrl('user/'); ?>">
                                                 CANCELAR
                                             </a>
-                                            <button id="formSubmit" class="button is-medium is-primary">
+                                            <button id="formSubmit" class="button is-medium is-dark">
                                                 <?php echo empty($user) ? 'CRIAR NOVO USUÁRIO' : 'EDITAR USUÁRIO'; ?>
                                             </button>
                                         </div>
