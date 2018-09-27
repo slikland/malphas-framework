@@ -1,6 +1,5 @@
 <?php
-use core\Route;
-use core\RouteCms;
+    use core\RouteCms;
 
 #     ___  _  _  ____
 #    / __)( \/ )/ ___)
@@ -9,6 +8,6 @@ use core\RouteCms;
 #
 #       R O U T E S
 
-    Route::add('/', 'Auth@login');
+    RouteCms::add('/', 'Auth@login');
 
     RouteCms::run();
