@@ -45,6 +45,7 @@ class UserController extends Controller
     }
 
     public function edit($id)
+
     {
         $role = new Role();
         return $this->view('user/create', array(
@@ -77,8 +78,20 @@ class UserController extends Controller
 
     public function delete($id)
     {
-        $this->model->delete($id);
-        header("Location: " . BASE_URL . 'user/');
+        if($this->model->delete($id)) {
+            $return = array(
+                'action' => true,
+                'message' => 'Usuário deletado com sucesso.'
+            );
+        } else {
+            $return = array(
+                'action' => false,
+                'message' => 'Usuário não deletado.'
+            );
+        }
+
+        Http::contentType('application/json');
+        print json_encode($return);
     }
     
 }

@@ -21,8 +21,32 @@ $(document).on('ready', function () {
                 confirmButtonText: 'Sim, deletar!'
             }).then(function(result) {
                 if (result.value) {
-                    $this.parent().parent().hide(200);
-                    window.location.href = $this.attr('href');
+
+                    $this.cmsAjaxDelete(
+                        $this.attr('href'),
+                        '',
+                        function (response) {
+                            if(response.action) {
+                                swal({
+                                    title: 'Sucesso',
+                                    text: response.message,
+                                    type: 'success',
+                                    confirmButtonText: 'Okay'
+                                }).then(function(result) {
+                                    window.location.href = baseUrl+'user/';
+                                });
+                            } else {
+                                swal({
+                                    title: 'Ops!',
+                                    text: response.message,
+                                    type: 'error',
+                                    confirmButtonText: 'Okay'
+                                });
+                            }
+                        }
+                    );
+                    //$this.parent().parent().hide(200);
+
                 }
             });
             return false;
@@ -35,10 +59,10 @@ $(document).on('ready', function () {
         '',
         function (response) {
 
-            if(response.action) {
+            if(response === true) {
                 swal({
                     title: 'Sucesso',
-                    text: response.message,
+                    text: 'Adicionado com Sucesso',
                     type: 'success',
                     confirmButtonText: 'Okay'
                 }).then(function(result) {
