@@ -80,8 +80,20 @@ class RoleController extends Controller
 
     public function delete($id)
     {
-        $this->model->delete($id);
-        header("Location: " . BASE_URL . 'role/');
+        if($this->model->delete($id)) {
+            $return = array(
+                'action' => true,
+                'message' => 'Grupo Usuário deletado com sucesso.'
+            );
+        } else {
+            $return = array(
+                'action' => false,
+                'message' => 'Grupo Usuário não deletado.'
+            );
+        }
+
+        Http::contentType('application/json');
+        print json_encode($return);
     }
 
     public function get($id)

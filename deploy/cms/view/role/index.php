@@ -102,10 +102,10 @@
                                     <th><?php echo date('d/m/Y - H:i', strtotime($value['created_at'])); ?></th>
                                     <th><?php echo date('d/m/Y - H:i', strtotime($value['updated_at'])); ?></th>
                                     <th>
-                                        <a class="edit-user button is-warning" href="<?php echo baseUrl("role/edit/{$value['id']}"); ?>">
+                                        <a class="edit-role button is-warning" href="<?php echo baseUrl("role/edit/{$value['id']}"); ?>">
                                             <i class="fa fa-edit"></i>
                                         </a>
-                                        <a class="delete-user button is-danger" href="<?php echo baseUrl("role/delete/{$value['id']}"); ?>">
+                                        <a class="delete-role button is-danger" href="<?php echo baseUrl("role/delete/{$value['id']}"); ?>">
                                             <i class="fa fa-times"></i>
                                         </a>
                                     </th>
