@@ -1,6 +1,6 @@
 <?php
-use core\Route;
-use core\RouteApi;
+    use core\RouteApi;
+    use core\JsonResponse;
 
 #      __   ____  __
 #     / _\ (  _ \(  )
@@ -9,7 +9,8 @@ use core\RouteApi;
 #
 #      R O U T E S
 
-
-//    Route::add('/', 'User@index');
+    RouteApi::add('/', function (){
+        JsonResponse::set(401);
+    });
 
     RouteApi::run();
