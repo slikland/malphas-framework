@@ -1,6 +1,11 @@
 $(document).on('ready', function () {
 
 
+    $('#generatePass').on('click', function() {
+        $('#userPassword, #userConfirmPassword').attr('type', 'text').val(randomPassword(8));
+    });
+
+
     $('.delete-user').each(function(index, element) {
         var $this = $(element);
 

@@ -11,7 +11,7 @@
         ?>
         <div id="wrap" class="transitions">
 
-            <!-- VIEW DASHBOARD -->
+            <!-- VIEW USER -->
             <section id="user" class="section page-content">
                 <div class="container is-fluid">
 
@@ -52,9 +52,7 @@
                     <?php endif; ?>
 
                     <div class="box">
-                        <pre style="display: none">
-                            <?php print_r($users); ?>
-                        </pre>
+
                         <?php if(empty($users)) : ?>
                         <div class="notification">
                             <p class="has-text-centered">
@@ -128,7 +126,7 @@
 
                 </div>
             </section>
-            <!-- VIEW DASHBOARD -->
+            <!-- VIEW USER -->
 
 
             <?php inc('_common/footer.php'); ?>

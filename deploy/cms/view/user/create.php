@@ -181,17 +181,6 @@
                             </div>
 
                         </form>
-                        <script type="text/javascript">
-
-
-                            $('#generatePass').on('click', function() {
-
-                                $('#userPassword, #userConfirmPassword').attr('type', 'text').val(randomPassword(8));
-
-                            });
-
-
-                        </script>
 
                     </div>
 

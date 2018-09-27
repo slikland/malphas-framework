@@ -2,6 +2,7 @@
 use model\Role;
 use core\Controller;
 use core\Utils\Filter;
+use core\Http;
 
 class RoleController extends Controller
 {
@@ -23,29 +24,64 @@ class RoleController extends Controller
 
     public function create()
     {
-
+        return $this->view('role/create', array(
+            'pageTitle'     => 'Adicionar Grupo Usuário',
+            'pageSubTitle'  => ''
+        ));
     }
 
     public function insert()
     {
         $filteredData = Filter::vetor($this->model->fillable, $_POST);
 
-        print json_encode($this->model->insert($filteredData));
+        if($this->model->insert($filteredData)) {
+            $return = array(
+                'action' => true,
+                'message' => 'Grupo Usuário adicionado com sucesso.'
+            );
+        } else {
+            $return = array(
+                'action' => false,
+                'message' => 'Grupo Usuário não adicionado'
+            );
+        }
+
+        Http::contentType('application/json');
+        print json_encode($return);
+
     }
 
     public function edit($id)
     {
-        echo "show a form to edit a user";
+        return $this->view('role/create', array(
+            'pageTitle'     => 'Editar Grupo Usuário',
+            'pageSubTitle'  => '',
+            'role'         => $this->model->get($id)
+        ));
     }
 
     public function update($id)
     {
-        echo json_encode($this->model->update($id, $_POST));
+        if($this->model->update($id, $filteredData)) {
+            $return = array(
+                'action' => true,
+                'message' => 'Grupo Usuário editado com sucesso.'
+            );
+        } else {
+            $return = array(
+                'action' => false,
+                'message' => 'Grupo Usuário não editado.'
+            );
+        }
+
+        Http::contentType('application/json');
+        print json_encode($return);
     }
 
     public function delete($id)
     {
-        echo json_encode($this->model->delete($id));
+        $this->model->delete($id);
+        header("Location: " . BASE_URL . 'role/');
     }
 
     public function get($id)
