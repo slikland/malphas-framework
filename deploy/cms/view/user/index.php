@@ -76,8 +76,8 @@
                                     <th>E-mail</th>
                                     <th>Permissão</th>
                                     <th>Criado em :</th>
+                                    <th>Atualizado em :</th>
                                     <th style="width: 130px;">Ação</th>
-
                                 </tr>
                             </thead>
 
@@ -90,8 +90,8 @@
                                     <th>E-mail</th>
                                     <th>Permissão</th>
                                     <th>Criado em :</th>
+                                    <th>Atualizado em :</th>
                                     <th>Ação</th>
-
                                 </tr>
                             </tfoot>
 
@@ -107,6 +107,7 @@
                                     </th>
                                     <th><?php echo $value['cms_role_id']; ?></th>
                                     <th><?php echo date('d/m/Y - H:i', strtotime($value['created_at'])); ?></th>
+                                    <th><?php echo date('d/m/Y - H:i', strtotime($value['updated_at'])); ?></th>
                                     <th>
                                         <a class="edit-user button is-warning" href="<?php echo baseUrl("user/edit/{$value['id']}"); ?>">
                                             <i class="fa fa-edit"></i>

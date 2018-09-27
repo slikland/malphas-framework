@@ -1,5 +1,6 @@
 <?php
 use model\User;
+use model\Role;
 use core\Controller;
 use core\Utils\Filter;
 use core\Http;
@@ -30,9 +31,11 @@ class UserController extends Controller
 
     public function create()
     {
+        $role = new Role();
         return $this->view('user/create', array(
             'pageTitle'     => 'Adicionar Usuário',
-            'pageSubTitle'  => ''
+            'pageSubTitle'  => '',
+            'roles'         => $role->all()
         ));
     }
 
@@ -66,10 +69,12 @@ class UserController extends Controller
 
     public function edit($id)
     {
+        $role = new Role();
         return $this->view('user/create', array(
             'pageTitle'     => 'Editar Usuário',
             'pageSubTitle'  => '',
-            'user'         => $this->model->get($id)
+            'user'          => $this->model->get($id),
+            'roles'         => $role->all()
         ));
     }
 

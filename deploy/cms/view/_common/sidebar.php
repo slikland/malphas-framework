@@ -31,13 +31,6 @@ $pageArea = array(
         'child' => array(),
     ),
     array(
-        'id' => 3,
-        'label' => 'Usuários',
-        'path' => baseUrl('user'),
-        'icon' => 'users',
-        'child' => array(),
-    ),
-    array(
         'id' => 7,
         'label' => 'Configurações',
         'path' => '#/open-submenu',
