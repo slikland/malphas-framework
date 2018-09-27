@@ -22,7 +22,7 @@ $(document).on('ready', function () {
                         $this.attr('href'),
                         '',
                         function (response) {
-                            if(response.action) {
+                            if(response === true) {
                                 swal({
                                     title: 'Sucesso',
                                     text: response.message,

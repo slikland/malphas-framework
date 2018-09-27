@@ -3,7 +3,6 @@ use model\User;
 use model\Role;
 use core\Controller;
 use core\Utils\Filter;
-use core\Http;
 use core\JsonResponse;
 
 class UserController extends Controller
@@ -45,9 +44,9 @@ class UserController extends Controller
     }
 
     public function edit($id)
-
     {
         $role = new Role();
+
         return $this->view('user/create', array(
             'pageTitle'     => 'Editar Usuário',
             'pageSubTitle'  => '',
@@ -60,38 +59,17 @@ class UserController extends Controller
     {
         $filteredData = Filter::vetor($this->model->fillable, $_POST);
 
-        if($this->model->update($id, $filteredData)) {
-            $return = array(
-                'action' => true,
-                'message' => 'Usuário editado com sucesso.'
-            );
-        } else {
-            $return = array(
-                'action' => false,
-                'message' => 'Usuário não editado.'
-            );
-        }
+        $update = $this->model->update($id, $filteredData);
+        $response = parent::parseResponse($update);
 
-        Http::contentType('application/json');
-        print json_encode($return);
+        return JsonResponse::set(200, $response);
     }
 
     public function delete($id)
     {
-        if($this->model->delete($id)) {
-            $return = array(
-                'action' => true,
-                'message' => 'Usuário deletado com sucesso.'
-            );
-        } else {
-            $return = array(
-                'action' => false,
-                'message' => 'Usuário não deletado.'
-            );
-        }
+        $delete = $this->model->delete($id);
+        $response = parent::parseResponse($delete);
 
-        Http::contentType('application/json');
-        print json_encode($return);
+        return JsonResponse::set(200, $response);
     }
-    
 }

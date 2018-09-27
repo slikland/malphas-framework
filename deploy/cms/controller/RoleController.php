@@ -2,7 +2,7 @@
 use model\Role;
 use core\Controller;
 use core\Utils\Filter;
-use core\Http;
+use core\JsonResponse;
 
 class RoleController extends Controller
 {
@@ -34,21 +34,10 @@ class RoleController extends Controller
     {
         $filteredData = Filter::vetor($this->model->fillable, $_POST);
 
-        if($this->model->insert($filteredData)) {
-            $return = array(
-                'action' => true,
-                'message' => 'Grupo Usuário adicionado com sucesso.'
-            );
-        } else {
-            $return = array(
-                'action' => false,
-                'message' => 'Grupo Usuário não adicionado'
-            );
-        }
+        $insert = $this->model->insert($filteredData);
+        $response = parent::parseResponse($insert);
 
-        Http::contentType('application/json');
-        print json_encode($return);
-
+        return JsonResponse::set(200, $response);
     }
 
     public function edit($id)
@@ -62,43 +51,19 @@ class RoleController extends Controller
 
     public function update($id)
     {
-        if($this->model->update($id, $filteredData)) {
-            $return = array(
-                'action' => true,
-                'message' => 'Grupo Usuário editado com sucesso.'
-            );
-        } else {
-            $return = array(
-                'action' => false,
-                'message' => 'Grupo Usuário não editado.'
-            );
-        }
+        $filteredData = Filter::vetor($this->model->fillable, $_POST);
 
-        Http::contentType('application/json');
-        print json_encode($return);
+        $update = $this->model->update($id, $filteredData);
+        $response = parent::parseResponse($update);
+
+        return JsonResponse::set(200, $response);
     }
 
     public function delete($id)
     {
-        if($this->model->delete($id)) {
-            $return = array(
-                'action' => true,
-                'message' => 'Grupo Usuário deletado com sucesso.'
-            );
-        } else {
-            $return = array(
-                'action' => false,
-                'message' => 'Grupo Usuário não deletado.'
-            );
-        }
+        $delete = $this->model->delete($id);
+        $response = parent::parseResponse($delete);
 
-        Http::contentType('application/json');
-        print json_encode($return);
+        return JsonResponse::set(200, $response);
     }
-
-    public function get($id)
-    {
-        echo json_encode($this->model->get($id));
-    }
-    
 }
