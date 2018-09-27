@@ -132,6 +132,11 @@ class DB
                 return $statement->error;
             }
 
+            if($result = $statement->get_result())
+            {
+                return $result;
+            }
+
             return true;
         }
     }
