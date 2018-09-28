@@ -9,6 +9,31 @@ class UserController extends Controller
 {
     private $model;
 
+    public $validation = [
+        'email' => [
+            'Email' => 'isValid',
+            'Data'  => [
+                'required',
+                ['min' => 3],
+                'unique'
+            ]
+        ],
+        'name' => [
+            'Data' => [
+                'required',
+                ['min' => 3],
+                ['max' => 255],
+                'unique'
+            ]
+        ],
+        'password' => [
+            'Data'  => [
+                'required',
+                ['min' => 6]
+            ]
+        ]
+    ];
+
     public function __construct()
     {
         $this->model = new User();

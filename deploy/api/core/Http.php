@@ -49,6 +49,11 @@ class Http
         return false;
     }
 
+    public static function getPost()
+    {
+        return $_POST;
+    }
+
     public static function status($status)
     {
         return http_response_code($status);

@@ -49,6 +49,7 @@ class Controller
     public static function execute($controller, $method, $parameters = false)
     {
         $instance = self::load($controller);
+        self::validate($instance);
 
         if($method && $parameters) {
             $instance->{$method}($parameters);
@@ -90,5 +91,10 @@ class Controller
         }
 
         return $response;
+    }
+
+    private static function validate($instance)
+    {
+        Validate::this($instance);
     }
 }
