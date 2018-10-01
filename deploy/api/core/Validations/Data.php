@@ -1,5 +1,5 @@
 <?php
-
+use core\Utils\Type;
 class Data
 {
     public static function required($postValue)
@@ -7,13 +7,12 @@ class Data
         if(!empty($postValue)) {
             return true;
         }
-        return ['message' => 'Campo não está preenchido'];
+        return ['message' => 'Preencha esse campo'];
     }
 
     public static function min($postValue, $valid)
     {
-        $isValid = (strlen($postValue) >= $valid);
-        if($isValid){
+        if(strlen($postValue) >= $valid){
             return true;
         }
 
@@ -22,8 +21,7 @@ class Data
 
     public static function max($postValue, $valid)
     {
-        $isValid = (strlen($postValue) <= $valid);
-        if($isValid) {
+        if(strlen($postValue) <= $valid) {
             return true;
         }
 
@@ -33,6 +31,15 @@ class Data
     public static function unique($postValue)
     {
         return true;
+    }
+
+    public static function isInt($postValue)
+    {
+        if(Type::isInt($postValue)) {
+            return true;
+        }
+
+        return ['message' => "Esse campo deve ser do tipo inteiro"];
     }
 
 }

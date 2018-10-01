@@ -1,7 +1,6 @@
 <?php
 namespace core;
 
-
 class Validate
 {
     public static $messages = [];
