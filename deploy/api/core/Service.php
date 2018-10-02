@@ -8,6 +8,8 @@ class Service
 {
     public $isAuthenticable = true;
 
+    public $validation = [];
+
     public function index()
     {
         if(!Http::isGet()){

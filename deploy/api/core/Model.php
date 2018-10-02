@@ -5,9 +5,12 @@ class Model
 {
     protected static $db;
 
+    protected $validation = [];
+
     public function __construct()
     {
         self::$db = DB::getInstance();
+        $this->validate();
     }
 
     public function all()
@@ -33,5 +36,10 @@ class Model
     public function delete($id)
     {
         return self::$db->delete($this->table, $id);
+    }
+
+    private function validate()
+    {
+        Validate::this($this);
     }
 }

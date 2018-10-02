@@ -6,6 +6,8 @@ class Controller
 {
     public $isAuthenticable = true;
 
+    public $validation = [];
+
     public function view($file, $data = false)
     {
         return new Template($file, $data);
