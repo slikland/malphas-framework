@@ -1,7 +1,6 @@
 var $loading;
 
 $(document).on('ready', function () {
-    console.log('READY GLOBAL : ', Date());
 
     $loading = $('#loading');
 
@@ -11,16 +10,6 @@ $(document).on('ready', function () {
         });
     });
 
-    /**
-    // ACTION FOR MAIL TO CLICK
-    $('.link-mailto').each(function(index, element) {
-        $(element).on('click', function() {
-            var x = window.open("mailto:diego.sanches@slikland.com?subject=Hello&body=Escreva aqui . . .");
-            //x.close();
-            return false;
-        });
-    });
-    */
 
     $('#navbarTopBurger').on('click', function() {
         var $this = $(this);
@@ -67,6 +56,37 @@ $(document).on('ready', function () {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     $(window).on('scroll', function () {
         var _scaleY = $(document).scrollTop();
 
@@ -89,7 +109,6 @@ $(document).on('ready', function () {
 });
 
 $(window).on('load', function () {
-    console.log('LOADED GLOBAL : ', Date());
 
     animaScroll(0);
 

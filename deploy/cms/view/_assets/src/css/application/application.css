@@ -157,13 +157,16 @@ body {
 
 
 
-#severalAction {}
-#severalAction.blocked {
-    opacity: 0.5;
-    cursor: not-allowed;
+#severalAction {
+
 }
-    #severalAction .button {}
-        #severalAction .button i {}
+    #severalAction .button.blocked {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+        #severalAction .button i {
+
+        }
 
 
 
@@ -431,6 +434,10 @@ body {
 
 
 
+table.is-loading {
+    opacity: 0.5;
+    cursor: wait;
+}
 table tr.odd {
     background-color: #F5F5F5 !important;
 }

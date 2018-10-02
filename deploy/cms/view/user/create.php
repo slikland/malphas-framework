@@ -10,11 +10,11 @@
             inc('_common/sidebar.php');
         ?>
         <div id="wrap" class="transitions">
-
-            <!-- VIEW DASHBOARD -->
+            <!-- VIEW USER CREATE EDIT -->
             <section id="userCreate" class="section page-content">
                 <div class="container is-fluid">
 
+                    <!-- REFACTORY TEMPLATE -->
                     <div class="header">
                         <nav class="breadcrumb has-arrow-separator is-small" aria-label="breadcrumbs">
                             <ul>
@@ -32,14 +32,21 @@
                         </h2>
                         <hr>
                     </div>
+                    <!-- REFACTORY TEMPLATE -->
 
                     <div class="box">
-                        <?php if(empty($user)) : ?>
-                        <form id="formUserCreate" action="javascript:void(0);" data-action="<?php echo baseUrl('user/insert'); ?>" method="POST">
-                        <?php else : ?>
-                        <form id="formUserCreate" action="javascript:void(0);" data-action="<?php echo baseUrl('user/update/' . $user['id']); ?>" method="POST">
-                        <?php endif; ?>
 
+                        <!-- FORM SUBMIT -->
+                        <form id="formSubmit"
+                              action="javascript:void(0);"
+                              data-action="<?php if(empty($user)) {
+                                  echo baseUrl('user/insert');
+                              } else {
+                                  echo baseUrl('user/update/' . $user['id']);
+                              } ?>"
+                              method="POST">
+
+                            <!-- INPUT -->
                             <div class="field is-horizontal">
                                 <div class="field-label is-medium">
                                     <label class="label">Nome Completo</label>
@@ -47,24 +54,31 @@
                                 <div class="field-body">
                                     <div class="field">
                                         <div class="control has-icons-left has-icons-right">
-                                            <input id="userName" name="name" class="input is-medium" type="text" placeholder=". . ."
-                                                   value="<?php echo !empty($user['name']) ? $user['name'] : ''; ?>" required>
+                                            <input id="userName"
+                                                   name="name"
+                                                   class="input is-medium"
+                                                   type="text"
+                                                   placeholder=". . ."
+                                                   value="<?php echo !empty($user['name']) ? $user['name'] : ''; ?>">
+
                                             <span class="icon is-medium is-left">
-                                            <i class="fa fa-address-card"></i>
-                                        </span>
+                                                <i class="fa fa-address-card"></i>
+                                            </span>
+
                                             <span class="icon is-medium is-right icon-success" style="display: none;">
-                                            <i class="fa fa-check"></i>
-                                        </span>
+                                                <i class="fa fa-check"></i>
+                                            </span>
                                             <span class="icon is-medium is-right icon-error" style="display: none;">
-                                            <i class="fa fa-times"></i>
-                                        </span>
+                                                <i class="fa fa-times"></i>
+                                            </span>
                                         </div>
+                                        <p class="help is-danger">This email is invalid</p>
                                     </div>
                                 </div>
                             </div>
 
 
-
+                            <!-- INPUT -->
                             <div class="field is-horizontal">
                                 <div class="field-label is-medium">
                                     <label class="label">E-mail</label>
@@ -72,22 +86,30 @@
                                 <div class="field-body">
                                     <div class="field">
                                         <div class="control has-icons-left has-icons-right">
-                                            <input id="userEmail" name="email" class="input is-medium" type="email" placeholder=". . ."
-                                                   value="<?php echo !empty($user['email']) ? $user['email'] : ''; ?>" required>
+                                            <input id="userEmail"
+                                                   name="email"
+                                                   class="input is-medium"
+                                                   type="text"
+                                                   placeholder=". . ."
+                                                   value="<?php echo !empty($user['email']) ? $user['email'] : ''; ?>">
+
                                             <span class="icon is-medium is-left">
-                                            <i class="fa fa-envelope"></i>
-                                        </span>
-                                            <span class="icon is-medium is-right icon-success" style="display: none;">
-                                            <i class="fa fa-check"></i>
-                                        </span>
-                                            <span class="icon is-medium is-right icon-error" style="display: none;">
-                                            <i class="fa fa-times"></i>
-                                        </span>
+                                                <i class="fa fa-envelope"></i>
+                                            </span>
+                                                <span class="icon is-medium is-right icon-success" style="display: none;">
+                                                <i class="fa fa-check"></i>
+                                            </span>
+                                                <span class="icon is-medium is-right icon-error" style="display: none;">
+                                                <i class="fa fa-times"></i>
+                                            </span>
                                         </div>
+                                        <p class="help is-danger">This email is invalid</p>
                                     </div>
                                 </div>
                             </div>
 
+
+                            <!-- INPUT -->
                             <div class="field is-horizontal">
                                 <div class="field-label is-medium">
                                     <label class="label">Permissão</label>
@@ -96,10 +118,9 @@
 
                                     <div class="field">
                                         <div class="control has-icons-left">
-
                                             <?php if(!empty($roles)) : ?>
                                             <div class="select is-medium is-fullwidth">
-                                                <select id="userPermissions" name="cms_role_id" type="select" required>
+                                                <select id="userPermissions" name="cms_role_id" type="select">
                                                     <option value="">Escolha a Permissão</option>
                                                     <?php foreach ($roles as $value) : ?>
                                                     <option value="<?php echo $value['id']; ?>" <?php if(!empty($user) && $value['id'] == $user['cms_role_id']) { echo 'selected'; } ?>>
@@ -112,17 +133,15 @@
                                                 <i class="fa fa-key"></i>
                                             </span>
                                             <?php endif; ?>
-
                                         </div>
+                                        <p class="help is-danger">This email is invalid</p>
                                     </div>
 
                                 </div>
                             </div>
 
 
-
-
-
+                            <!-- INPUT -->
                             <div class="field is-horizontal">
                                 <div class="field-label is-medium">
                                     <label class="label">Senha</label>
@@ -130,31 +149,45 @@
                                 <div class="field-body">
                                     <div class="field">
                                         <div class="control has-icons-left has-icons-right">
-                                            <input id="userPassword" name="password" class="input is-medium" type="password" placeholder="Minimo de 8 caracteres" <?php echo empty($user) ? 'required' : ''; ?>>
+                                            <input id="userPassword"
+                                                   name="password"
+                                                   class="input is-medium"
+                                                   type="password"
+                                                   placeholder="Minimo de 8 caracteres"
+                                                   <?php echo empty($user) ? '' : ''; ?>>
+
                                             <span class="icon is-medium is-left">
-                                            <i class="fa fa-lock"></i>
-                                        </span>
+                                                <i class="fa fa-lock"></i>
+                                            </span>
                                             <span class="icon is-medium is-right icon-success" style="display: none;">
-                                            <i class="fa fa-check"></i>
-                                        </span>
+                                                <i class="fa fa-check"></i>
+                                            </span>
                                             <span class="icon is-medium is-right icon-error" style="display: none;">
-                                            <i class="fa fa-times"></i>
-                                        </span>
+                                                <i class="fa fa-times"></i>
+                                            </span>
                                         </div>
+                                        <p class="help is-danger">This email is invalid</p>
                                     </div>
                                     <div class="field">
                                         <div class="control has-icons-left has-icons-right">
-                                            <input id="userConfirmPassword" name="password_confirm" class="input is-medium" type="password" placeholder="Repetir Senha" <?php echo empty($user) ? 'required' : ''; ?>>
+                                            <input id="userConfirmPassword"
+                                                   name="password_confirm"
+                                                   class="input is-medium"
+                                                   type="password"
+                                                   placeholder="Repetir Senha"
+                                                   <?php echo empty($user) ? '' : ''; ?>>
+
                                             <span class="icon is-medium is-left">
-                                            <i class="fa fa-lock"></i>
-                                        </span>
+                                                <i class="fa fa-lock"></i>
+                                            </span>
                                             <span class="icon is-medium is-right icon-success" style="display: none;">
-                                            <i class="fa fa-check"></i>
-                                        </span>
+                                                <i class="fa fa-check"></i>
+                                            </span>
                                             <span class="icon is-medium is-right icon-error" style="display: none;">
-                                            <i class="fa fa-times"></i>
-                                        </span>
+                                                <i class="fa fa-times"></i>
+                                            </span>
                                         </div>
+                                        <p class="help is-danger">This email is invalid</p>
                                     </div>
                                     <div class="field">
                                         <div class="control">
@@ -166,6 +199,8 @@
                                 </div>
                             </div>
 
+
+                            <!-- INPUT -->
                             <div class="field is-horizontal" style="margin-top: 30px;">
                                 <div class="field-label">
                                     <!-- Left empty for spacing -->
@@ -176,7 +211,7 @@
                                             <a class="button is-medium" href="<?php echo baseUrl('user/'); ?>">
                                                 CANCELAR
                                             </a>
-                                            <button id="formSubmit" class="button is-medium is-dark">
+                                            <button id="formSubmit" class="button is-submit is-medium is-dark">
                                                 <?php echo empty($user) ? 'CRIAR NOVO USUÁRIO' : 'EDITAR USUÁRIO'; ?>
                                             </button>
                                         </div>
@@ -185,17 +220,15 @@
                             </div>
 
                         </form>
+                        <!-- FORM SUBMIT -->
 
                     </div>
-
                 </div>
             </section>
-            <!-- VIEW DASHBOARD -->
-
+            <!-- VIEW USER CREATE EDIT -->
 
             <?php inc('_common/footer.php'); ?>
         </div>
-
         <?php inc('_common/content-after.php'); ?>
     </body>
 </html>
