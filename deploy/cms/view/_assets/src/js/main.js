@@ -56,6 +56,8 @@ var randomPassword = function(length) {
     return pass;
 };
 
+
+
 /**
  * CREATE JQUERY FUNCTION
  * FOR CSS LIB ANIMATE.CSS
@@ -93,42 +95,21 @@ $.fn.extend({
  **/
 $.fn.extend({
 
-
-    /**
-     * AUTH FORMULARIO DE
-     * LOGIN E ESQUECI A SENHA
-     **/
     formSubmitAuth : function(beforeSend, success, error, complete) {
-
         this.on('submit', function () {
-
             if($(this).cmsFormValidate()) {
-
                 $(this).cmsFormAjaxSend(beforeSend, success, error, complete);
-
             }
-
         });
-
     },
 
-
-    /**
-     * AUTH FORMULARIO DE
-     * LOGIN E ESQUECI A SENHA
-     **/
-    formSubmitGeneral : function(beforeSend, success, error, complete) {
-
+    formSubmitGeneral : function(options) {
+        if(options === undefined) {
+            options = {};
+        }
         this.on('submit', function () {
-
-            if($(this).cmsFormValidate()) {
-
-                $(this).cmsFormAjaxSend(beforeSend, success, error, complete);
-
-            }
-
+            $(this).formAjaxCmsValidation(options);
         });
-
     },
 
 
@@ -136,10 +117,301 @@ $.fn.extend({
 
 
 
+
+    formAjaxCmsValidation : function (options) {
+        var $form = this;
+        var $submit = this.find('button.is-submit');
+        var _methods = {
+            getPath : function ($form) {
+                if(!$form.attr('data-action').length) {
+                    return swal({
+                        title: 'Ops!',
+                        text: 'Action do formulário não foi definida.',
+                        type: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                }
+                return $form.attr('data-action');
+            },
+            getMethod : function ($form) {
+                if(!$form.attr('method').length) {
+                    return swal({
+                        title: 'Ops!',
+                        text: 'Method do formulário não foi definida.',
+                        type: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                }
+                return $form.attr('method');
+            }
+        };
+
+        if($form.hasClass('sending')) {
+            return false;
+        }
+
+        $.ajax({
+            url : _methods.getPath($form),
+            method : _methods.getMethod($form),
+            data : $form.serializeArray(),
+            beforeSend : function() {
+                $form.addClass('sending');
+                $submit.addClass('is-loading');
+                if (typeof options.beforeSend === 'function') {
+                    options.beforeSend();
+                }
+            },
+            success : function(response) {
+                if (typeof options.success === 'function') {
+                    options.success(response);
+                } else {
+
+                    if(response.error !== undefined) {
+                        return swal({
+                            title: 'Ops!',
+                            text: response.message,
+                            type: 'error',
+                            confirmButtonText: 'Okay'
+                        });
+                    }
+
+                    if(response === true) {
+                        swal({
+                            title: 'Sucesso',
+                            text: 'Salvo com sucesso.',
+                            type: 'success',
+                            confirmButtonText: 'Okay'
+                        }).then(function(result) {
+                            //window.location.href = baseUrl+'user/';
+                        });
+                    } else {
+                        $form.responseCmsValidation();
+                    }
+
+                }
+            },
+            error : function() {
+                if (typeof options.error === 'function') {
+                    options.error();
+                } else {
+                    swal({
+                        title: 'Ops!',
+                        text: 'Erro no servidor, tente novamente daqui alguns minutos.',
+                        type: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                }
+            },
+            complete : function() {
+                $form.removeClass('sending');
+                $submit.removeClass('is-loading');
+                if (typeof options.complete === 'function') {
+                    options.complete();
+                }
+            }
+        });
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    cmsFormAjaxSend : function (beforeSend, success, error, complete) {
+
+        var $form = this;
+        var $submit = this.find('button.is-submit');
+        var _methods = {
+
+            getPath : function ($form) {
+
+                if(!$form.attr('data-action').length) {
+                    return swal({
+                        title: 'Ops!',
+                        text: 'Action do formulário não foi definida.',
+                        type: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                }
+
+                return $form.attr('data-action');
+
+            },
+
+            getMethod : function ($form) {
+
+                if(!$form.attr('method').length) {
+                    return swal({
+                        title: 'Ops!',
+                        text: 'Method do formulário não foi definida.',
+                        type: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                }
+
+                return $form.attr('method');
+
+            },
+
+        };
+
+        // VALIDANDO SE JÁ FOI SUBMETIDO
+        if($form.hasClass('sending')) {
+            return false;
+        }
+
+        // ENVIANDO O REQUEST EM AJAX
+        $.ajax({
+            url : _methods.getPath($form),
+            method : _methods.getMethod($form),
+            data : $form.serializeArray(),
+            beforeSend : function() {
+                $form.addClass('sending');
+                $submit.addClass('is-loading');
+
+                if (typeof beforeSend === 'function') {
+                    beforeSend();
+                }
+            },
+            success : function(response) {
+                if (typeof success === 'function') {
+                    success(response);
+                }
+            },
+            error : function() {
+
+                if (typeof error === 'function') {
+                    error();
+                } else {
+                    swal({
+                        title: 'Ops!',
+                        text: 'Erro no servidor, tente novamente daqui alguns minutos.',
+                        type: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                }
+            },
+            complete : function() {
+                $form.removeClass('sending');
+                $submit.removeClass('is-loading');
+
+                if (typeof complete === 'function') {
+                    complete();
+                }
+            },
+            statusCode : {
+                200 : function() {console.log('200');},
+                404 : function() {console.log('404');},
+                500 : function() {console.log('500');}
+            }
+        });
+
+    },
+
+
+
+    cmsAjaxDelete : function (path, beforeSend, success, error, complete) {
+
+        var $this = this;
+
+        if(!path.length) {
+            return swal({
+                title: 'Ops!',
+                text: 'Action do formulário não foi definida.',
+                type: 'error',
+                confirmButtonText: 'Okay'
+            });
+        }
+
+        // VALIDANDO SE JÁ FOI SUBMETIDO
+        if($this.hasClass('sending')) {
+            return false;
+        }
+
+        // ENVIANDO O REQUEST EM AJAX
+        $.ajax({
+            url : path,
+            method : 'GET',
+            beforeSend : function() {
+                $this.addClass('sending is-loading');
+                if (typeof beforeSend === 'function') {
+                    beforeSend();
+                }
+            },
+            success : function(response) {
+                if (typeof success === 'function') {
+                    success(response);
+                }
+            },
+            error : function() {
+                if (typeof error === 'function') {
+                    error();
+                } else {
+                    swal({
+                        title: 'Ops!',
+                        text: 'Erro no servidor, tente novamente daqui alguns minutos.',
+                        type: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                }
+            },
+            complete : function() {
+                $this.removeClass('sending is-loading');
+
+                if (typeof complete === 'function') {
+                    complete();
+                }
+            },
+            statusCode : {
+                200 : function() {console.log('200');},
+                404 : function() {console.log('404');},
+                500 : function() {console.log('500');}
+            }
+        });
+
+
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /**
-     *
+     * VALIDATE JAVASCRIPT FRONT
      **/
-    cmsFormValidate : function () {
+    responseCmsValidation : function () {
 
         var $form = this;
         var validateAllInput = true;
@@ -320,163 +592,7 @@ $.fn.extend({
 
         return validateAllInput;
 
-    },
-    
-    
-
-    cmsFormAjaxSend : function (beforeSend, success, error, complete) {
-
-        var $form = this;
-        var $submit = this.find('button.is-submit');
-        var _methods = {
-
-            getPath : function ($form) {
-
-                if(!$form.attr('data-action').length) {
-                    return swal({
-                        title: 'Ops!',
-                        text: 'Action do formulário não foi definida.',
-                        type: 'error',
-                        confirmButtonText: 'Okay'
-                    });
-                }
-
-                return $form.attr('data-action');
-
-            },
-
-            getMethod : function ($form) {
-
-                if(!$form.attr('method').length) {
-                    return swal({
-                        title: 'Ops!',
-                        text: 'Method do formulário não foi definida.',
-                        type: 'error',
-                        confirmButtonText: 'Okay'
-                    });
-                }
-
-                return $form.attr('method');
-
-            },
-
-        };
-
-        // VALIDANDO SE JÁ FOI SUBMETIDO
-        if($form.hasClass('sending')) {
-            return false;
-        }
-
-        // ENVIANDO O REQUEST EM AJAX
-        $.ajax({
-            url : _methods.getPath($form),
-            method : _methods.getMethod($form),
-            data : $form.serializeArray(),
-            beforeSend : function() {
-                $form.addClass('sending');
-                $submit.addClass('is-loading');
-
-                if (typeof beforeSend === 'function') {
-                    beforeSend();
-                }
-            },
-            success : function(response) {
-                if (typeof success === 'function') {
-                    success(response);
-                }
-            },
-            error : function() {
-
-                if (typeof error === 'function') {
-                    error();
-                } else {
-                    swal({
-                        title: 'Ops!',
-                        text: 'Erro no servidor, tente novamente daqui alguns minutos.',
-                        type: 'error',
-                        confirmButtonText: 'Okay'
-                    });
-                }
-            },
-            complete : function() {
-                $form.removeClass('sending');
-                $submit.removeClass('is-loading');
-
-                if (typeof complete === 'function') {
-                    complete();
-                }
-            },
-            statusCode : {
-                200 : function() {console.log('200');},
-                404 : function() {console.log('404');},
-                500 : function() {console.log('500');}
-            }
-        });
-
-    },
-
-
-
-    cmsAjaxDelete : function (path, beforeSend, success, error, complete) {
-
-        var $this = this;
-
-        if(!path.length) {
-            return swal({
-                title: 'Ops!',
-                text: 'Action do formulário não foi definida.',
-                type: 'error',
-                confirmButtonText: 'Okay'
-            });
-        }
-
-        // VALIDANDO SE JÁ FOI SUBMETIDO
-        if($this.hasClass('sending')) {
-            return false;
-        }
-
-        // ENVIANDO O REQUEST EM AJAX
-        $.ajax({
-            url : path,
-            method : 'GET',
-            beforeSend : function() {
-                $this.addClass('sending is-loading');
-                if (typeof beforeSend === 'function') {
-                    beforeSend();
-                }
-            },
-            success : function(response) {
-                if (typeof success === 'function') {
-                    success(response);
-                }
-            },
-            error : function() {
-                if (typeof error === 'function') {
-                    error();
-                } else {
-                    swal({
-                        title: 'Ops!',
-                        text: 'Erro no servidor, tente novamente daqui alguns minutos.',
-                        type: 'error',
-                        confirmButtonText: 'Okay'
-                    });
-                }
-            },
-            complete : function() {
-                $this.removeClass('sending is-loading');
-
-                if (typeof complete === 'function') {
-                    complete();
-                }
-            },
-            statusCode : {
-                200 : function() {console.log('200');},
-                404 : function() {console.log('404');},
-                500 : function() {console.log('500');}
-            }
-        });
-
-
     }
-    
+
+
 });

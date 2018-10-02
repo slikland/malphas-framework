@@ -51,29 +51,5 @@ $(document).on('ready', function () {
     });
 
 
-    $('#formRoleCreate').formSubmitGeneral(
-        '',
-        function (response) {
-
-            if(response === true) {
-                swal({
-                    title: 'Sucesso',
-                    text: response.message,
-                    type: 'success',
-                    confirmButtonText: 'Okay'
-                }).then(function(result) {
-                    window.location.href = baseUrl+'role/';
-                });
-            } else {
-                swal({
-                    title: 'Ops!',
-                    text: response.message,
-                    type: 'error',
-                    confirmButtonText: 'Okay'
-                });
-            }
-
-        }
-    );
 
 });

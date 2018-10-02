@@ -15,6 +15,7 @@
         <section id="role" class="section page-content">
             <div class="container is-fluid">
 
+                <!-- REFACTORY TEMPLATE -->
                 <div class="header">
                     <nav class="breadcrumb has-arrow-separator is-small" aria-label="breadcrumbs">
                         <ul>
@@ -32,16 +33,24 @@
                     </h2>
                     <hr>
                 </div>
+                <!-- REFACTORY TEMPLATE -->
 
                 <?php if(!empty($roles)) : ?>
                     <div class="columns">
                         <div class="column">
-                            <div class="select">
-                                <select>
-                                    <option>Ação em massa</option>
-                                    <option>Deletar</option>
-                                </select>
+
+                            <div id="severalAction" class="">
+                                <a id="severalActionSelectAllRows" class="button">
+                                    <i class="far fa-square"></i>
+                                </a>
+                                <a id="severalActionRefresh" class="button">
+                                    <i class="fas fa-sync-alt"></i>
+                                </a>
+                                <a id="severalActionDelete" class="button blocked">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
                             </div>
+
                         </div>
                         <div class="column has-text-right">
                             <a class="button is-dark" href="<?php echo baseUrl('role/create'); ?>">
@@ -69,9 +78,7 @@
                         <table class="table is-fullwidth">
                             <thead>
                                 <tr>
-                                    <th style="width: 20px;">
-                                        <input type="checkbox" name="">
-                                    </th>
+                                    <th style="width: 20px;"></th>
                                     <th>Nome</th>
                                     <th>Criado em :</th>
                                     <th>Atualizado em :</th>
@@ -82,9 +89,7 @@
 
                             <tfoot>
                                 <tr>
-                                    <th>
-                                        <input type="checkbox" name="">
-                                    </th>
+                                    <th></th>
                                     <th>Nome</th>
                                     <th>Criado em :</th>
                                     <th>Atualizado em :</th>
@@ -97,7 +102,7 @@
                                 <tr>
                                     <th>
                                         <label class="label">
-                                            <input type="checkbox" name="">
+                                            <input class="select-this-row" type="checkbox" name="id[]" value="<?php echo $value['id']; ?>">
                                         </label>
                                     </th>
                                     <th><?php echo $value['name']; ?></th>

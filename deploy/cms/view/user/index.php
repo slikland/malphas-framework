@@ -37,13 +37,15 @@
                     <div class="columns">
                         <div class="column">
 
-                            <div id="severalAction" class="blocked">
-                                <a class="button">
-                                    <i class="fas fa-trash-alt"></i>
+                            <div id="severalAction" class="">
+                                <a id="severalActionSelectAllRows" class="button">
+                                    <i class="far fa-square"></i>
                                 </a>
-
-                                <a class="button">
+                                <a id="severalActionRefresh" class="button">
                                     <i class="fas fa-sync-alt"></i>
+                                </a>
+                                <a id="severalActionDelete" class="button blocked">
+                                    <i class="fas fa-trash-alt"></i>
                                 </a>
                             </div>
 
@@ -74,11 +76,7 @@
                         <table class="table is-fullwidth">
                             <thead>
                                 <tr>
-                                    <th style="width: 20px;">
-                                        <label class="label">
-                                            <input id="selectAllRows" class="" type="checkbox">
-                                        </label>
-                                    </th>
+                                    <th style="width: 20px;"></th>
                                     <th>Nome</th>
                                     <th>E-mail</th>
                                     <th>Permissão</th>
@@ -90,9 +88,7 @@
 
                             <tfoot>
                                 <tr>
-                                    <th>
-                                        <input type="checkbox" name="">
-                                    </th>
+                                    <th></th>
                                     <th>Nome</th>
                                     <th>E-mail</th>
                                     <th>Permissão</th>

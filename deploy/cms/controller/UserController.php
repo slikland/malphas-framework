@@ -61,7 +61,6 @@ class UserController extends Controller
     public function insert()
     {
         $filteredData = Filter::vetor($this->model->fillable, $_POST);
-
         $insert = $this->model->insert($filteredData);
         $response = parent::parseResponse($insert);
 
@@ -83,7 +82,6 @@ class UserController extends Controller
     public function update($id)
     {
         $filteredData = Filter::vetor($this->model->fillable, $_POST);
-
         $update = $this->model->update($id, $filteredData);
         $response = parent::parseResponse($update);
 
