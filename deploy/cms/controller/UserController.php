@@ -10,6 +10,13 @@ class UserController extends Controller
     private $model;
 
     public $validation = [
+        'name' => [
+            'Data' => [
+                'required',
+                ['min' => 3],
+                ['max' => 255]
+            ]
+        ],
         'email' => [
             'Email' => 'isValid',
             'Data'  => [
@@ -18,18 +25,16 @@ class UserController extends Controller
                 'unique'
             ]
         ],
-        'name' => [
-            'Data' => [
-                'required',
-                ['min' => 3],
-                ['max' => 255],
-                'unique'
-            ]
-        ],
         'password' => [
             'Data'  => [
                 'required',
                 ['min' => 6]
+            ]
+        ],
+        'cms_role_id' => [
+            'Data' => [
+                'required',
+                'isInt'
             ]
         ]
     ];

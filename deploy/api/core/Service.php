@@ -99,6 +99,7 @@ class Service
     public static function execute($service, $method, $parameters = false)
     {
         $instance = self::load($service);
+        self::validate($instance);
 
         if($method && $parameters) {
             $instance->{$method}($parameters);
@@ -127,4 +128,8 @@ class Service
         return $name;
     }
 
+    private static function validate($instance)
+    {
+        Validate::this($instance);
+    }
 }
