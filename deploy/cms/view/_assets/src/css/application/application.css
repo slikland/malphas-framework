@@ -356,13 +356,6 @@ body {
 
 
 
-
-
-
-
-
-
-
 .navbar-item {}
 .navbar-item i.fa {
     margin-right: 8px;
@@ -376,6 +369,85 @@ body {
 .icon-error {
     color: #DD0000 !important;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* ==========
+   FORM CRUD
+============= */
+.form-crud {
+    position: relative;
+}
+.form-crud.is-form-create {}
+
+.form-crud .help {
+    display: none;
+}
+.form-crud .help span {
+    display: block;
+}
+.form-crud .help.is-danger {}
+
+
+
+
+
+
+
+/* ===============
+   TABLE CONTENT
+================= */
+#tableContent {}
+    #tableContent thead {}
+        #tableContent thead tr {}
+            #tableContent thead tr th.first {
+                background: none;
+                width: 30px !important;
+            }
+            #tableContent thead tr th.last {
+                width: 100px !important;
+            }
+
+    #tableContent tbody {}
+        #tableContent tbody tr {}
+            #tableContent tbody tr th {}
+                #tableContent tbody tr th .label {
+                    display: block;
+                    width: 35px;
+                    height: 35px;
+                    text-align: center;
+                    line-height: 30px;
+                }
+                    #tableContent tbody tr th .table-content-select-this-row {}
+
+table.is-loading {
+    opacity: 0.5;
+    cursor: wait;
+}
+table tr.odd {
+    background-color: #F5F5F5 !important;
+}
+table tr.is-selected {
+    background-color: #333 !important;
+}
+
+
+
 
 
 
@@ -434,22 +506,7 @@ body {
 
 
 
-table.is-loading {
-    opacity: 0.5;
-    cursor: wait;
-}
-table tr.odd {
-    background-color: #F5F5F5 !important;
-}
-table tr.is-selected {
-    background-color: #333 !important;
-}
-table tr th .label {
-    text-align: center;
-    display: block;
-    height: 30px;
-    cursor: pointer;
-}
+
 
 
 

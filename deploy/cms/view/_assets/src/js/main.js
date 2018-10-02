@@ -91,9 +91,10 @@ $.fn.extend({
 
 
 /**
- * UTILS PLUGINS FOR CMS
+ * PLUGINS FOR CMS
  **/
 $.fn.extend({
+
 
     formSubmitAuth : function(beforeSend, success, error, complete) {
         this.on('submit', function () {
@@ -103,316 +104,185 @@ $.fn.extend({
         });
     },
 
-    formSubmitGeneral : function(options) {
+
+    formCrudAjax : function (options) {
         if(options === undefined) {
             options = {};
         }
+        this.find('input').first().focus();
         this.on('submit', function () {
-            $(this).formAjaxCmsValidation(options);
-        });
-    },
-
-
-
-
-
-
-
-    formAjaxCmsValidation : function (options) {
-        var $form = this;
-        var $submit = this.find('button.is-submit');
-        var _methods = {
-            getPath : function ($form) {
-                if(!$form.attr('data-action').length) {
-                    return swal({
-                        title: 'Ops!',
-                        text: 'Action do formulário não foi definida.',
-                        type: 'error',
-                        confirmButtonText: 'Okay'
-                    });
-                }
-                return $form.attr('data-action');
-            },
-            getMethod : function ($form) {
-                if(!$form.attr('method').length) {
-                    return swal({
-                        title: 'Ops!',
-                        text: 'Method do formulário não foi definida.',
-                        type: 'error',
-                        confirmButtonText: 'Okay'
-                    });
-                }
-                return $form.attr('method');
-            }
-        };
-
-        if($form.hasClass('sending')) {
-            return false;
-        }
-
-        $.ajax({
-            url : _methods.getPath($form),
-            method : _methods.getMethod($form),
-            data : $form.serializeArray(),
-            beforeSend : function() {
-                $form.addClass('sending');
-                $submit.addClass('is-loading');
-                if (typeof options.beforeSend === 'function') {
-                    options.beforeSend();
-                }
-            },
-            success : function(response) {
-                if (typeof options.success === 'function') {
-                    options.success(response);
-                } else {
-
-                    if(response.error !== undefined) {
+            var $form = $(this);
+            var $submit = $form.find('button.is-form-submit');
+            var _methods = {
+                getPath : function ($element) {
+                    if(!$element.attr('data-action').length) {
                         return swal({
                             title: 'Ops!',
-                            text: response.message,
+                            text: 'Action do formulário não foi definida.',
                             type: 'error',
                             confirmButtonText: 'Okay'
                         });
                     }
-
-                    if(response === true) {
-                        swal({
-                            title: 'Sucesso',
-                            text: 'Salvo com sucesso.',
-                            type: 'success',
+                    return $element.attr('data-action');
+                },
+                getMethod : function ($element) {
+                    if(!$element.attr('method').length) {
+                        return swal({
+                            title: 'Ops!',
+                            text: 'Method do formulário não foi definida.',
+                            type: 'error',
                             confirmButtonText: 'Okay'
-                        }).then(function(result) {
-                            //window.location.href = baseUrl+'user/';
                         });
-                    } else {
-                        $form.responseCmsValidation();
                     }
-
+                    return $element.attr('method');
                 }
-            },
-            error : function() {
-                if (typeof options.error === 'function') {
-                    options.error();
-                } else {
-                    swal({
-                        title: 'Ops!',
-                        text: 'Erro no servidor, tente novamente daqui alguns minutos.',
-                        type: 'error',
-                        confirmButtonText: 'Okay'
-                    });
-                }
-            },
-            complete : function() {
-                $form.removeClass('sending');
-                $submit.removeClass('is-loading');
-                if (typeof options.complete === 'function') {
-                    options.complete();
-                }
+            };
+            if($form.hasClass('sending')) {
+                return false;
             }
-        });
-    },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    cmsFormAjaxSend : function (beforeSend, success, error, complete) {
-
-        var $form = this;
-        var $submit = this.find('button.is-submit');
-        var _methods = {
-
-            getPath : function ($form) {
-
-                if(!$form.attr('data-action').length) {
-                    return swal({
-                        title: 'Ops!',
-                        text: 'Action do formulário não foi definida.',
-                        type: 'error',
-                        confirmButtonText: 'Okay'
-                    });
+            $.ajax({
+                url : _methods.getPath($form),
+                method : _methods.getMethod($form),
+                data : $form.serializeArray(),
+                beforeSend : function() {
+                    $form.addClass('sending');
+                    $form.find('.is-danger').removeClass('is-danger');
+                    $form.find('.is-success').removeClass('is-success');
+                    $form.find('.icon-error').hide();
+                    $form.find('.icon-success').hide();
+                    $form.find('.help').slideUp(200);
+                    $submit.addClass('is-loading');
+                    if (typeof options.beforeSend === 'function') {
+                        options.beforeSend();
+                    }
+                },
+                success : function(response) {
+                    if (typeof options.success === 'function') {
+                        options.success(response);
+                    } else {
+                        if(response.error !== undefined) {
+                            return swal({
+                                title: 'Ops!',
+                                text: response.message,
+                                type: 'error',
+                                confirmButtonText: 'Okay'
+                            });
+                        }
+                        if(response === true) {
+                            return swal({
+                                title: 'Sucesso',
+                                text: 'Salvo com sucesso.',
+                                type: 'success',
+                                confirmButtonText: 'Okay'
+                            }).then(function(result) {
+                                if($form.attr('data-redirect').length) {
+                                    window.location.href = $form.attr('data-redirect');
+                                } else {
+                                    window.location.reload();
+                                }
+                            });
+                        } else {
+                            $form.formCrudValidation(response);
+                        }
+                    }
+                },
+                error : function() {
+                    if (typeof options.error === 'function') {
+                        options.error();
+                    } else {
+                        return swal({
+                            title: 'Ops!',
+                            text: 'Erro no servidor, tente novamente daqui alguns minutos.',
+                            type: 'error',
+                            confirmButtonText: 'Okay'
+                        });
+                    }
+                },
+                complete : function() {
+                    $form.removeClass('sending');
+                    $submit.removeClass('is-loading');
+                    if (typeof options.complete === 'function') {
+                        options.complete();
+                    }
                 }
-
-                return $form.attr('data-action');
-
-            },
-
-            getMethod : function ($form) {
-
-                if(!$form.attr('method').length) {
-                    return swal({
-                        title: 'Ops!',
-                        text: 'Method do formulário não foi definida.',
-                        type: 'error',
-                        confirmButtonText: 'Okay'
-                    });
-                }
-
-                return $form.attr('method');
-
-            },
-
-        };
-
-        // VALIDANDO SE JÁ FOI SUBMETIDO
-        if($form.hasClass('sending')) {
-            return false;
-        }
-
-        // ENVIANDO O REQUEST EM AJAX
-        $.ajax({
-            url : _methods.getPath($form),
-            method : _methods.getMethod($form),
-            data : $form.serializeArray(),
-            beforeSend : function() {
-                $form.addClass('sending');
-                $submit.addClass('is-loading');
-
-                if (typeof beforeSend === 'function') {
-                    beforeSend();
-                }
-            },
-            success : function(response) {
-                if (typeof success === 'function') {
-                    success(response);
-                }
-            },
-            error : function() {
-
-                if (typeof error === 'function') {
-                    error();
-                } else {
-                    swal({
-                        title: 'Ops!',
-                        text: 'Erro no servidor, tente novamente daqui alguns minutos.',
-                        type: 'error',
-                        confirmButtonText: 'Okay'
-                    });
-                }
-            },
-            complete : function() {
-                $form.removeClass('sending');
-                $submit.removeClass('is-loading');
-
-                if (typeof complete === 'function') {
-                    complete();
-                }
-            },
-            statusCode : {
-                200 : function() {console.log('200');},
-                404 : function() {console.log('404');},
-                500 : function() {console.log('500');}
-            }
-        });
-
-    },
-
-
-
-    cmsAjaxDelete : function (path, beforeSend, success, error, complete) {
-
-        var $this = this;
-
-        if(!path.length) {
-            return swal({
-                title: 'Ops!',
-                text: 'Action do formulário não foi definida.',
-                type: 'error',
-                confirmButtonText: 'Okay'
             });
-        }
-
-        // VALIDANDO SE JÁ FOI SUBMETIDO
-        if($this.hasClass('sending')) {
-            return false;
-        }
-
-        // ENVIANDO O REQUEST EM AJAX
-        $.ajax({
-            url : path,
-            method : 'GET',
-            beforeSend : function() {
-                $this.addClass('sending is-loading');
-                if (typeof beforeSend === 'function') {
-                    beforeSend();
-                }
-            },
-            success : function(response) {
-                if (typeof success === 'function') {
-                    success(response);
-                }
-            },
-            error : function() {
-                if (typeof error === 'function') {
-                    error();
-                } else {
-                    swal({
-                        title: 'Ops!',
-                        text: 'Erro no servidor, tente novamente daqui alguns minutos.',
-                        type: 'error',
-                        confirmButtonText: 'Okay'
-                    });
-                }
-            },
-            complete : function() {
-                $this.removeClass('sending is-loading');
-
-                if (typeof complete === 'function') {
-                    complete();
-                }
-            },
-            statusCode : {
-                200 : function() {console.log('200');},
-                404 : function() {console.log('404');},
-                500 : function() {console.log('500');}
-            }
         });
-
-
     },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
     /**
      * VALIDATE JAVASCRIPT FRONT
      **/
-    responseCmsValidation : function () {
+    formCrudValidation : function (response) {
+        var $form = this;
 
+        var _i = 0;
+        for(var key in response) {
+            var $thisInput = $form.find('[name="'+key+'"]');
+
+            if(_i === 0) {
+                $thisInput.focus();
+            }
+            _i++;
+
+            $form.animateCss('shake');
+
+            var _html = '';
+            for(var i = 0; i < response[key].length; i++) {
+                _html += '<span><i class="fas fa-exclamation-circle"></i> '+response[key][i]+'</span>';
+            }
+
+            switch ($thisInput[0].localName) {
+
+                case 'input':
+                    $thisInput.addClass('is-danger');
+                    $thisInput.parent().find('.icon-error').show();
+                    $thisInput.parent()
+                        .parent()
+                        .find('.help')
+                        .addClass('is-danger')
+                        .html(_html)
+                        .slideDown(200);
+
+                    break;
+
+                case 'select':
+                    $thisInput.parent().addClass('is-danger');
+                    $thisInput.parent()
+                        .parent()
+                        .parent()
+                        .find('.help')
+                        .addClass('is-danger')
+                        .html(_html)
+                        .slideDown(200);
+
+                    break;
+
+                case 'textarea':
+                    break;
+            }
+
+        }
+    },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    cmsFormValidate : function() {
         var $form = this;
         var validateAllInput = true;
 
@@ -591,8 +461,163 @@ $.fn.extend({
         });
 
         return validateAllInput;
+    },
+    cmsFormAjaxSend : function (beforeSend, success, error, complete) {
 
-    }
+        var $form = this;
+        var $submit = this.find('button.is-submit');
+        var _methods = {
+
+            getPath : function ($form) {
+
+                if(!$form.attr('data-action').length) {
+                    return swal({
+                        title: 'Ops!',
+                        text: 'Action do formulário não foi definida.',
+                        type: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                }
+
+                return $form.attr('data-action');
+
+            },
+
+            getMethod : function ($form) {
+
+                if(!$form.attr('method').length) {
+                    return swal({
+                        title: 'Ops!',
+                        text: 'Method do formulário não foi definida.',
+                        type: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                }
+
+                return $form.attr('method');
+
+            },
+
+        };
+
+        // VALIDANDO SE JÁ FOI SUBMETIDO
+        if($form.hasClass('sending')) {
+            return false;
+        }
+
+        // ENVIANDO O REQUEST EM AJAX
+        $.ajax({
+            url : _methods.getPath($form),
+            method : _methods.getMethod($form),
+            data : $form.serializeArray(),
+            beforeSend : function() {
+                $form.addClass('sending');
+                $submit.addClass('is-loading');
+
+                if (typeof beforeSend === 'function') {
+                    beforeSend();
+                }
+            },
+            success : function(response) {
+                if (typeof success === 'function') {
+                    success(response);
+                }
+            },
+            error : function() {
+
+                if (typeof error === 'function') {
+                    error();
+                } else {
+                    swal({
+                        title: 'Ops!',
+                        text: 'Erro no servidor, tente novamente daqui alguns minutos.',
+                        type: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                }
+            },
+            complete : function() {
+                $form.removeClass('sending');
+                $submit.removeClass('is-loading');
+
+                if (typeof complete === 'function') {
+                    complete();
+                }
+            },
+            statusCode : {
+                200 : function() {console.log('200');},
+                404 : function() {console.log('404');},
+                500 : function() {console.log('500');}
+            }
+        });
+
+    },
+
+
+
+    cmsAjaxDelete : function (path, beforeSend, success, error, complete) {
+
+        var $this = this;
+
+        if(!path.length) {
+            return swal({
+                title: 'Ops!',
+                text: 'Action do formulário não foi definida.',
+                type: 'error',
+                confirmButtonText: 'Okay'
+            });
+        }
+
+        // VALIDANDO SE JÁ FOI SUBMETIDO
+        if($this.hasClass('sending')) {
+            return false;
+        }
+
+        // ENVIANDO O REQUEST EM AJAX
+        $.ajax({
+            url : path,
+            method : 'GET',
+            beforeSend : function() {
+                $this.addClass('sending is-loading');
+                if (typeof beforeSend === 'function') {
+                    beforeSend();
+                }
+            },
+            success : function(response) {
+                if (typeof success === 'function') {
+                    success(response);
+                }
+            },
+            error : function() {
+                if (typeof error === 'function') {
+                    error();
+                } else {
+                    swal({
+                        title: 'Ops!',
+                        text: 'Erro no servidor, tente novamente daqui alguns minutos.',
+                        type: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                }
+            },
+            complete : function() {
+                $this.removeClass('sending is-loading');
+
+                if (typeof complete === 'function') {
+                    complete();
+                }
+            },
+            statusCode : {
+                200 : function() {console.log('200');},
+                404 : function() {console.log('404');},
+                500 : function() {console.log('500');}
+            }
+        });
+
+
+    },
+
+
 
 
 });

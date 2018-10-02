@@ -15,6 +15,8 @@
             <section id="user" class="section page-content">
                 <div class="container is-fluid">
 
+
+                    <!-- PRECISA SEPARAR EM TEMPLATE -->
                     <div class="header">
                         <nav class="breadcrumb has-arrow-separator is-small" aria-label="breadcrumbs">
                             <ul>
@@ -32,31 +34,36 @@
                         </h2>
                         <hr>
                     </div>
+                    <!-- PRECISA SEPARAR EM TEMPLATE -->
+
 
                     <?php if(!empty($users)) : ?>
-                    <div class="columns">
+                    <div id="actionTableContent" class="columns">
                         <div class="column">
 
                             <div id="severalAction" class="">
-                                <a id="severalActionSelectAllRows" class="button">
+                                <a id="actionTableContentSelectAllRows" class="button">
                                     <i class="far fa-square"></i>
                                 </a>
-                                <a id="severalActionRefresh" class="button">
+                                <a id="actionTableContentRefreshTable" class="button">
                                     <i class="fas fa-sync-alt"></i>
                                 </a>
-                                <a id="severalActionDelete" class="button blocked">
+                                <a id="actionTableContentDeleteSelectedRows" class="button blocked">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
                             </div>
 
                         </div>
                         <div class="column has-text-right">
-                            <a class="button is-dark" href="<?php echo baseUrl('user/create'); ?>">
+                            <a id="actionCreateNewRegister"
+                               class="button is-dark"
+                               href="<?php echo baseUrl('user/create'); ?>">
                                 <strong>CRIAR NOVO USUÁRIO</strong>
                             </a>
                         </div>
                     </div>
                     <?php endif; ?>
+
 
                     <div class="box">
 
@@ -66,23 +73,27 @@
                                 <strong class="is-size-4">Nenhum usuário cadastrado</strong>
                                 <br>
                                 <br>
-                                <a class="button is-primary is-medium" href="<?php echo baseUrl('user/create'); ?>">
+                                <a class="button is-primary is-medium"
+                                   href="<?php echo baseUrl('user/create'); ?>">
                                     <strong>CRIAR PRIMEIRO USUÁRIO</strong>
                                 </a>
                             </p>
                         </div>
                         <?php else : ?>
 
-                        <table class="table is-fullwidth">
+                        <table id="tableContent"
+                               class="table is-fullwidth"
+                               data-action="<?php echo baseUrl('user/'); ?>"
+                               data-redirect="<?php echo baseUrl('user/'); ?>">
                             <thead>
                                 <tr>
-                                    <th style="width: 20px;"></th>
+                                    <th class="first"></th>
                                     <th>Nome</th>
                                     <th>E-mail</th>
                                     <th>Permissão</th>
                                     <th>Criado em :</th>
                                     <th>Atualizado em :</th>
-                                    <th style="width: 130px;">Ação</th>
+                                    <th class="last">Ação</th>
                                 </tr>
                             </thead>
 
@@ -103,7 +114,10 @@
                                 <tr>
                                     <th>
                                         <label class="label">
-                                            <input class="select-this-row" type="checkbox" name="id[]" value="<?php echo $value['id']; ?>">
+                                            <input class="table-content-select-this-row"
+                                                   type="checkbox"
+                                                   name="id[]"
+                                                   value="<?php echo $value['id']; ?>">
                                         </label>
                                     </th>
                                     <th><?php echo $value['name']; ?></th>
@@ -114,10 +128,10 @@
                                     <th><?php echo dateFormatBR($value['created_at']); ?></th>
                                     <th><?php echo dateFormatBR($value['updated_at']); ?></th>
                                     <th>
-                                        <a class="edit-user button is-warning" href="<?php echo baseUrl("user/edit/{$value['id']}"); ?>">
+                                        <a class="button is-warning" href="<?php echo baseUrl("user/edit/{$value['id']}"); ?>">
                                             <i class="fa fa-edit"></i>
                                         </a>
-                                        <a class="delete-user button is-danger" href="<?php echo baseUrl("user/delete/{$value['id']}"); ?>">
+                                        <a class="delete-this-register button is-danger" href="<?php echo baseUrl("user/delete/{$value['id']}"); ?>">
                                             <i class="fa fa-times"></i>
                                         </a>
                                     </th>

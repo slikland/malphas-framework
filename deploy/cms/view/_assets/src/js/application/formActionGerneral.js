@@ -1,93 +1,166 @@
 $(document).on('ready', function () {
 
 
-    if($('#formSubmit').length) {
-        $('#formSubmit').formSubmitGeneral();
+    /*
+    * FORM CRUD AJAX GERAL
+    * VALIDAÇÃO, ENVIO E RETORNO
+    */
+    if($('#formCrudAjax').length) {
+        $('#formCrudAjax').formCrudAjax();
+    }
+
+
+    /*
+    * AÇÕES EM MASSA PARA
+    * TABELA DE VISUALIZAR DADOS
+    */
+    if($('#actionTableContent').length) {
+
+        var $tableContent = $('#tableContent');
+
+        $('#actionTableContentSelectAllRows').on('click', function () {
+            if($('.table-content-select-this-row:not(:checked)').length) {
+                $('.table-content-select-this-row:not(:checked)').each(function (index, element) {
+                    $(element).trigger('click');
+                });
+            } else {
+                $('.table-content-select-this-row').each(function (index, element) {
+                    $(element).trigger('click');
+                });
+            }
+        });
+
+        $('#actionTableContentRefreshTable').on('click', function () {
+            window.location.reload();
+        });
+
+        $('#actionTableContentDeleteSelectedRows').on('click', function () {
+            var $this = $(this);
+
+            if(!$this.hasClass('blocked')) {
+
+                swal({
+                    title: 'Deletar vários registros.',
+                    text: 'Tem certeza que deseja deletar (' + $('.table-content-select-this-row:checked').length + ') registros?',
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sim, deletar!'
+
+                }).then(function(result) {
+
+                    if (result.value) {
+
+                        console.log('DELETE VARIOS FAKING AJAX');
+
+                        $this.addClass('is-loading');
+                        $('.table').addClass('is-loading');
+
+                        var _ids = [];
+                        $('.table-content-select-this-row:checked').each(function (index, element) {
+                            _ids.push($(this).val());
+                        });
+
+                        console.log(_ids);
+
+                        setTimeout(function () {
+                            $this.removeClass('is-loading blocked');
+                            $('.table tr.is-selected').slideUp(200, function () {
+                                swal({
+                                    title: 'Sucesso',
+                                    text: '',
+                                    type: 'success',
+                                    confirmButtonText: 'Okay'
+                                }).then(function(result) {
+                                    console.log(result);
+                                    if(result.value) {
+                                        window.location.reload();
+                                    }
+                                });
+                            });
+
+                        }, 1500);
+                    }
+                });
+            }
+        });
     }
 
 
 
-
-    /*
-    * AÇÕES PARA TABELA DE LISTAGEM DOS DADOS
-    * MELHORAR DEPOIS
-    *
-    $('.select-this-row').each(function (index, element) {
+    $('.table-content-select-this-row').each(function (index, element) {
         var $this = $(element);
 
         $this.on('click', function() {
             $this.parent().parent().parent().toggleClass('is-selected');
-            if($('.select-this-row:checked').length) {
-                $('#severalActionDelete').removeClass('blocked');
-                $('#severalActionSelectAllRows i').attr('class', 'fas fa-check-square');
+
+            if($('.table-content-select-this-row:checked').length) {
+                $('#actionTableContentDeleteSelectedRows').removeClass('blocked');
+                $('#actionTableContentSelectAllRows i').attr('class', 'fas fa-check-square');
             } else {
-                $('#severalActionDelete').addClass('blocked');
-                $('#severalActionSelectAllRows i').attr('class', 'far fa-square');
+                $('#actionTableContentDeleteSelectedRows').addClass('blocked');
+                $('#actionTableContentSelectAllRows i').attr('class', 'far fa-square');
             }
         });
     });
 
-    $('#severalActionSelectAllRows').on('click', function () {
-
-        if($('.select-this-row:not(:checked)').length) {
-            $('.select-this-row:not(:checked)').each(function (index, element) {
-                $(element).trigger('click');
-            });
-        } else {
-            $('.select-this-row').each(function (index, element) {
-                $(element).trigger('click');
-            });
-        }
 
 
-    });
-    $('#severalActionRefresh').on('click', function () {
-        window.location.reload();
-    })
-    $('#severalActionDelete').on('click', function () {
-        var $this = $(this);
 
-        if(!$this.hasClass('blocked')) {
+    $('.delete-this-register').each(function(index, element) {
+        var $this = $(element);
+
+        $this.on('click', function() {
+
             swal({
-                title: 'Deletar vários usuários.',
-                text: 'Tem certeza que vai deletar (' + $('.select-this-row:checked').length + ') usuários?',
+                title: 'Deletar usuário.',
+                text: 'Tem certeza que deseja deletar esse registro?',
                 type: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
                 cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Sim, deletar!'
+
             }).then(function(result) {
                 if (result.value) {
-                    $this.addClass('is-loading');
-                    $('.table').addClass('is-loading');
 
-                    var _ids = [];
-                    $('.select-this-row:checked').each(function (index, element) {
-                        _ids.push($(this).val());
-                    });
+                    $this.cmsAjaxDelete(
+                        $this.attr('href'),
+                        '',
+                        function (response) {
+                            if(response === true) {
+                                swal({
+                                    title: 'Sucesso',
+                                    text: response.message,
+                                    type: 'success',
+                                    confirmButtonText: 'Okay'
+                                }).then(function(result) {
+                                    window.location.reload();
+                                });
+                            } else {
+                                swal({
+                                    title: 'Ops!',
+                                    text: response.message,
+                                    type: 'error',
+                                    confirmButtonText: 'Okay'
+                                });
+                            }
+                        }
+                    );
+                    //$this.parent().parent().hide(200);
 
-                    setTimeout(function () {
-                        $this.removeClass('is-loading blocked');
-                        $('.table tr.is-selected').slideUp(200, function () {
-                            swal({
-                                title: 'Sucesso',
-                                text: '',
-                                type: 'success',
-                                confirmButtonText: 'Okay'
-                            }).then(function(result) {
-                                window.location.href = baseUrl+'user/';
-                            });
-                        });
-
-                    }, 2000);
                 }
             });
-        }
+            return false;
+        });
+
     });
-    *
-    * AÇÕES PARA TABELA DE LISTAGEM DOS DADOS
-    * MELHORAR DEPOIS
-    */
+
+
+
+
+
 
 
 

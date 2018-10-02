@@ -37,10 +37,12 @@
                     <div class="box">
 
                         <!-- FORM SUBMIT -->
-                        <form id="formSubmit"
+                        <form id="formCrudAjax"
+                              class="form-crud is-form-create"
                               action="javascript:void(0);"
+                              data-redirect="<?php echo baseUrl('user'); ?>"
                               data-action="<?php if(empty($user)) {
-                                  echo baseUrl('user/insert');
+                                  echo baseUrl('user/insert/');
                               } else {
                                   echo baseUrl('user/update/' . $user['id']);
                               } ?>"
@@ -72,7 +74,7 @@
                                                 <i class="fa fa-times"></i>
                                             </span>
                                         </div>
-                                        <p class="help is-danger">This email is invalid</p>
+                                        <p class="help"></p>
                                     </div>
                                 </div>
                             </div>
@@ -103,7 +105,7 @@
                                                 <i class="fa fa-times"></i>
                                             </span>
                                         </div>
-                                        <p class="help is-danger">This email is invalid</p>
+                                        <p class="help"></p>
                                     </div>
                                 </div>
                             </div>
@@ -134,7 +136,8 @@
                                             </span>
                                             <?php endif; ?>
                                         </div>
-                                        <p class="help is-danger">This email is invalid</p>
+                                        <p class="help"></p>
+
                                     </div>
 
                                 </div>
@@ -153,7 +156,7 @@
                                                    name="password"
                                                    class="input is-medium"
                                                    type="password"
-                                                   placeholder="Minimo de 8 caracteres"
+                                                   placeholder="Minimo de 6 caracteres"
                                                    <?php echo empty($user) ? '' : ''; ?>>
 
                                             <span class="icon is-medium is-left">
@@ -166,7 +169,7 @@
                                                 <i class="fa fa-times"></i>
                                             </span>
                                         </div>
-                                        <p class="help is-danger">This email is invalid</p>
+                                        <p class="help"></p>
                                     </div>
                                     <div class="field">
                                         <div class="control has-icons-left has-icons-right">
@@ -187,7 +190,7 @@
                                                 <i class="fa fa-times"></i>
                                             </span>
                                         </div>
-                                        <p class="help is-danger">This email is invalid</p>
+                                        <p class="help is-danger"></p>
                                     </div>
                                     <div class="field">
                                         <div class="control">
@@ -211,7 +214,7 @@
                                             <a class="button is-medium" href="<?php echo baseUrl('user/'); ?>">
                                                 CANCELAR
                                             </a>
-                                            <button id="formSubmit" class="button is-submit is-medium is-dark">
+                                            <button id="formBtnSubmit" class="button is-form-submit is-medium is-dark">
                                                 <?php echo empty($user) ? 'CRIAR NOVO USUÁRIO' : 'EDITAR USUÁRIO'; ?>
                                             </button>
                                         </div>
