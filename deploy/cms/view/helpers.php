@@ -33,9 +33,8 @@ function dateFormatBR($databaseTimeStamp)
     $date = null;
 
     if(!empty($databaseTimeStamp)) {
-        $date = new \DateTime();
-        $date::createFromFormat('Y-m-d H:i:s', $databaseTimeStamp);
-        $date = $date->format('d/m/Y - H:s');
+        $date = DateTime::createFromFormat('Y-m-d H:i:s', $databaseTimeStamp);
+        $date = $date->format('d/m/Y - H:i');
     }
 
     return $date;
