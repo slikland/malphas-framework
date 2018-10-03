@@ -57,7 +57,7 @@ class Controller
             $instance->{$method}($parameters);
         } elseif ($method) {
             if(method_exists ($instance, $method)) {
-                $instance->{$method}();
+                $instance->{$method}($parameters);
             } else {
                 http_response_code(404);
                 echo "404";
