@@ -412,28 +412,109 @@ body {
 /* ===============
    TABLE CONTENT
 ================= */
-#tableContent {}
-    #tableContent thead {}
-        #tableContent thead tr {}
-            #tableContent thead tr th.first {
-                background: none;
-                width: 30px !important;
+#tableContent_wrapper {
+    position: relative;
+}
+    #tableContent_wrapper .dataTables_length,
+    #tableContent_wrapper .tableContent_filter {
+        margin-bottom: 20px;
+    }
+        #tableContent_wrapper .dataTables_length label,
+        #tableContent_wrapper .dataTables_filter label {
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+            #tableContent_wrapper .dataTables_filter label input,
+            #tableContent_wrapper .dataTables_length label select {
+                border: solid 1px #CCC;
+                padding: 8px 5px 8px 15px;
+                height: 35px;
             }
-            #tableContent thead tr th.last {
-                width: 100px !important;
+            #tableContent_wrapper .dataTables_filter label input {
+                margin-left: 10px;
+            }
+            #tableContent_wrapper .dataTables_length label select {
+                margin-right: 10px;
             }
 
-    #tableContent tbody {}
-        #tableContent tbody tr {}
-            #tableContent tbody tr th {}
-                #tableContent tbody tr th .label {
-                    display: block;
-                    width: 35px;
-                    height: 35px;
-                    text-align: center;
-                    line-height: 30px;
+
+    #tableContent_wrapper .dataTables_info {
+    }
+    #tableContent_wrapper .dataTables_paginate {
+        text-align: center;
+        float: none;
+    }
+        #tableContent_wrapper .dataTables_paginate .paginate_button {
+            background: #FFF;
+            border-color: #dbdbdb;
+            border-width: 1px;
+            border-radius: 4px;
+            color: #363636;
+            cursor: pointer;
+            justify-content: center;
+            padding-bottom: calc(.375em - 1px);
+            padding-left: .75em;
+            padding-right: .75em;
+            padding-top: calc(.375em - 1px);
+            margin: 0 5px;
+            text-align: center;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+        #tableContent_wrapper .dataTables_paginate .paginate_button.next {}
+        #tableContent_wrapper .dataTables_paginate .paginate_button.previous {}
+
+        #tableContent_wrapper .dataTables_paginate .paginate_button:hover,
+        #tableContent_wrapper .dataTables_paginate .paginate_button.current {
+            background: #222;
+            color: #FFF !important;
+        }
+        #tableContent_wrapper .dataTables_paginate .paginate_button.disabled {
+            background: #FFF;
+            color: #363636 !important;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+
+
+    #tableContent {
+        padding-top: 15px;
+        clear: both;
+    }
+        #tableContent thead {
+            background-color: #333;
+        }
+            #tableContent thead tr {}
+                #tableContent thead tr th {
+                    color: #FFF;
+                    padding: 10px 2px;
                 }
-                    #tableContent tbody tr th .table-content-select-this-row {}
+                #tableContent thead tr th.first {
+                    background: none;
+                    width: 30px !important;
+                }
+                #tableContent thead tr th.last {
+                    width: 110px !important;
+                }
+
+        #tableContent tbody {}
+            #tableContent tbody tr {}
+                #tableContent tbody tr th {}
+                    #tableContent tbody tr th .label {
+                        display: block;
+                        width: 35px;
+                        height: 35px;
+                        text-align: center;
+                        line-height: 30px;
+                    }
+                        #tableContent tbody tr th .table-content-select-this-row {}
+
+
+
+
+
 
 table.is-loading {
     opacity: 0.5;

@@ -85,11 +85,11 @@
                                data-redirect="<?php echo baseUrl('role/'); ?>">
                                 <thead>
                                     <tr>
-                                        <th style="width: 20px;"></th>
+                                        <th class="first"></th>
                                         <th>Nome</th>
                                         <th>Criado em :</th>
                                         <th>Atualizado em :</th>
-                                        <th style="width: 130px;">Ação</th>
+                                        <th class="last">Ação</th>
                                     </tr>
                                 </thead>
 
@@ -119,7 +119,7 @@
                                         <th><?php echo dateFormatBR($value['updated_at']); ?></th>
                                         <th>
                                             <a class="button is-warning"
-                                               href="<?php echo baseUrl("user/edit/{$value['id']}"); ?>">
+                                               href="<?php echo baseUrl("role/edit/{$value['id']}"); ?>">
                                                 <i class="fa fa-edit"></i>
                                             </a>
                                             <a class="table-content-delete-this-register button is-danger"
