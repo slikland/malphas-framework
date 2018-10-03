@@ -16,9 +16,8 @@ $(document).on('ready', function () {
     */
     if($('#actionTableContent').length) {
 
-        var $tableContent = $('#tableContent');
-
         $('#actionTableContentSelectAllRows').on('click', function () {
+
             if($('.table-content-select-this-row:not(:checked)').length) {
                 $('.table-content-select-this-row:not(:checked)').each(function (index, element) {
                     $(element).trigger('click');

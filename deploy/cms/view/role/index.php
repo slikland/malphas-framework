@@ -37,30 +37,30 @@
 
                     <?php if(!empty($roles)) : ?>
                     <!-- REFACTORY TEMPLATE -->
-                        <div id="actionTableContent" class="columns">
-                            <div class="column">
+                    <div id="actionTableContent" class="columns">
+                        <div class="column">
 
-                                <div id="severalAction" class="">
-                                    <a id="severalActionSelectAllRows" class="button">
-                                        <i class="far fa-square"></i>
-                                    </a>
-                                    <a id="severalActionRefresh" class="button">
-                                        <i class="fas fa-sync-alt"></i>
-                                    </a>
-                                    <a id="severalActionDelete" class="button blocked">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </a>
-                                </div>
-
-                            </div>
-                            <div class="column has-text-right">
-                                <a id="actionCreateNewRegister"
-                                   class="button is-dark"
-                                   href="<?php echo baseUrl('role/create'); ?>">
-                                    <strong>CRIAR NOVO GRUPO DE USUÁRIO</strong>
+                            <div id="severalAction" class="">
+                                <a id="actionTableContentSelectAllRows" class="button">
+                                    <i class="far fa-square"></i>
+                                </a>
+                                <a id="actionTableContentRefreshTable" class="button">
+                                    <i class="fas fa-sync-alt"></i>
+                                </a>
+                                <a id="actionTableContentDeleteSelectedRows" class="button blocked">
+                                    <i class="fas fa-trash-alt"></i>
                                 </a>
                             </div>
+
                         </div>
+                        <div class="column has-text-right">
+                            <a id="actionCreateNewRegister"
+                               class="button is-dark"
+                               href="<?php echo baseUrl('role/create'); ?>">
+                                <strong>CRIAR NOVO GRUPO DE USUÁRIO</strong>
+                            </a>
+                        </div>
+                    </div>
                     <!-- REFACTORY TEMPLATE -->
                     <?php endif; ?>
 

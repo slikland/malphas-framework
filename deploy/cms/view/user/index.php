@@ -35,20 +35,19 @@
                     </div>
                     <!-- REFACTORY TEMPLATE -->
 
-
                     <?php if(!empty($users)) : ?>
                     <!-- REFACTORY TEMPLATE -->
                     <div id="actionTableContent" class="columns">
                         <div class="column">
 
                             <div id="severalAction" class="">
-                                <a id="severalActionSelectAllRows" class="button">
+                                <a id="actionTableContentSelectAllRows" class="button">
                                     <i class="far fa-square"></i>
                                 </a>
-                                <a id="severalActionRefresh" class="button">
+                                <a id="actionTableContentRefreshTable" class="button">
                                     <i class="fas fa-sync-alt"></i>
                                 </a>
-                                <a id="severalActionDelete" class="button blocked">
+                                <a id="actionTableContentDeleteSelectedRows" class="button blocked">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
                             </div>
