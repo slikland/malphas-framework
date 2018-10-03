@@ -15,8 +15,7 @@
             <section id="user" class="section page-content">
                 <div class="container is-fluid">
 
-
-                    <!-- PRECISA SEPARAR EM TEMPLATE -->
+                    <!-- REFACTORY TEMPLATE -->
                     <div class="header">
                         <nav class="breadcrumb has-arrow-separator is-small" aria-label="breadcrumbs">
                             <ul>
@@ -34,21 +33,22 @@
                         </h2>
                         <hr>
                     </div>
-                    <!-- PRECISA SEPARAR EM TEMPLATE -->
+                    <!-- REFACTORY TEMPLATE -->
 
 
                     <?php if(!empty($users)) : ?>
+                    <!-- REFACTORY TEMPLATE -->
                     <div id="actionTableContent" class="columns">
                         <div class="column">
 
                             <div id="severalAction" class="">
-                                <a id="actionTableContentSelectAllRows" class="button">
+                                <a id="severalActionSelectAllRows" class="button">
                                     <i class="far fa-square"></i>
                                 </a>
-                                <a id="actionTableContentRefreshTable" class="button">
+                                <a id="severalActionRefresh" class="button">
                                     <i class="fas fa-sync-alt"></i>
                                 </a>
-                                <a id="actionTableContentDeleteSelectedRows" class="button blocked">
+                                <a id="severalActionDelete" class="button blocked">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
                             </div>
@@ -62,6 +62,7 @@
                             </a>
                         </div>
                     </div>
+                    <!-- REFACTORY TEMPLATE -->
                     <?php endif; ?>
 
 
@@ -80,7 +81,6 @@
                             </p>
                         </div>
                         <?php else : ?>
-
                         <table id="tableContent"
                                class="table is-fullwidth"
                                data-action="<?php echo baseUrl('user/'); ?>"
@@ -99,7 +99,7 @@
 
                             <tfoot>
                                 <tr>
-                                    <th></th>
+                                    <th class="first"></th>
                                     <th>Nome</th>
                                     <th>E-mail</th>
                                     <th>Permissão</th>
@@ -122,16 +122,20 @@
                                     </th>
                                     <th><?php echo $value['name']; ?></th>
                                     <th>
-                                        <a class="link-mailto" href="mailto:<?php echo $value['email']; ?>"><?php echo $value['email']; ?></a>
+                                        <a class="link-mailto"href="mailto:<?php echo $value['email']; ?>">
+                                            <?php echo $value['email']; ?>
+                                        </a>
                                     </th>
                                     <th><?php echo $value['cms_role_id']; ?></th>
                                     <th><?php echo dateFormatBR($value['created_at']); ?></th>
                                     <th><?php echo dateFormatBR($value['updated_at']); ?></th>
                                     <th>
-                                        <a class="button is-warning" href="<?php echo baseUrl("user/edit/{$value['id']}"); ?>">
+                                        <a class="button is-warning"
+                                           href="<?php echo baseUrl("user/edit/{$value['id']}"); ?>">
                                             <i class="fa fa-edit"></i>
                                         </a>
-                                        <a class="delete-this-register button is-danger" href="<?php echo baseUrl("user/delete/{$value['id']}"); ?>">
+                                        <a class="table-content-delete-this-register button is-danger"
+                                           href="<?php echo baseUrl("user/delete/{$value['id']}"); ?>">
                                             <i class="fa fa-times"></i>
                                         </a>
                                     </th>

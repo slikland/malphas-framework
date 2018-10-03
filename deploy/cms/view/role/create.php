@@ -35,11 +35,16 @@
 
                 <div class="box">
 
-                <?php if(empty($role)) : ?>
-                    <form id="formRoleCreate" class="" action="javascript:void(0);" data-action="<?php echo baseUrl('role/insert/'); ?>" method="POST">
-                <?php else : ?>
-                    <form id="formRoleCreate" class="" action="javascript:void(0);" data-action="<?php echo baseUrl('role/update/' . $role['id']); ?>" method="POST">
-                <?php endif; ?>
+                    <form id="formCrudAjax"
+                          class="form-crud is-form-create"
+                          action="javascript:void(0);"
+                          data-redirect="<?php echo baseUrl('role'); ?>"
+                          data-action="<?php if(empty($role)) {
+                              echo baseUrl('role/insert/');
+                          } else {
+                              echo baseUrl('role/update/' . $role['id']);
+                          } ?>"
+                          method="POST">
 
                         <div class="field is-horizontal">
                             <div class="field-label is-medium">
@@ -48,7 +53,7 @@
                             <div class="field-body">
                                 <div class="field">
                                     <div class="control has-icons-left has-icons-right">
-                                        <input id="groupName" name="name" class="input is-medium" type="text" placeholder=". . ." value="<?php echo !empty($role['name']) ? $role['name'] : ''; ?>" required>
+                                        <input id="groupName" name="name" class="input is-medium" type="text" placeholder=". . ." value="<?php echo !empty($role['name']) ? $role['name'] : ''; ?>">
                                         <span class="icon is-medium is-left">
                                             <i class="fa fa-layer-group"></i>
                                         </span>
@@ -59,6 +64,7 @@
                                             <i class="fa fa-times"></i>
                                         </span>
                                     </div>
+                                    <p class="help is-danger"></p>
                                 </div>
                             </div>
                         </div>
@@ -74,7 +80,7 @@
                                         <a class="button is-medium" href="<?php echo baseUrl('role/'); ?>">
                                             CANCELAR
                                         </a>
-                                        <button id="formSubmit" class="button is-medium is-dark">
+                                        <button id="formBtnSubmit" class="button is-medium is-dark">
                                             <?php echo empty($role) ? 'CRIAR NOVO GRUPO USUÁRIO' : 'EDITAR GRUPO USUÁRIO'; ?>
                                         </button>
                                     </div>

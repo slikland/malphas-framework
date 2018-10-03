@@ -88,80 +88,67 @@ $(document).on('ready', function () {
     }
 
 
+    /*
+    * AÇÕES DO CONTEUDO DA TABELA
+    * SELECIONA LINHA E DELETAR REGISTRO
+    */
+    if($('#tableContent').length) {
 
-    $('.table-content-select-this-row').each(function (index, element) {
-        var $this = $(element);
-
-        $this.on('click', function() {
-            $this.parent().parent().parent().toggleClass('is-selected');
-
-            if($('.table-content-select-this-row:checked').length) {
-                $('#actionTableContentDeleteSelectedRows').removeClass('blocked');
-                $('#actionTableContentSelectAllRows i').attr('class', 'fas fa-check-square');
-            } else {
-                $('#actionTableContentDeleteSelectedRows').addClass('blocked');
-                $('#actionTableContentSelectAllRows i').attr('class', 'far fa-square');
-            }
-        });
-    });
-
-
-
-
-    $('.delete-this-register').each(function(index, element) {
-        var $this = $(element);
-
-        $this.on('click', function() {
-
-            swal({
-                title: 'Deletar usuário.',
-                text: 'Tem certeza que deseja deletar esse registro?',
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Sim, deletar!'
-
-            }).then(function(result) {
-                if (result.value) {
-
-                    $this.cmsAjaxDelete(
-                        $this.attr('href'),
-                        '',
-                        function (response) {
-                            if(response === true) {
-                                swal({
-                                    title: 'Sucesso',
-                                    text: response.message,
-                                    type: 'success',
-                                    confirmButtonText: 'Okay'
-                                }).then(function(result) {
-                                    window.location.reload();
-                                });
-                            } else {
-                                swal({
-                                    title: 'Ops!',
-                                    text: response.message,
-                                    type: 'error',
-                                    confirmButtonText: 'Okay'
-                                });
-                            }
-                        }
-                    );
-                    //$this.parent().parent().hide(200);
-
+        $('.table-content-select-this-row').each(function (index, element) {
+            var $this = $(element);
+            $this.on('click', function() {
+                $this.parent().parent().parent().toggleClass('is-selected');
+                if($('.table-content-select-this-row:checked').length) {
+                    $('#actionTableContentDeleteSelectedRows').removeClass('blocked');
+                    $('#actionTableContentSelectAllRows i').attr('class', 'fas fa-check-square');
+                } else {
+                    $('#actionTableContentDeleteSelectedRows').addClass('blocked');
+                    $('#actionTableContentSelectAllRows i').attr('class', 'far fa-square');
                 }
             });
-            return false;
         });
 
-    });
-
-
-
-
-
-
+        $('.table-content-delete-this-register').each(function(index, element) {
+            var $this = $(element);
+            $this.on('click', function() {
+                swal({
+                    title: 'Deletar usuário.',
+                    text: 'Tem certeza que deseja deletar esse registro?',
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Sim, deletar!'
+                }).then(function(result) {
+                    if (result.value) {
+                        $this.formCrudAjaxDelete({
+                            path : $this.attr('href'),
+                            success : function (response) {
+                                if(response === true) {
+                                    swal({
+                                        title: 'Sucesso',
+                                        text: response.message,
+                                        type: 'success',
+                                        confirmButtonText: 'Okay'
+                                    }).then(function(result) {
+                                        window.location.reload();
+                                    });
+                                } else {
+                                    swal({
+                                        title: 'Ops!',
+                                        text: response.message,
+                                        type: 'error',
+                                        confirmButtonText: 'Okay'
+                                    });
+                                }
+                            }
+                        });
+                    }
+                });
+                return false;
+            });
+        });
+    }
 
 
 

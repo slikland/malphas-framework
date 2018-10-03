@@ -210,6 +210,71 @@ $.fn.extend({
     },
 
 
+    formCrudAjaxDelete : function (options) {
+        if(options === undefined) {
+            options = {};
+        }
+
+        var $this = this;
+
+        if(options.path === undefined) {
+            return swal({
+                title: 'Ops!',
+                text: 'Action do formulário não foi definida.',
+                type: 'error',
+                confirmButtonText: 'Okay'
+            });
+        }
+
+        // VALIDANDO SE JÁ FOI SUBMETIDO
+        if($this.hasClass('sending')) {
+            return false;
+        }
+
+        // ENVIANDO O REQUEST EM AJAX
+        $.ajax({
+            url : options.path,
+            method : 'GET',
+            beforeSend : function() {
+                $this.addClass('sending is-loading');
+                if (typeof options.beforeSend === 'function') {
+                    options.beforeSend();
+                }
+            },
+            success : function(response) {
+                if (typeof options.success === 'function') {
+                    options.success(response);
+                }
+            },
+            error : function() {
+                if (typeof options.error === 'function') {
+                    options.error();
+                } else {
+                    swal({
+                        title: 'Ops!',
+                        text: 'Erro no servidor, tente novamente daqui alguns minutos.',
+                        type: 'error',
+                        confirmButtonText: 'Okay'
+                    });
+                }
+            },
+            complete : function() {
+                $this.removeClass('sending is-loading');
+                if (typeof options.complete === 'function') {
+                    options.complete();
+                }
+            },
+            statusCode : {
+                200 : function() {console.log('200');},
+                404 : function() {console.log('404');},
+                500 : function() {console.log('500');}
+            }
+        });
+
+
+    },
+
+
 
     /**
      * VALIDATE JAVASCRIPT FRONT
@@ -551,73 +616,6 @@ $.fn.extend({
             }
         });
 
-    },
-
-
-
-    cmsAjaxDelete : function (path, beforeSend, success, error, complete) {
-
-        var $this = this;
-
-        if(!path.length) {
-            return swal({
-                title: 'Ops!',
-                text: 'Action do formulário não foi definida.',
-                type: 'error',
-                confirmButtonText: 'Okay'
-            });
-        }
-
-        // VALIDANDO SE JÁ FOI SUBMETIDO
-        if($this.hasClass('sending')) {
-            return false;
-        }
-
-        // ENVIANDO O REQUEST EM AJAX
-        $.ajax({
-            url : path,
-            method : 'GET',
-            beforeSend : function() {
-                $this.addClass('sending is-loading');
-                if (typeof beforeSend === 'function') {
-                    beforeSend();
-                }
-            },
-            success : function(response) {
-                if (typeof success === 'function') {
-                    success(response);
-                }
-            },
-            error : function() {
-                if (typeof error === 'function') {
-                    error();
-                } else {
-                    swal({
-                        title: 'Ops!',
-                        text: 'Erro no servidor, tente novamente daqui alguns minutos.',
-                        type: 'error',
-                        confirmButtonText: 'Okay'
-                    });
-                }
-            },
-            complete : function() {
-                $this.removeClass('sending is-loading');
-
-                if (typeof complete === 'function') {
-                    complete();
-                }
-            },
-            statusCode : {
-                200 : function() {console.log('200');},
-                404 : function() {console.log('404');},
-                500 : function() {console.log('500');}
-            }
-        });
-
-
-    },
-
-
-
+    }
 
 });
