@@ -1,6 +1,15 @@
 var $loading;
-
 $(document).on('ready', function () {
+
+    $(document).on('drop', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+    });
+    $(document).on('dragover', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+    });
+
 
     $loading = $('#loading');
 
@@ -25,7 +34,9 @@ $(document).on('ready', function () {
 
 
     $('.table').each(function(index, element) {
-        $(this).DataTable({
+        var $this = $(element);
+
+        $this.DataTable({
             paging: true,
             info : false,
             language : {
@@ -50,10 +61,13 @@ $(document).on('ready', function () {
                     "sSortAscending": ": Ordenar colunas de forma ascendente",
                     "sSortDescending": ": Ordenar colunas de forma descendente"
                 }
+            },
+            'initComplete' : function () {
+                console.log('DataTable : initComplete');
             }
-            // autoFill: {
-            //     update: true
-            // }
+        });
+        $this.on('page.dt', function () {
+            animaScroll(0);
         });
     });
 

@@ -12,9 +12,10 @@
         <div id="wrap" class="transitions">
 
             <!-- VIEW GERENCIADOR DE MEDIA -->
-            <section id="gerenciadorMedia" class="section page-content">
+            <section id="mediaManager" class="section page-content">
                 <div class="container is-fluid">
 
+                    <!-- REFACTORY TEMPLATE -->
                     <div class="header">
                         <nav class="breadcrumb has-arrow-separator is-small" aria-label="breadcrumbs">
                             <ul>
@@ -32,107 +33,51 @@
                         </h2>
                         <hr>
                     </div>
+                    <!-- REFACTORY TEMPLATE -->
 
-                    <div id="gerenciadorMedia" class="box">
-
+                    <?php if(!empty($files)) : ?>
+                    <div id="actionMediaManager">
                         <div class="columns">
                             <div class="column">
-
-
+                                <div id="severalAction" class="">
+                                    <a id="" class="button">
+                                        <i class="far fa-square"></i>
+                                    </a>
+                                    <a id="" class="button">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </a>
+                                    <a id="" class="button blocked">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
                             </div>
                             <div class="column has-text-right">
                                 <a id="addFileDragAndDrop" href="#/" class="button is-info"">
-                                <strong>Adicionar Vários Arquivos</strong>
+                                    <strong>ADICIONAR VÁRIOS ARQUIVOS</strong>
                                 </a>
                                 <a href="./ajax-image-add" class="button is-dark" rel="modal:open">
-                                    <strong>Adicionar um Arquivo</strong>
+                                    <strong>ADICIONAR UM ARQUIVO</strong>
                                 </a>
                             </div>
                         </div>
+                        <?php endif; ?>
 
-                        <div id="uploadDragDrop">
-                            <div id="uploadDragDropIcon">
+                        <div id="uploadDropMediaManager" class="transitions">
+                            <div id="uploadDropMediaManagerIcon">
                                 <i class="fas fa-upload"></i>
-                                <span>Arraste e solte aqui os arquivos</span>
+                                <p>Arraste e solte aqui os arquivos</p>
+                                <progress class="progress is-small" value="0" max="100">0%</progress>
                             </div>
                         </div>
 
+                    </div>
+
+
+                    <?php if(!empty($files)) : ?>
+                    <div id="gerenciadorMedia" class="box">
                         <ul id="fileManagerList">
-                            <?php
-
-                            $fileList = array(
-
-                                array(
-                                    'name' => '',
-                                    'path' => '',
-                                    'alt' => '',
-                                    'type' => 'file',
-                                    'created_at' => date('Y-m-d H:i:s'),
-                                    'updated_at' => date('Y-m-d H:i:s'),
-
-                                ),
-                                array(
-                                    'type' => 'word'
-                                ),
-                                array(
-                                    'type' => 'powerpoint'
-                                ),
-                                array(
-                                    'type' => 'medical'
-                                ),
-                                array(
-                                    'type' => 'image'
-                                ),
-                                array(
-                                    'type' => 'code'
-                                ),
-                                array(
-                                    'type' => 'audio'
-                                ),
-                                array(
-                                    'type' => 'video'
-                                ),
-                                array(
-                                    'type' => 'archive'
-                                ),
-                                array(
-                                    'type' => 'pdf'
-                                ),
-                                array(
-                                    'type' => 'signature'
-                                ),
-                                array(
-                                    'type' => 'excel'
-                                ),
-                                array(
-                                    'type' => 'contract'
-                                ),
-                                array(
-                                    'type' => 'alt'
-                                ),
-                                array(
-                                    'type' => 'download'
-                                ),
-                                array(
-                                    'type' => 'upload'
-                                ),
-                                array(
-                                    'type' => 'invoice'
-                                ),
-                                array(
-                                    'type' => 'invoice-dollar'
-                                )
-                            );
-
-                            shuffle($fileList);
-
-                            foreach ($fileList as $key => $value) :
-
-                                ?>
-
+                            <?php foreach ($files as $key => $value) : ?>
                                 <li class="file-manager-item">
-
-
                                     <i class="file-manager-type fa fa-<?=($value['type'] === 'file')? 'file' : 'file-' . $value['type']; ?>"></i>
                                     <a href="./ajax-image" class="file-manager-view" rel="modal:open">
                                         <i class="fa fa-eye"></i>
@@ -141,7 +86,9 @@
                                         <a href="#/" class="file-manager-delete">
                                             <i class="fa fa-times"></i>
                                         </a>
-                                        <a href="./ajax-image-edit" class="file-manager-edit" rel="modal:open">
+                                        <a href="./ajax-image-edit"
+                                           class="file-manager-edit"
+                                           rel="modal:open">
                                             <i class="fa fa-edit"></i>
                                         </a>
                                     </div>
@@ -149,8 +96,8 @@
 
                             <?php endforeach; ?>
                         </ul>
-
                     </div>
+                    <?php endif; ?>
 
                 </div>
             </section>

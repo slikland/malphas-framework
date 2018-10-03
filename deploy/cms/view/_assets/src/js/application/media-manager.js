@@ -1,5 +1,54 @@
 $(document).on('ready', function () {
 
+
+    if($('#mediaManager').length) {
+
+        $('#mediaManager').on('dragover', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            $('#uploadDropMediaManager').slideDown(200);
+        });
+        $('#mediaManager').on('dragleave', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            $('#uploadDropMediaManager').removeClass('is-dragover');
+        });
+
+
+
+        $('#uploadDropMediaManager').on('dragover', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            $('#uploadDropMediaManager').addClass('is-dragover');
+        });
+
+        $('#uploadDropMediaManager').on('drop', function(event) {
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            $('#uploadDropMediaManager').removeClass('is-dragover');
+
+            console.log('#uploadDragDrop DROP', event);
+
+            var file = event.originalEvent.dataTransfer.files;
+            var fd = new FormData();
+            fd.append('file', file[0]);
+            fd.append('file2', file[1]);
+
+            console.log(file);
+
+            console.log(fd);
+            //uploadData(fd);
+
+        });
+
+
+    }
+
+
+
+
     $('.file-manager-view').each(function(index, element) {});
     $('.file-manager-edit').each(function(index, element) {});
 
@@ -104,85 +153,5 @@ $(document).on('ready', function () {
         $('#uploadDragDrop').slideToggle(200);
 
     });
-
-
-
-
-    $(document).on('dragover', function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        $('#uploadDragDrop').slideDown(200);
-    });
-// $(document).on('dragleave', function(event) {
-//     event.preventDefault();
-//     event.stopPropagation();
-// });
-    $(document).on("drop", function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-    });
-
-
-
-
-
-
-    $('#uploadDragDrop').on('drop', function(event) {
-
-        event.preventDefault();
-        event.stopPropagation();
-
-        console.log('#uploadDragDrop DROP', event);
-
-        var file = event.originalEvent.dataTransfer.files;
-        var fd = new FormData();
-        fd.append('file', file[0]);
-        fd.append('file2', file[1]);
-
-        console.log(file);
-
-        console.log(fd);
-        uploadData(fd);
-
-    });
-
-
-
-
-
-    // $('html').on("dragenter", function(e) {
-    //     e.preventDefault();
-    //     e.stopPropagation();
-    //     console.log('HTML DRAGENTER');
-    //     //$('#uploadDragDrop').slideUp(200);
-    // });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 */

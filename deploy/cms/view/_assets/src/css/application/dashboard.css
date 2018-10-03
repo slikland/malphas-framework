@@ -18,9 +18,12 @@
         }
         #dashboardGrid .dashboard-grid-item.is-full {
             width: 98%;
-        margin: 1%;
+            margin: 1%;
         }
-
+        #dashboardGrid .dashboard-grid-item.is-half {
+            width: 48%;
+            margin: 1%;
+        }
         #dashboardGrid .dashboard-grid-placeholder {
             float: left;
             background-color: #FFF;
@@ -37,6 +40,10 @@
 
     @media screen and (max-width: 600px) {
         #dashboardGrid .dashboard-grid-item {
+            width: 100%;
+            margin: 0 0 20px 0;
+        }
+        #dashboardGrid .dashboard-grid-item.is-half {
             width: 100%;
             margin: 0 0 20px 0;
         }

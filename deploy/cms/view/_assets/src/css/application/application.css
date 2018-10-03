@@ -484,16 +484,17 @@ body {
         clear: both;
     }
         #tableContent thead {
-            background-color: #333;
+            background-color: #222;
         }
             #tableContent thead tr {}
                 #tableContent thead tr th {
                     color: #FFF;
                     padding: 10px 2px;
+                    border-color: #EEE;
                 }
                 #tableContent thead tr th.first {
                     background: none;
-                    width: 30px !important;
+                    width: 50px !important;
                 }
                 #tableContent thead tr th.last {
                     width: 110px !important;

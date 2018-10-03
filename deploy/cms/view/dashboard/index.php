@@ -35,6 +35,50 @@
 
                     <div id="dashboardGrid">
 
+                        <div class="dashboard-grid-item is-half">
+                            <div class="message">
+                                <div class="dashboard-grid-handle message-header">
+                                    <i class="fas fa-grip-vertical"></i>
+                                    <p>Usuários</p>
+                                    <span>
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </span>
+                                </div>
+                                <div class="message-body">
+                                    <div class="has-text-centered">
+                                        <p style="font-size: 100px;line-height: 100px;"><?php echo $totalUser; ?></p>
+                                        <p>TOTAL USÁRIOS</p>
+                                        <p>
+                                            <a class="button is-small is-dark">VER TODOS</a>
+                                            <a class="button is-small is-info">ADICIONAR</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-grid-item is-half">
+                            <div class="message">
+                                <div class="dashboard-grid-handle message-header">
+                                    <i class="fas fa-grip-vertical"></i>
+                                    <p>Permissões</p>
+                                    <span>
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </span>
+                                </div>
+                                <div class="message-body">
+                                    <div class="has-text-centered">
+                                        <p style="font-size: 100px;line-height: 100px;"><?php echo $totalRole; ?></p>
+                                        <p>TOTAL PERMISSÕES</p>
+                                        <p>
+                                            <a class="button is-small is-dark">VER TODOS</a>
+                                            <a class="button is-small is-info">ADICIONAR</a>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="dashboard-grid-item is-full">
                             <div class="message is-dark">
                                 <div class="dashboard-grid-handle message-header">

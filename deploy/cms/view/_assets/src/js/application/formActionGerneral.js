@@ -1,6 +1,5 @@
 $(document).on('ready', function () {
 
-
     /*
     * FORM CRUD AJAX GERAL
     * VALIDAÇÃO, ENVIO E RETORNO
