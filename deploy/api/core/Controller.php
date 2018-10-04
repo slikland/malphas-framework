@@ -53,15 +53,16 @@ class Controller
         $instance = self::load($controller);
         self::validate($instance);
 
+        if(!method_exists ($instance, $method)) {
+            Http::status(404);
+            echo "404";
+            die();
+        }
+
         if($method && $parameters) {
             $instance->{$method}($parameters);
         } elseif ($method) {
-            if(method_exists ($instance, $method)) {
-                $instance->{$method}();
-            } else {
-                http_response_code(404);
-                echo "404";
-            }
+            $instance->{$method}();
         }
     }
 
