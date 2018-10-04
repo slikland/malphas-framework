@@ -4,10 +4,22 @@ use model\Role;
 use core\Controller;
 use core\Utils\Filter;
 use core\JsonResponse;
+use core\Utils\Hash;
+
 
 class UserController extends Controller
 {
     private $model;
+
+    public $validation = [
+        'password_confirm' => ['Data'  => 'required'],
+        'password' => [
+            'Data'  => [
+                'required',
+                ['equals' => 'password_confirm']
+            ]
+        ]
+    ];
 
     public function __construct()
     {
@@ -36,6 +48,7 @@ class UserController extends Controller
     public function insert()
     {
         $filteredData = Filter::vetor($this->model->fillable, $_POST);
+        $filteredData['password'] = Hash::generate($filteredData['password']);
         $insert = $this->model->insert($filteredData);
         $response = parent::parseResponse($insert);
 

@@ -12,6 +12,7 @@
      * Application
      */
     define('APP_NAME', 'Slikland CMS');
+    define('KEY', '412e374c92d92505c581f705cac8273a');
 
     /*
      * Environment

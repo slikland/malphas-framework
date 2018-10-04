@@ -1,5 +1,7 @@
 <?php
 use core\Utils\Type;
+use core\Http;
+
 class Data
 {
     public static function required($postValue)
@@ -40,6 +42,15 @@ class Data
         }
 
         return ['message' => "Esse campo deve ser do tipo inteiro"];
+    }
+
+    public static function equals($postValue, $valid)
+    {
+        if(Http::getPost($valid) === $postValue) {
+            return true;
+        }
+
+        return ['message' => "As senhas não conferem"];
     }
 
 }

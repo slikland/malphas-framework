@@ -1,7 +1,6 @@
 <?php
 namespace core;
 
-
 class DB
 {
     private static $instance = NULL;
@@ -340,7 +339,7 @@ class DB
     public function fetch_all($sql, $params = NULL, $array = false, $collate = NULL)
     {
         if($this->softDelete) {
-            $sql = $sql . " WHERE deleted_at IS NULL";
+            $sql = !preg_match('/WHERE/', $sql) ? $sql . " WHERE deleted_at IS NULL" : $sql . " AND deleted_at IS NULL";
         }
 
         $resource = $this->query($sql, $params, $collate);

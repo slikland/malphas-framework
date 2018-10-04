@@ -49,8 +49,12 @@ class Http
         return false;
     }
 
-    public static function getPost()
+    public static function getPost($index = false)
     {
+        if($index && !empty($_POST[$index])) {
+            return $_POST[$index];
+        }
+
         return $_POST;
     }
 

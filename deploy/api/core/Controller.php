@@ -8,6 +8,13 @@ class Controller
 
     public $validation = [];
 
+    public function __construct()
+    {
+        if($this->isAuthenticable){
+           Auth::isLoggedIn();
+        }
+    }
+
     public function view($file, $data = false)
     {
         return new Template($file, $data);

@@ -1,9 +1,23 @@
 <?php
 use core\Controller;
+use core\Auth;
+use core\JsonResponse;
 
 class AuthController extends Controller
 {
     public $isAuthenticable = false;
+
+    public function index()
+    {
+        if(Auth::isValidLogin()) {
+            Auth::init();
+            $return = ['success' => true];
+            return JsonResponse::set(200, $return);
+        }
+
+        $return = ['message' => 'Usuário/Senha invalido(s)'];
+        return JsonResponse::set(401, $return);
+    }
 
     public function login()
     {
@@ -17,6 +31,8 @@ class AuthController extends Controller
 
     public function logout()
     {
+        Auth::destroy();
+
         return $this->view('auth/login', array(
             'message' => 'Logout realizado com sucesso.'
         ));

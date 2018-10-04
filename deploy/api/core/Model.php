@@ -5,7 +5,7 @@ class Model
 {
     protected static $db;
 
-    protected $validation = [];
+    public $validation = [];
 
     public function __construct()
     {
@@ -38,8 +38,24 @@ class Model
         return self::$db->delete($this->table, $id);
     }
 
+    public function getWhere($conditions)
+    {
+        $where = $this->queryBuilderWhere($conditions);
+        return self::$db->fetch_all('SELECT * FROM '.$this->table.$where, $conditions);
+    }
+
+    private function queryBuilderWhere($conditions)
+    {
+        $where = '';
+        foreach ($conditions as $fieldName => $value) {
+            $where .= empty($where) ? " WHERE $fieldName = ?" : " AND $fieldName = ?";
+        }
+        return $where;
+    }
+
     private function validate()
     {
-        Validate::this($this);
+        return true;
+//        Validate::this($this);
     }
 }
