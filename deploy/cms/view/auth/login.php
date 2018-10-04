@@ -26,14 +26,14 @@
 
                         <form id="formLogin"
                               action="javascript:void(0);"
-                              data-action="https://api.diegosanches.me/login/"
+                              data-action="<?php echo baseUrl('auth/'); ?>"
                               method="POST">
 
                             <div class="field">
                                 <p class="control has-icons-left has-icons-right">
                                     <input id="loginEmail"
                                            class="input is-medium"
-                                           name="loginEmail"
+                                           name="email"
                                            type="email"
                                            placeholder="Email"
                                            autocomplete="off"
@@ -55,7 +55,7 @@
                                 <p class="control has-icons-left has-icons-right">
 
                                     <input id="loginPass"
-                                           name="loginPass"
+                                           name="password"
                                            class="input is-medium"
                                            type="password"
                                            placeholder="Password"

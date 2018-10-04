@@ -44,5 +44,19 @@ class User extends Model
         'cms_role_id'
     ];
 
+    public function getByEmail($email)
+    {
+        $all = $this->getWhere(['email' => $email]);
+
+        if(count($all) > 1) {
+            return $all;
+        }
+
+        if(!empty($all[0])) {
+            return $all[0];
+        }
+
+        return $all;
+    }
 
 }

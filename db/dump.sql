@@ -112,14 +112,13 @@ CREATE TABLE `cms_users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `password` char(32) NOT NULL,
+  `password` char(60) NOT NULL,
   `status` tinyint(4) NOT NULL DEFAULT '1',
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` datetime DEFAULT NULL,
   `deleted_at` datetime DEFAULT NULL,
   `cms_role_id` int(11) NOT NULL,
   PRIMARY KEY (`id`,`cms_role_id`),
-  UNIQUE KEY `email_UNIQUE` (`email`),
   KEY `fk_users_roles1_idx` (`cms_role_id`),
   CONSTRAINT `fk_users_roles1` FOREIGN KEY (`cms_role_id`) REFERENCES `cms_roles` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -129,7 +128,7 @@ LOCK TABLES `cms_users` WRITE;
 
 INSERT INTO `cms_users` (`id`, `name`, `email`, `password`, `status`, `cms_role_id`)
 VALUES
-	(1,'Slikland','admin@slikland.com','SpaceInvaders',1,1);
+	(1,'Slikland','admin@slikland.com','$2y$10$rFgktaRHYHDDyfUwdNAv9.bs8oU2jb1U51TMgdLOmoXxYVArsgoNq',1,1);
 
 /*!40000 ALTER TABLE `cms_users` ENABLE KEYS */;
 UNLOCK TABLES;
