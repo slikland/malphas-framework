@@ -66,8 +66,11 @@
                             <div id="uploadDropMediaManagerIcon">
                                 <i class="fas fa-upload"></i>
                                 <p>Arraste e solte aqui os arquivos</p>
-                                <progress class="progress is-small" value="0" max="100">0%</progress>
+                                <progress id="uploadDropMediaManagerProgress"
+                                          class="progress is-small transitions"
+                                          value="0" max="100">0%</progress>
                             </div>
+                            <div id="uploadDropMediaManagerThumbs"><!-- DINAMIC THUMBS --></div>
                         </div>
 
                     </div>

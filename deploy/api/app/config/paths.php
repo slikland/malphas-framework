@@ -9,6 +9,7 @@
     define('SERVICE_PATH', APP_PATH . 'service' . DIRECTORY_SEPARATOR);
     define('CORE_PATH', API_PATH . 'core' . DIRECTORY_SEPARATOR);
     define('DYNAMIC_PATH', ROOT . 'dynamic' . DIRECTORY_SEPARATOR);
+    define('UPLOAD_PATH', DYNAMIC_PATH . 'uploads' . DIRECTORY_SEPARATOR);
 
 
     define('CMS_PATH', ROOT . 'cms' . DIRECTORY_SEPARATOR);

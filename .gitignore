@@ -1,4 +1,5 @@
 .DS_Store
+/deploy/dynamic/
 
 /deploy/cms/view/_assets/node_modules
 /deploy/cms/view/_assets/package-lock.json

@@ -2,6 +2,7 @@
 
 use core\Controller;
 use core\JsonResponse;
+use core\Utils\File;
 
 class MediaManagerController extends Controller
 {
@@ -83,13 +84,36 @@ class MediaManagerController extends Controller
 
 
 
-    public function ajax($param = false)
+    public function ajax($param = null)
     {
         if(empty($param)) {
             $param = array('empty');
         }
 
         return JsonResponse::set(200, $param);
+    }
+
+    public function upload()
+    {
+        if(empty($_FILES)) {
+            return JsonResponse::set(200, array(
+                'error' => true,
+                'message' => 'Nenhuma Arquivo enviado'
+            ));
+        }
+
+        $upload = File::upload($_FILES);
+
+        if($upload) {
+            $response = true;
+        } else {
+            $response = array(
+                'error' => true,
+                'data' => $upload,
+                'message' => 'Não foi salvo por algum motivo'
+            );
+        }
+        return JsonResponse::set(200, $response);
     }
 
 }
