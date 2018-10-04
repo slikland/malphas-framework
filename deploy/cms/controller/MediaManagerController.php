@@ -83,7 +83,7 @@ class MediaManagerController extends Controller
 
 
 
-    public function ajax($param)
+    public function ajax($param = false)
     {
         if(empty($param)) {
             $param = array('empty');
