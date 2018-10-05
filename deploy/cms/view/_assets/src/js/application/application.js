@@ -5,6 +5,10 @@ $(document).on('ready', function () {
         event.preventDefault();
         event.stopPropagation();
     });
+    $(document).on('dragleave', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+    });
     $(document).on('dragover', function(event) {
         event.preventDefault();
         event.stopPropagation();

@@ -81,6 +81,11 @@ body {
     }
 }
 
+
+html.has-dragover {
+    overflow: hidden;
+}
+
 /* ==================
    LOADING GLOBAL
 ================== */
