@@ -10,7 +10,7 @@ use model\User;
 class Auth
 {
     protected $inactivity      = 60;          // TODO: this
-    protected $redirectTo      = 'dashboard'; // TODO: this
+    public  static $redirectTo = 'dashboard';
     private static $expire     = '2 hours';
     private static $cookieName = 'auth_cms';
 

@@ -11,7 +11,11 @@ class AuthController extends Controller
     {
         if(Auth::isValidLogin()) {
             Auth::init();
-            $return = ['success' => true];
+            $redirectTo = Auth::$redirectTo;
+            $return = [
+                'success' => true,
+                'redirect' => $redirectTo
+            ];
             return JsonResponse::set(200, $return);
         }
 
