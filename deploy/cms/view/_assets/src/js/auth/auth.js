@@ -9,63 +9,98 @@ $(document).on('ready', function () {
     var $notification = $('#authNotification');
         $notification.hide();
 
+    if($('#formAuth').length) {
 
-    if($('#formLogin').length) {
+        $('#formAuth').on('submit', function () {
 
-        if($notification.find('p').text().length) {
-            $notification.addClass('is-info').slideDown(200);
-        }
+            if($notification.find('p').text().length) {
+                $notification.addClass('is-info').slideDown(200);
+            }
 
-        var beforeSend = function() {
-            $notification.slideUp(200, function() {
-                $(this).attr('class', 'notification').find('p').html('');
+            var $form = $(this);
+            var $submit = $form.find('button.is-submit');
+            var _methods = {
+                getPath : function ($form) {
+                    if(!$form.attr('data-action').length) {
+                        return swal({
+                            title: 'Ops!',
+                            text: 'Action do formulário não foi definida.',
+                            type: 'error',
+                            confirmButtonText: 'Okay'
+                        });
+                    }
+                    return $form.attr('data-action');
+                },
+                getMethod : function ($form) {
+                    if(!$form.attr('method').length) {
+                        return swal({
+                            title: 'Ops!',
+                            text: 'Method do formulário não foi definida.',
+                            type: 'error',
+                            confirmButtonText: 'Okay'
+                        });
+                    }
+                    return $form.attr('method');
+                }
+            };
+
+            if($form.hasClass('sending')) {
+                return false;
+            }
+
+            $.ajax({
+                url : _methods.getPath($form),
+                method : _methods.getMethod($form),
+                data : $form.serializeArray(),
+                beforeSend : function() {
+                    $form.addClass('sending');
+                    $submit.addClass('is-loading');
+                    $notification.slideUp(200);
+                },
+                success : function(response) {
+                    if(response.success) {
+                        window.location.href = baseUrl + response.redirect;
+                    }
+                },
+                error : function(response) {
+                    console.log(response);
+                    if(response.status === 401) {
+                        $notification.text(response.responseJSON.message)
+                            .addClass('is-danger')
+                            .slideDown(200);
+                    } else {
+                        swal({
+                            title: 'Ops!',
+                            text: 'Erro no servidor, tente novamente daqui alguns minutos.',
+                            type: 'error',
+                            confirmButtonText: 'Okay'
+                        });
+                    }
+                },
+                complete : function() {
+                    $form.removeClass('sending');
+                    $submit.removeClass('is-loading');
+                },
+                statusCode : {
+                    200 : function() {console.log('200');},
+                    404 : function() {console.log('404');},
+                    500 : function() {console.log('500');}
+                }
             });
-        };
-
-        var success = function(response) {
-
-            $notification.find('p').html('Usuário ou senha inválido');
-            $notification.addClass('is-danger').slideDown(200);
-            $('#formLogin').animateCss('shake');
-        };
-
-        $('#formLogin').formSubmitAuth(beforeSend, success);
-
+        });
     }
-
-
-    if($('#formForgot').length) {
-
-        var beforeSend = function() {
-            $notification.slideUp(200, function() {
-                $(this).attr('class', 'notification').find('p').html('');
-            });
-        };
-
-        var success = function(response) {
-
-            $notification.find('p').html('Pronto! O e-mail de recuperação foi enviado.');
-            $notification.addClass('is-link').slideDown(200);
-
-        };
-
-        $('#formForgot').formSubmitAuth(beforeSend, success);
-
-    }
-
 });
 
 $(window).on('load', function () {
 
-    $('#loginEmail, #forgotEmail').focus();
     $('body').removeClass('loading');
-    $('#loginBox, #forgotBox').animateCss('bounceIn');
+    $('#authBox').animateCss('bounceIn');
 
 });
 
 $(window).on('beforeunload', function () {
 
     $('body').addClass('loading');
-    $('#loginBox, #forgotBox').animateCss('zoomOut');
+    $('#authBox').animateCss('zoomOut');
 
 });

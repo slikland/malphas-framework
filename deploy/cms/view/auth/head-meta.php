@@ -11,3 +11,6 @@
 <link rel="stylesheet" href="<?php echo css('auth.min'); ?>">
 
 <script src="<?php echo js('vendor.min'); ?>"></script>
+<script>
+    var baseUrl = '<?php echo baseUrl(); ?>';
+</script>

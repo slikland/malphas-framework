@@ -13,20 +13,20 @@
             <div class="hero-body">
                 <div class="container">
 
-                    <div id="forgotBox" class="">
+                    <div id="authBox" class="">
 
                         <h1 class="has-text-centered">
                             <strong><?php echo title(); ?></strong>
                         </h1>
 
-                        <div id="authNotification" class="notification" style="display: none;">
+                        <div id="authNotification" class="notification has-text-centered" style="display: none;">
                             <button class="notification-close delete"></button>
-                            <p></p>
+                            <p><?php if(!empty($message)) { echo $message; } ?></p>
                         </div>
 
-                        <form id="formForgot"
+                        <form id="formAuth"
                               action="javascript:void(0);"
-                              data-action="https://api.diegosanches.me/login/forgot/"
+                              data-action="<?php echo baseUrl('user/forgotpassword/'); ?>"
                               method="POST">
 
                             <div class="field">
@@ -38,8 +38,7 @@
                                            name="forgotEmail"
                                            type="email"
                                            placeholder="Email"
-                                           autocomplete="off"
-                                           required="required">
+                                           autocomplete="off"">
 
                                     <span class="icon is-small is-left">
                                         <i class="fa fa-envelope"></i>
@@ -55,7 +54,8 @@
                             </div>
                             <div class="field">
                                 <p class="control">
-                                    <button id="forgotSubmit" class="button is-medium is-success is-fullwidth is-submit">
+                                    <button id="authSubmit"
+                                            class="button is-medium is-success is-fullwidth is-submit">
                                         <span>Recuperar senha</span>
                                     </button>
                                 </p>

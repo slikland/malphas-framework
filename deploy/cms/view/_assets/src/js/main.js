@@ -1,6 +1,7 @@
 /**
  * AVOID `CONSOLE`
- * ERRORS IN BROWSERS THAT LACK A CONSOLE.
+ * ERRORS IN BROWSERS
+ * THAT LACK A CONSOLE.
  **/
 ;(function() {
     var method;
@@ -94,16 +95,6 @@ $.fn.extend({
  * PLUGINS FOR CMS
  **/
 $.fn.extend({
-
-
-    formSubmitAuth : function(beforeSend, success, error, complete) {
-        this.on('submit', function () {
-            if($(this).cmsFormValidate()) {
-                $(this).cmsFormAjaxSend(beforeSend, success, error, complete);
-            }
-        });
-    },
-
 
     formCrudAjax : function (options) {
         if(options === undefined) {
@@ -226,12 +217,10 @@ $.fn.extend({
             });
         }
 
-        // VALIDANDO SE JÁ FOI SUBMETIDO
         if($this.hasClass('sending')) {
             return false;
         }
 
-        // ENVIANDO O REQUEST EM AJAX
         $.ajax({
             url : options.path,
             method : 'GET',
@@ -277,7 +266,7 @@ $.fn.extend({
 
 
     /**
-     * VALIDATE JAVASCRIPT FRONT
+     * VALIDATE FORM JAVASCRIPT FRONT
      **/
     formCrudValidation : function (response) {
         var $form = this;
@@ -329,293 +318,6 @@ $.fn.extend({
             }
 
         }
-    },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    cmsFormValidate : function() {
-        var $form = this;
-        var validateAllInput = true;
-
-        var _methods = {
-
-            isRequired : function () {},
-
-            /**
-             * VERIFICA SE O INPUT ESTÁ VAZIO
-             * OU É MENOR QUE O MÍNIMO
-             * DE CARACTERES NECESSÁRIO
-             **/
-            inputLengthEmpty : function($element) {
-                if(!$element.val().length) {
-                    return true;
-                }
-                if($element.attr('minlength') !== undefined) {
-                    if($element.val().length < $element.attr('minlength')) {
-                        return true;
-                    }
-                }
-                return false;
-            },
-
-
-            /**
-             * VERIFICA SE O INPUT ESTÁ VAZIO
-             * OU É MENOR QUE O MÍNIMO
-             * DE CARACTERES NECESSÁRIO
-             **/
-            inputIsEmailValid : function($element) {
-
-                if (!regex.email.test($element.val())) {
-                    _methods.inputAlertInvalid($element);
-                    return false;
-                }
-                return true;
-            },
-
-
-            /**
-             * SINALIZA QUE O INPUT ESTÁ INVÁLIDO
-             * E FAZ UM EFEITO DE "SHAKE" no FORM
-             **/
-            inputAlertInvalid : function ($element) {
-                $form.animateCss('shake');
-                $element.addClass('is-danger');
-                $element.focus().parent().find('.icon-error').show();
-                return false;
-            },
-
-
-
-
-        };
-
-        $form.find('.icon-error, .icon-success').hide();
-
-
-        /**
-         * PERCORRENDO TODOS ELEMENTOS DO FORMULARIO
-         **/
-        $form.find('input, select, textarea').each(function(index, element) {
-
-            var $element = $(element);
-
-
-            /**
-             * VALIDAÇÃO "REQUIRED"
-             **/
-            if($element.attr('required') !== undefined) {
-
-                switch($element.attr('type')) {
-
-                    /**
-                     * VALIDANDO INPUT TYPE TEXT
-                     **/
-                    case 'text':
-                    case 'search':
-                    case 'password':
-                        if(_methods.inputLengthEmpty($element)) {
-
-                            _methods.inputAlertInvalid($element);
-                            validateAllInput = false;
-
-                            return false;
-                        }
-                        break;
-
-
-
-                    /**
-                     * VALIDANDO INPUT TYPE EMAIL
-                     **/
-                    case 'email':
-
-                        if(_methods.inputLengthEmpty($element)) {
-
-                            _methods.inputAlertInvalid($element);
-                            validateAllInput = false;
-
-                            return false;
-                        }
-
-                        if (!_methods.inputIsEmailValid($element)) {
-
-                            _methods.inputAlertInvalid($element);
-                            validateAllInput = false;
-
-                            return false;
-                        }
-
-                        break;
-
-
-
-                    /**
-                     * VALIDANDO INPUT TYPE CHECKBOX
-                     **/
-                    case 'checkbox':
-
-                        _methods.inputAlertInvalid($element);
-                        validateAllInput = false;
-                        return false;
-
-                        break;
-
-
-                    /**
-                     * VALIDANDO INPUT TYPE RADIO
-                     **/
-                    case 'radio':
-
-                        _methods.inputAlertInvalid($element);
-                        validateAllInput = false;
-                        return false;
-
-                        break;
-
-
-                    // case 'select':
-                    //     if(!$element.val().length) {
-                    //         $form.animateCss('shake');
-                    //         $element.parent().addClass('is-danger');
-                    //         $element.focus().parent().find('.icon-error').show();
-                    //         validateAllInput = false;
-                    //         return false;
-                    //     }
-                    //     break;
-
-                    // case 'textarea':
-                    //     if($element.val().length < 3) {
-                    //         $form.animateCss('shake');
-                    //         $element.addClass('is-danger');
-                    //         $element.focus().parent().find('.icon-error').show();
-                    //         validateAllInput = false;
-                    //         return false;
-                    //     }
-                    //     break;
-
-                    default:
-                        console.log('INPUT NÃO INDENTIFICADO');
-                }
-
-                console.log('INPUT PASSOU PELO SWITCH');
-
-            }
-
-            $element.addClass('is-success').removeClass('is-danger');
-            $element.parent().find('.icon-success').show();
-
-            // if($element.attr('type') === 'select') {
-            //     $element.parent().addClass('is-success').removeClass('is-danger');
-            // }
-
-        });
-
-        return validateAllInput;
-    },
-    cmsFormAjaxSend : function (beforeSend, success, error, complete) {
-
-        var $form = this;
-        var $submit = this.find('button.is-submit');
-        var _methods = {
-
-            getPath : function ($form) {
-
-                if(!$form.attr('data-action').length) {
-                    return swal({
-                        title: 'Ops!',
-                        text: 'Action do formulário não foi definida.',
-                        type: 'error',
-                        confirmButtonText: 'Okay'
-                    });
-                }
-
-                return $form.attr('data-action');
-
-            },
-
-            getMethod : function ($form) {
-
-                if(!$form.attr('method').length) {
-                    return swal({
-                        title: 'Ops!',
-                        text: 'Method do formulário não foi definida.',
-                        type: 'error',
-                        confirmButtonText: 'Okay'
-                    });
-                }
-
-                return $form.attr('method');
-
-            },
-
-        };
-
-        // VALIDANDO SE JÁ FOI SUBMETIDO
-        if($form.hasClass('sending')) {
-            return false;
-        }
-
-        // ENVIANDO O REQUEST EM AJAX
-        $.ajax({
-            url : _methods.getPath($form),
-            method : _methods.getMethod($form),
-            data : $form.serializeArray(),
-            beforeSend : function() {
-                $form.addClass('sending');
-                $submit.addClass('is-loading');
-
-                if (typeof beforeSend === 'function') {
-                    beforeSend();
-                }
-            },
-            success : function(response) {
-                if (typeof success === 'function') {
-                    success(response);
-                }
-            },
-            error : function() {
-
-                if (typeof error === 'function') {
-                    error();
-                } else {
-                    swal({
-                        title: 'Ops!',
-                        text: 'Erro no servidor, tente novamente daqui alguns minutos.',
-                        type: 'error',
-                        confirmButtonText: 'Okay'
-                    });
-                }
-            },
-            complete : function() {
-                $form.removeClass('sending');
-                $submit.removeClass('is-loading');
-
-                if (typeof complete === 'function') {
-                    complete();
-                }
-            },
-            statusCode : {
-                200 : function() {console.log('200');},
-                404 : function() {console.log('404');},
-                500 : function() {console.log('500');}
-            }
-        });
-
     }
 
 });

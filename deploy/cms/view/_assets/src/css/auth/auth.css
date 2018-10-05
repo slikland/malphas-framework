@@ -10,43 +10,19 @@
     }
 
 
+    #login {}
+    #forgot {}
 
-/**
-** PAGE AUTH
-** LOGIN
-**/
-    #login {
-
-    }
-        #loginBox {
+        #authBox {
             width: 300px;
             margin: 0 auto;
         }
-        .loading #loginBox {
+        .loading #authBox {
             opacity: 0;
         }
-            #formLogin.sending {
+            #formAuth.sending {
                 opacity: 0.7;
                 cursor: wait;
             }
 
 
-
-/**
-** PAGE AUTH
-** FORGOT PASSWORD
-**/
-    #forgot {
-
-    }
-        #forgotBox {
-            width: 300px;
-            margin: 0 auto;
-        }
-        .loading #forgotBox {
-            opacity: 0;
-        }
-            #formForgot.sending {
-                opacity: 0.7;
-                cursor: wait;
-            }

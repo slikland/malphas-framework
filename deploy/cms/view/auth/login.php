@@ -13,18 +13,18 @@
             <div class="hero-body">
                 <div class="container">
 
-                    <div id="loginBox" class="">
+                    <div id="authBox" class="">
 
                         <h1 class="has-text-centered">
                             <strong><?php echo title(); ?></strong>
                         </h1>
 
-                        <div id="authNotification" class="notification" style="display: none;">
+                        <div id="authNotification" class="notification has-text-centered" style="display: none;">
                             <button class="notification-close delete"></button>
                             <p><?php if(!empty($message)) { echo $message; } ?></p>
                         </div>
 
-                        <form id="formLogin"
+                        <form id="formAuth"
                               action="javascript:void(0);"
                               data-action="<?php echo baseUrl('auth/'); ?>"
                               method="POST">
@@ -36,8 +36,7 @@
                                            name="email"
                                            type="email"
                                            placeholder="Email"
-                                           autocomplete="off"
-                                           required="required" >
+                                           autocomplete="off">
 
                                     <span class="icon is-small is-left">
                                         <i class="fa fa-envelope"></i>
@@ -60,7 +59,6 @@
                                            type="password"
                                            placeholder="Password"
                                            autocomplete="off"
-                                           required="required"
                                            minlength="6">
 
                                     <span class="icon is-small is-left">
@@ -78,7 +76,7 @@
 
                             <div class="field">
                                 <p class="control">
-                                    <button id="loginSubmit" class="button is-medium is-success is-fullwidth is-submit">
+                                    <button id="authSubmit" class="button is-medium is-success is-fullwidth is-submit">
                                         <span>Login</span>
                                     </button>
                                 </p>
