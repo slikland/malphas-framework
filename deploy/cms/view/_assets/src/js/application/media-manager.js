@@ -30,12 +30,15 @@ $(document).on('ready', function () {
                         'error'
                     );
                 }
+
                 $('#uploadDropMediaManagerProgress').val(100);
                 swal(
                     'Sucesso',
                     'Arquivos foram salvos com sucesso',
                     'success'
-                );
+                ).then(function(){
+                    window.location.reload();
+                });
             }
         });
     }
@@ -49,35 +52,82 @@ $(document).on('ready', function () {
 
 
 
+    if($('#actionMediaManager').length) {
+
+        $('#actionMediaManagerSelectAll').on('click', function () {
+            $('.file-manager-item').each(function (index, element) {
+                $(this).addClass('is-selected');
+            });
+        });
+        $('#actionMediaManagerSelectAll').on('click', function () {
+
+            if($('.file-manager-item:has(.is-selected)').length) {
+                $('.file-manager-item').each(function (index, element) {
+                    $(element).trigger('click');
+                });
+            } else {
+                $('.file-manager-item').each(function (index, element) {
+                    $(element).trigger('click');
+                });
+            }
+        });
 
 
+        $('.file-manager-item').each(function (index, element) {
+            $(this).on('click', function () {
+
+                $(this).addClass('is-selected');
+                //$(this).toggleClass('is-selected');
+
+                if($('.file-manager-item.is-selected').length) {
+                    $('#actionMediaManagerDeleteSelectedRows').removeClass('blocked');
+                    $('#actionMediaManagerSelectAll i').attr('class', 'fas fa-check-square');
+                } else {
+                    $('#actionMediaManagerDeleteSelectedRows').addClass('blocked');
+                    $('#actionMediaManagerSelectAll i').attr('class', 'far fa-square');
+                }
+            });
+        });
+
+    }
 
 
     if($('#mediaManager').length) {
+
+        if(!$('#gerenciadorMedia').length) {
+            $('#uploadDropMediaManager').slideDown(200);
+        }
 
         $('#mediaManager').on('dragover', function(event) {
             event.preventDefault();
             event.stopPropagation();
             $('#uploadDropMediaManager').slideDown(200);
+            $('html').addClass('has-dragover');
         });
         $('#mediaManager').on('dragleave', function(event) {
             event.preventDefault();
             event.stopPropagation();
             $('#uploadDropMediaManager').removeClass('is-dragover');
+            $('html').removeClass('has-dragover');
         });
-
-
+        $('#mediaManager').on('drop', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            $('#uploadDropMediaManager').removeClass('is-dragover');
+            $('html').removeClass('has-dragover');
+        });
 
         $('#uploadDropMediaManager').on('dragover', function(event) {
             event.preventDefault();
             event.stopPropagation();
             $('#uploadDropMediaManager').addClass('is-dragover');
+            $('html').addClass('has-dragover');
         });
-
         $('#uploadDropMediaManager').on('drop', function(event) {
             event.preventDefault();
             event.stopPropagation();
             $('#uploadDropMediaManager').removeClass('is-dragover');
+            $('html').removeClass('has-dragover');
 
             var filesDrop = event.originalEvent.dataTransfer.files;
             var filesData = new FormData();
@@ -85,15 +135,7 @@ $(document).on('ready', function () {
             for (var i = 0; i < filesDrop.length; i ++) {
                 filesData.append('file[]', filesDrop[i], filesDrop[i]['name']);
                 totalByte += filesDrop[i]['size'];
-
-                console.log('NAME : ', filesDrop[i]['name']);
-                console.log('SIZE : ', filesDrop[i]['size']);
-                console.log('TYPE : ', filesDrop[i]['type']);
-                console.log('---------------');
             }
-
-            console.log('totalByte', totalByte);
-            console.log('convertedByte', convertSize(totalByte));
 
             if(totalByte > 8300000) {
                 $('#uploadDropMediaManagerProgress').val(0);
@@ -107,47 +149,73 @@ $(document).on('ready', function () {
             uploadData(filesData);
         });
 
-    }
+        $('.file-manager-view').each(function(index, element) {});
+        $('.file-manager-edit').each(function(index, element) {});
 
+        $('.file-manager-delete').each(function(index, element) {
 
+            var $this = $(element);
 
+            $this.on('click', function() {
 
-    $('.file-manager-view').each(function(index, element) {});
-    $('.file-manager-edit').each(function(index, element) {});
+                swal({
+                    title: 'Deletar arquivo.',
+                    text: 'Tem certeza que vai deletar esse arquivo?',
+                    type: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sim, deletar!'
+                }).then(function(result){
 
-    $('.file-manager-delete').each(function(index, element) {
+                    if (result.value) {
+                        $this.parent().parent().hide(200);
+                        swal(
+                            'Deletado!',
+                            'Arquivo deletado para sempre!!!',
+                            'success'
+                        );
+                    }
 
-        var $this = $(element);
-
-        $this.on('click', function() {
-
-            swal({
-                title: 'Deletar arquivo.',
-                text: 'Tem certeza que vai deletar esse arquivo?',
-                type: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Sim, deletar!'
-            }).then(function(result){
-
-                if (result.value) {
-                    $this.parent().parent().hide(200);
-                    swal(
-                        'Deletado!',
-                        'Arquivo deletado para sempre!!!',
-                        'success'
-                    );
-                }
+                });
 
             });
 
         });
 
-    });
+
+
+
+        if($('#formSearcMedia').length) {
+
+            $(window).on('keyup', function(event) {
+                console.log(event);
+            });
+
+            $('#formSearcMedia').on('keyup', function(event) {
+                var $this = $(this);
+
+                $this.find('.control').addClass('is-loading');
+
+                if(event.keyCode === 27) {
+                    return $('#formSearcMediaInput').blur();
+                }
+
+
+            });
+
+            $('#formSearcMediaInput').blur(function () {
+                var $this = $(this);
+                $this.parent().removeClass('is-loading');
+            });
+
+        }
 
 
 
 
+
+
+    }
 
 });

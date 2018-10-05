@@ -1,5 +1,6 @@
 <?php
 namespace core\Utils;
+use model\Role;
 
 class File
 {
@@ -62,7 +63,6 @@ class File
         }
 
         $files = array();
-        $statusSave = array();
 
         foreach ($postFile['file']['name'] as $key => $value) {
 
@@ -76,26 +76,47 @@ class File
                 self::mkdir(UPLOAD_PATH, 0777);
             }
 
-            $nameExt = explode('.', $value);
-            $name = substr(Str::slugfy($nameExt[0]), 0, 200) . '-' .uniqid();
+            $fileName       = self::getName($value);
+            $fileName       = substr(Str::slugfy($fileName), 0, 200) . '-' .uniqid();
+            $fileExtension  = self::getExtension($value);
+            $fullName       = $fileName . '.' . $fileExtension;
 
             array_push($files, array(
-                'name'  => $name . '.' . $nameExt[1],
-                'ext'   => $nameExt[1],
+                'name'  => $fullName,
+                'ext'   => $fileExtension,
                 'type'  => $postFile['file']['type'][$key],
                 'size'  => $postFile['file']['size'][$key],
             ));
 
-            if(move_uploaded_file($fileTmp,UPLOAD_PATH . $name . '.' . $nameExt[1])) {
-                array_push($statusSave, $files);
-            } else {
-                array_push($statusSave, array(
-                    'error' => true,
-                ));
+            if(!move_uploaded_file($fileTmp,UPLOAD_PATH . $fullName)) {
+                return false;
             }
-
         }
-        return $statusSave;
+        return $files;
     }
+
+    public static function getName($fileName)
+    {
+        return self::explodeNameExtension($fileName)['name'];
+    }
+
+    public static function getExtension($fileName)
+    {
+        return self::explodeNameExtension($fileName)['extension'];
+    }
+
+    public static function explodeNameExtension($fileName)
+    {
+        $explode    = explode('.', $fileName);
+        $extension  = end($explode);
+        array_pop($explode);
+        $name       = implode('-', $explode);
+
+        return array(
+            'name'      => $name,
+            'extension' => $extension,
+        );
+    }
+
 
 }
