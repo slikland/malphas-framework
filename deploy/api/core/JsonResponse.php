@@ -13,5 +13,6 @@ class JsonResponse
         }
 
         print json_encode($data);
+        die;
     }
 }

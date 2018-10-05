@@ -9,10 +9,10 @@ use model\User;
 
 class Auth
 {
-    protected $inactivity      = 60;          // TODO: this
-    public  static $redirectTo = 'dashboard';
-    private static $expire     = '2 hours';
-    private static $cookieName = 'auth_cms';
+    protected $inactivity       = 60;
+    public  static $redirectTo  = 'dashboard';
+    private static $expire      = '2 hours';
+    private static $cookieName  = 'auth_cms';
 
     public static function init()
     {
@@ -22,14 +22,14 @@ class Auth
     public static function isLoggedIn()
     {
         if(empty($_COOKIE[self::$cookieName])) {
-            die('voce nao esta logado');
+            Http::redirect(BASE_URL);
         }
 
-        $decrypt    = Cypher::decrypt($_COOKIE[self::$cookieName]);
+        $decrypt     = Cypher::decrypt($_COOKIE[self::$cookieName]);
         $userAgentIp = self::userAgentIp();
 
         if($decrypt != $userAgentIp) {
-            die('voce nao esta logado');
+            Http::redirect(BASE_URL);
         }
     }
 

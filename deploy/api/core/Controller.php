@@ -20,6 +20,10 @@ class Controller
         return new Template($file, $data);
     }
 
+    public function redirect($path){
+        return Http::redirect($path);
+    }
+
     public static function load($controllerName)
     {
         $file  = !empty(self::find($controllerName)['fileName']) ? self::find($controllerName)['fileName'] : false;

@@ -37,8 +37,6 @@ class AuthController extends Controller
     {
         Auth::destroy();
 
-        return $this->view('auth/login', array(
-            'message' => 'Logout realizado com sucesso.'
-        ));
+        return $this->redirect(BASE_URL);
     }
 }

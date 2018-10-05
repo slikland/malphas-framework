@@ -257,4 +257,9 @@ class Http
     {
         return header("Content-Type: $contentType");
     }
+
+    public static function redirect($path)
+    {
+        header("Location:" . $path);
+    }
 }
