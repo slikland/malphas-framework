@@ -40,22 +40,26 @@
                         <div class="columns">
                             <div class="column">
                                 <div id="severalAction" class="">
-                                    <a id="actionMediaManagerSelectAll" class="button">
+                                    <a id="actionMediaManagerSelectAll"
+                                       class="button">
                                         <i class="far fa-square"></i>
                                     </a>
                                     <a id="" class="button">
                                         <i class="fas fa-sync-alt"></i>
                                     </a>
-                                    <a id="actionMediaManagerDeleteSelectedRows" class="button blocked">
+                                    <a id="actionMediaManagerDeleteSelectedRows"
+                                       class="button blocked">
                                         <i class="fas fa-trash-alt"></i>
                                     </a>
                                 </div>
                             </div>
                             <div class="column has-text-right">
-                                <a id="addFileDragAndDrop" href="#/" class="button is-info"">
+                                <a id="addFileDragAndDrop" href="#/"
+                                   class="button is-info"">
                                     <strong>ADICIONAR VÁRIOS ARQUIVOS</strong>
                                 </a>
-                                <a href="./ajax-image-add" class="button is-dark" rel="modal:open">
+                                <a href="<?php echo baseUrl('mediamanager/create/'); ?>"
+                                   class="button is-dark">
                                     <strong>ADICIONAR UM ARQUIVO</strong>
                                 </a>
                             </div>
@@ -89,26 +93,24 @@
                             </div>
                         </form>
                         <ul id="fileManagerList">
-
                             <?php foreach ($files as $key => $value) : ?>
                                 <li class="file-manager-item"
                                     data-id="<?php echo $value['id']; ?>"
                                     data-tags="<?php echo $value['ext']; ?>"
                                     data-description="<?php echo $value['description']; ?>">
-                                    <i class="file-manager-type fas fa-<?php echo mediaIcon($value['ext']); ?>"></i>
+                                    <i class="file-manager-type <?php echo mediaIcon($value['ext']); ?>"></i>
                                     <div class="file-manager-action">
-                                        <a href="#/" class="file-manager-delete">
+                                        <a href="<?php echo baseUrl("mediamanager/delete/{$value['id']}"); ?>"
+                                           class="file-manager-delete">
                                             <i class="fas fa-times"></i>
                                         </a>
-                                        <a href="./ajax-image-edit"
-                                           class="file-manager-edit"
-                                           rel="modal:open">
+                                        <a href="<?php echo baseUrl("mediamanager/edit/{$value['id']}"); ?>"
+                                           class="file-manager-edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                     </div>
                                 </li>
                             <?php endforeach; ?>
-
                         </ul>
                     </div>
                     <?php endif; ?>

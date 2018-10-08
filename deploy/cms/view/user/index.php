@@ -109,7 +109,8 @@
                             </tfoot>
 
                             <tbody>
-                            <?php foreach ($users as $value) : ?>
+                            <?php foreach ($users as $value) :
+                                if($value['email'] !== 'admin@slikland.com') : ?>
                                 <tr>
                                     <th>
                                         <label class="label">
@@ -139,7 +140,7 @@
                                         </a>
                                     </th>
                                 </tr>
-                            <?php endforeach; ?>
+                            <?php endif; endforeach; ?>
                             </tbody>
 
 

@@ -47,28 +47,26 @@ function dateFormatBR($databaseTimeStamp)
 function mediaIcon($extension = null)
 {
     $iconByExtension = array(
-        'file'          => array(''),
-        'image'         => array('jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff'),
-        'audio'         => array('mp3', 'wma', 'wav'),
-        'video'         => array('video', 'mov', 'mp4', 'avi', 'webm'),
-        'word'          => array('doc', 'docx'),
-        'powerpoint'    => array('ppt', 'pptx'),
-        'excel'         => array('xls', 'xlsx', 'csv'),
-        'pdf'           => array('pdf'),
-        'archive'       => array('zip', 'rar', 'tar'),
-        'html5'         => array('html', 'htm'),
-        'php'           => array('php'),
-        'js'            => array('js'),
-        'css3'          => array('css'),
-        'less'          => array('less'),
-        'sass'          => array('sass'),
-        'terminal'      => array('sh'),
-        'signature'     => array(''),
-        'contract'      => array(''),
-        'fingerprint'   => array('key', 'pem')
+        array('icon' => 'fas fa-file', 'ext' => array('')),
+        array('icon' => 'fas fa-file-image', 'ext' => array('jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff')),
+        array('icon' => 'fas fa-file-audio', 'ext' => array('mp3', 'wma', 'wav')),
+        array('icon' => 'fas fa-file-video', 'ext' => array('video', 'mov', 'mp4', 'avi', 'webm')),
+        array('icon' => 'fas fa-file-word', 'ext' => array('doc', 'docx')),
+        array('icon' => 'fas fa-file-powerpoint', 'ext' => array('ppt', 'pptx')),
+        array('icon' => 'fas fa-file-excel', 'ext' => array('xls', 'xlsx', 'csv')),
+        array('icon' => 'fas fa-file-pdf', 'ext' => array('pdf')),
+        array('icon' => 'fas fa-file-archive', 'ext' => array('zip', 'rar', 'tar')),
+        array('icon' => 'fas fa-file-code', 'ext' => array('html', 'htm', 'php', 'js', 'css', 'less', 'sass')),
+        array('icon' => 'fas fa-terminal', 'ext' => array('sh')),
+        array('icon' => 'fas fa-signature', 'ext' => array('')),
+        array('icon' => 'fas fa-contract', 'ext' => array('')),
+        array('icon' => 'fas fa-fingerprint', 'ext' => array('key', 'pem'))
     );
 
-
-    return 'file';
+    foreach ($iconByExtension as $key => $value) {
+        if(in_array($extension, $value['ext'])) {
+            return $value['icon'];
+        }
+    }
 
 }

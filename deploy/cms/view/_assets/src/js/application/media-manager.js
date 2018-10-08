@@ -1,7 +1,6 @@
 $(document).on('ready', function () {
 
     function uploadData(formdata){
-
         var _intervalProgress = 0;
         $.ajax({
             url: baseUrl+'mediamanager/upload/',
@@ -30,7 +29,6 @@ $(document).on('ready', function () {
                         'error'
                     );
                 }
-
                 $('#uploadDropMediaManagerProgress').val(100);
                 swal(
                     'Sucesso',
@@ -50,7 +48,20 @@ $(document).on('ready', function () {
         return Math.round(size / Math.pow(1024, i), 2) + ' ' + sizes[i];
     }
 
+    if($('#fileName').length) {
+        $('#fileName').on('keyup', function (event) {
+            var $this = $(this);
+            $this.val(slugify($this.val()));
+        });
+    }
 
+
+
+    if($('#addFileDragAndDrop').length) {
+        $('#addFileDragAndDrop').on('click', function () {
+            $('#uploadDropMediaManager').slideToggle(200);
+        });
+    }
 
     if($('#actionMediaManager').length) {
 
@@ -71,8 +82,6 @@ $(document).on('ready', function () {
                 });
             }
         });
-
-
         $('.file-manager-item').each(function (index, element) {
             $(this).on('click', function () {
 
@@ -153,11 +162,8 @@ $(document).on('ready', function () {
         $('.file-manager-edit').each(function(index, element) {});
 
         $('.file-manager-delete').each(function(index, element) {
-
             var $this = $(element);
-
             $this.on('click', function() {
-
                 swal({
                     title: 'Deletar arquivo.',
                     text: 'Tem certeza que vai deletar esse arquivo?',
@@ -167,18 +173,35 @@ $(document).on('ready', function () {
                     cancelButtonColor: '#d33',
                     confirmButtonText: 'Sim, deletar!'
                 }).then(function(result){
-
                     if (result.value) {
-                        $this.parent().parent().hide(200);
-                        swal(
-                            'Deletado!',
-                            'Arquivo deletado para sempre!!!',
-                            'success'
-                        );
+                        $this.formCrudAjaxDelete({
+                            path : $this.attr('href'),
+                            success : function (response) {
+                                if(response === true) {
+                                    swal({
+                                        title: 'Sucesso',
+                                        text: response.message,
+                                        type: 'success',
+                                        confirmButtonText: 'Okay'
+                                    }).then(function(result) {
+                                        $this.parent().parent().delay(300).addClass('deleted').hide(200);
+                                        if(!$('#fileManagerList .file-manager-item:not(.deleted)').length) {
+                                            window.location.reload();
+                                        }
+                                    });
+                                } else {
+                                    swal({
+                                        title: 'Ops!',
+                                        text: response.message,
+                                        type: 'error',
+                                        confirmButtonText: 'Okay'
+                                    });
+                                }
+                            }
+                        });
                     }
-
                 });
-
+                return false;
             });
 
         });
