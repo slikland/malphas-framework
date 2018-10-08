@@ -12,38 +12,33 @@ class UserController extends Controller
     private $model;
 
     public $validation = [
-        'nome' => [
-            'Data' => 'required'
-        ],
-        'email' => [
-            'Data' => [
-                'required',
-                ['min' => 3],
+        'general' => [
+            'name' => [
+                'Data' => [
+                    'required',
+                    ['min' => 3]
+                ]
             ],
-            'Email' => 'isValid'
+            'email' => [
+                'Data' => 'required',
+                'Email' => 'isValid'
+            ],
+            'cms_role_id' => [
+                'Data' => 'required'
+            ],
+            'password_confirm' => ['Data'  => 'required'],
+            'password' => [
+                'Data'  => [
+                    'required',
+                    ['equals' => 'password_confirm']
+                ]
+            ]
         ],
-        'password' => [
-            'Data' => ['min' => 3]
+        'update' => [
+            'password' => [],
+            'password_confirm' => []
         ]
     ];
-
-//    public $validation = [
-//        'general' => [
-//            'password_confirm' => ['Data'  => 'required'],
-//            'password' => [
-//                'Data'  => [
-//                    'required',
-//                    ['equals' => 'password_confirm']
-//                ]
-//            ]
-//        ],
-//        'insert' => [
-//
-//        ],
-//        'update' => [
-//
-//        ]
-//    ];
 
     public function __construct()
     {

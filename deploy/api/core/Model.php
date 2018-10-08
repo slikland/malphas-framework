@@ -7,10 +7,11 @@ class Model
 
     public $validation = [];
 
+    public $methodsToValidate = ['insert', 'update'];
+
     public function __construct()
     {
         self::$db = DB::getInstance();
-        $this->validate();
     }
 
     public function all()
@@ -25,11 +26,13 @@ class Model
 
     public function insert($data)
     {
+        $this->validate('insert');
         return self::$db->insertFields($this->table, $data);
     }
 
     public function update($id, $data)
     {
+        $this->validate('update');
         return self::$db->updateFields($this->table, $data, "id = $id");
     }
 
@@ -44,6 +47,16 @@ class Model
         return self::$db->fetch_all('SELECT * FROM '.$this->table.$where, $conditions);
     }
 
+    public function isUnique($conditions)
+    {
+        $get = self::getWhere($conditions);
+        if(count($get) >= 1) {
+            return false;
+        }
+
+        return true;
+    }
+
     private function queryBuilderWhere($conditions)
     {
         $where = '';
@@ -53,9 +66,8 @@ class Model
         return $where;
     }
 
-    private function validate()
+    private function validate($method)
     {
-        return true;
-//        Validate::this($this);
+        Validate::current($this, $method);
     }
 }

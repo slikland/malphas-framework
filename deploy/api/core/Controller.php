@@ -111,6 +111,6 @@ class Controller
 
     private static function validate($instance, $method)
     {
-        Validate::this($instance, $method);
+        Validate::current($instance, $method);
     }
 }

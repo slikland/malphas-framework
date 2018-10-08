@@ -9,36 +9,15 @@ class User extends Model
 
     public $validation = [
         'general' => [
-            'name' => [
-                'Data' => [
-                    ['min' => 3],
-                    ['max' => 255]
-                ]
-            ],
             'email' => [
-                'Email' => 'isValid',
-                'Data'  => [
-                    ['min' => 3],
-                    'unique'
-                ]
-            ],
-            'password' => [
-                'Data'  => [
-                    ['min' => 6]
-                ]
+                'Data'  => 'unique'
             ],
             'cms_role_id' => [
-                'Data' => [
-                    'required',
-                    'isInt'
-                ]
+                'Data' => 'isInt'
             ]
         ],
-        'insert' => [
-
-        ],
         'update' => [
-
+            'email' => []
         ]
     ];
 
