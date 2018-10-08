@@ -8,6 +8,8 @@ class Controller
 
     public $validation = [];
 
+    public $methodsToValidate = ['insert', 'update'];
+
     public function __construct()
     {
         if($this->isAuthenticable){
@@ -62,7 +64,7 @@ class Controller
     public static function execute($controller, $method, $parameters = false)
     {
         $instance = self::load($controller);
-        self::validate($instance);
+        self::validate($instance, $method);
 
         if(!method_exists ($instance, $method)) {
             Http::status(404);
@@ -107,8 +109,8 @@ class Controller
         return $response;
     }
 
-    private static function validate($instance)
+    private static function validate($instance, $method)
     {
-        Validate::this($instance);
+        Validate::current($instance, $method);
     }
 }
