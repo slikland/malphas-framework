@@ -35,11 +35,11 @@
                     </div>
                     <!-- REFACTORY TEMPLATE -->
 
-                    <?php if(!empty($users)) : ?>
-                    <!-- REFACTORY TEMPLATE -->
-                    <div id="actionTableContent" class="columns">
-                        <div class="column">
+                    <?php if(count($users) > 1) : ?>
 
+                    <div id="actionTableContent" class="columns">
+                        <!-- REFACTORY TEMPLATE -->
+                        <div class="column">
                             <div id="severalAction" class="">
                                 <a id="actionTableContentSelectAllRows" class="button">
                                     <i class="far fa-square"></i>
@@ -51,8 +51,9 @@
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
                             </div>
-
                         </div>
+                        <!-- REFACTORY TEMPLATE -->
+
                         <div class="column has-text-right">
                             <a id="actionCreateNewRegister"
                                class="button is-dark"
@@ -61,13 +62,12 @@
                             </a>
                         </div>
                     </div>
-                    <!-- REFACTORY TEMPLATE -->
                     <?php endif; ?>
 
 
                     <div class="box">
 
-                        <?php if(empty($users)) : ?>
+                        <?php if(count($users) <= 1) : ?>
                         <div class="notification">
                             <p class="has-text-centered">
                                 <strong class="is-size-4">Nenhum usuário cadastrado</strong>
@@ -110,7 +110,7 @@
 
                             <tbody>
                             <?php foreach ($users as $value) :
-                                if($value['email'] !== 'admin@slikland.com') : ?>
+                                if($value['id'] !== 1) : ?>
                                 <tr>
                                     <th>
                                         <label class="label">
