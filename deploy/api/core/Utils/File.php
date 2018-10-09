@@ -67,6 +67,7 @@ class File
         foreach ($postFile['file']['name'] as $key => $value) {
 
             $fileTmp = $postFile['file']['tmp_name'][$key];
+            $fullName = self::gernerateFileName($value);
 
             if(!file_exists($fileTmp)) {
                 return false;
@@ -76,14 +77,9 @@ class File
                 self::mkdir(UPLOAD_PATH, 0777);
             }
 
-            $fileName       = self::getName($value);
-            $fileName       = substr(Str::slugfy($fileName), 0, 200) . '-' .uniqid();
-            $fileExtension  = self::getExtension($value);
-            $fullName       = $fileName . '.' . $fileExtension;
-
             array_push($files, array(
                 'name'  => $fullName,
-                'ext'   => $fileExtension,
+                'ext'   => self::getExtension($value),
                 'type'  => $postFile['file']['type'][$key],
                 'size'  => $postFile['file']['size'][$key],
             ));
@@ -110,19 +106,25 @@ class File
         $explode    = explode('.', $fileName);
         $extension  = end($explode);
         array_pop($explode);
-        $name       = implode('-', $explode);
 
         return array(
-            'name'      => $name,
+            'name'      => implode('-', $explode),
             'extension' => $extension,
         );
+    }
+
+    public static function gernerateFileName($fileName)
+    {
+        $fileName       = substr(Str::slugfy(self::getName($fileName)), 0, 200) . '-' .uniqid();
+        $fileExtension  = self::getExtension($fileName);
+
+        return $fileName . '.' . $fileExtension;
     }
 
     public static function convertByteToMega($size, $precision = 2)
     {
         $base = log($size, 1024);
         $suffixes = array('B', 'KB', 'MB', 'GB', 'TB');
-
         return round(pow(1024, $base - floor($base)), $precision) .' '. $suffixes[floor($base)];
     }
 

@@ -49,11 +49,16 @@ class MediaManagerController extends Controller
         ));
     }
 
-    public function update($id)
+    public function update($id = null)
     {
-        $oldFile = $this->model->get($id);
         $getPost = Http::getPost();
-        $getPost['name'] = $getPost['name'].'.'.$getPost['ext'];
+
+        if(empty($getPost)) {
+            return false;
+        }
+
+        $oldFile = $this->model->get($id);
+        $getPost['name'] = File::gernerateFileName($getPost['name'].'.'.$getPost['ext']);
         $filteredData = Filter::vetor($this->model->fillable, $getPost);
         $update = $this->model->update($id, $filteredData);
 

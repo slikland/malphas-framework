@@ -51,11 +51,9 @@ $(document).on('ready', function () {
     if($('#fileName').length) {
         $('#fileName').on('keyup', function (event) {
             var $this = $(this);
-            $this.val(slugify($this.val()));
+            //$this.val(slugify($this.val()));
         });
     }
-
-
 
     if($('#addFileDragAndDrop').length) {
         $('#addFileDragAndDrop').on('click', function () {
@@ -64,30 +62,25 @@ $(document).on('ready', function () {
     }
 
     if($('#actionMediaManager').length) {
-
         $('#actionMediaManagerSelectAll').on('click', function () {
-            $('.file-manager-item').each(function (index, element) {
-                $(this).addClass('is-selected');
-            });
-        });
-        $('#actionMediaManagerSelectAll').on('click', function () {
-
-            if($('.file-manager-item:has(.is-selected)').length) {
-                $('.file-manager-item').each(function (index, element) {
+            if($('.file-manager-item:not(.is-selected)').length) {
+                $('.file-manager-item:not(.is-selected)').each(function (index, element) {
                     $(element).trigger('click');
                 });
             } else {
-                $('.file-manager-item').each(function (index, element) {
+                $('.file-manager-item.is-selected').each(function (index, element) {
                     $(element).trigger('click');
                 });
             }
         });
         $('.file-manager-item').each(function (index, element) {
             $(this).on('click', function () {
-
-                $(this).addClass('is-selected');
-                //$(this).toggleClass('is-selected');
-
+                $(this).toggleClass('is-selected');
+                if($(this).hasClass('is-selected')) {
+                    $(this).find('input').prop('checked', true);
+                } else {
+                    $(this).find('input').prop('checked', false);
+                }
                 if($('.file-manager-item.is-selected').length) {
                     $('#actionMediaManagerDeleteSelectedRows').removeClass('blocked');
                     $('#actionMediaManagerSelectAll i').attr('class', 'fas fa-check-square');
@@ -212,24 +205,60 @@ $(document).on('ready', function () {
         if($('#formSearcMedia').length) {
 
             $(window).on('keyup', function(event) {
-                console.log(event);
+                //console.log(event);
             });
+
+            var mediaSearchKeyupInterval = 0;
+
+            var mediaSearchKeyupEnd = function() {
+                $('#formSearcMedia .control').removeClass('is-loading');
+                var $mediaItem = $('.file-manager-item');
+
+                $mediaItem.each(function(index, element) {
+                    var $this = $(element);
+                    var str = $this.attr('data-search-item').toLowerCase();
+
+                    if($this.attr('data-search-item') !== undefined) {
+                        if(str.indexOf($('#formSearcMediaInput').val().toLowerCase()) !== -1) {
+                            $this.css({
+                                display : 'inline-block',
+                                opacity : 1
+                            });
+                        } else {
+                            $this.css({
+                                display : 'none',
+                                opacity : 0.3
+                            });
+                        }
+                    }
+                });
+                clearInterval(mediaSearchKeyupInterval);
+            };
 
             $('#formSearcMedia').on('keyup', function(event) {
                 var $this = $(this);
+                var $mediaItem = $('.file-manager-item');
 
                 $this.find('.control').addClass('is-loading');
+                $mediaItem.css({
+                    opacity : 0.3
+                });
 
                 if(event.keyCode === 27) {
                     return $('#formSearcMediaInput').blur();
                 }
 
-
+                clearInterval(mediaSearchKeyupInterval);
+                mediaSearchKeyupInterval = setInterval(mediaSearchKeyupEnd, 250);
             });
 
             $('#formSearcMediaInput').blur(function () {
                 var $this = $(this);
                 $this.parent().removeClass('is-loading');
+                $('.file-manager-item').css({
+                    display : 'inline-block',
+                    opacity : 1
+                });
             });
 
         }

@@ -199,7 +199,7 @@
                                             CANCELAR
                                         </a>
                                         <button id="formBtnSubmit" class="button is-medium is-dark">
-                                            <?php echo empty($role) ? 'ADICIONAR NOVO ARQUIVO' : 'EDITAR ARQUIVO'; ?>
+                                            <?php echo empty($media) ? 'ADICIONAR NOVO ARQUIVO' : 'EDITAR ARQUIVO'; ?>
                                         </button>
                                     </div>
                                 </div>

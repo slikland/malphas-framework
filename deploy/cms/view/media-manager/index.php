@@ -44,9 +44,6 @@
                                        class="button">
                                         <i class="far fa-square"></i>
                                     </a>
-                                    <a id="" class="button">
-                                        <i class="fas fa-sync-alt"></i>
-                                    </a>
                                     <a id="actionMediaManagerDeleteSelectedRows"
                                        class="button blocked">
                                         <i class="fas fa-trash-alt"></i>
@@ -58,10 +55,10 @@
                                    class="button is-info"">
                                     <strong>ADICIONAR VÁRIOS ARQUIVOS</strong>
                                 </a>
-                                <a href="<?php echo baseUrl('mediamanager/create/'); ?>"
+                                <!-- <a href="<?php echo baseUrl('mediamanager/create/'); ?>"
                                    class="button is-dark">
                                     <strong>ADICIONAR UM ARQUIVO</strong>
-                                </a>
+                                </a> -->
                             </div>
                         </div>
                         <?php endif; ?>
@@ -74,7 +71,6 @@
                                           class="progress is-small transitions"
                                           value="0" max="100">0%</progress>
                             </div>
-                            <div id="uploadDropMediaManagerThumbs"><!-- DINAMIC THUMBS --></div>
                         </div>
 
                     </div>
@@ -88,7 +84,7 @@
                                     <input id="formSearcMediaInput"
                                            class="input is-medium"
                                            type="text"
-                                           placeholder="Pesquisar arquivos">
+                                           placeholder="Procurar arquivos">
                                 </div>
                             </div>
                         </form>
@@ -96,9 +92,16 @@
                             <?php foreach ($files as $key => $value) : ?>
                                 <li class="file-manager-item"
                                     data-id="<?php echo $value['id']; ?>"
-                                    data-tags="<?php echo $value['ext']; ?>"
-                                    data-description="<?php echo $value['description']; ?>">
+                                    data-search-item="<?php echo $value['description']; ?>, <?php echo $value['ext']; ?>, <?php echo $value['name']; ?>">
+                                    <span class="file-manager-checkbox">
+                                        <input type="checkbox" value="<?php echo $value['id']; ?>">
+                                    </span>
                                     <i class="file-manager-type <?php echo mediaIcon($value['ext']); ?>"></i>
+                                    <hr>
+                                    <p class="file-manager-name">
+                                        <i class="<?php echo mediaIcon($value['ext']); ?>"></i>
+                                        <span><?php echo $value['name']; ?></span>
+                                    </p>
                                     <div class="file-manager-action">
                                         <a href="<?php echo baseUrl("mediamanager/delete/{$value['id']}"); ?>"
                                            class="file-manager-delete">
