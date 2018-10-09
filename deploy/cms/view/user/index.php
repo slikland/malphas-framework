@@ -110,7 +110,7 @@
 
                             <tbody>
                             <?php foreach ($users as $value) :
-                                if($value['id'] !== 1) : ?>
+                                if($value['id'] != '1') : ?>
                                 <tr>
                                     <th>
                                         <label class="label">
