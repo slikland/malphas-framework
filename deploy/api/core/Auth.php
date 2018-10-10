@@ -41,8 +41,7 @@ class Auth
     public static function isValidLogin()
     {
         $post = Http::getPost();
-        $user = new User();
-        $user = $user->getByEmail($post['email']);
+        $user = User::getByEmail($post['email']);
 
         if(empty($user)) {
             return false;

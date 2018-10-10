@@ -5,6 +5,7 @@
     </head>
     <body class="loading">
         <?php
+            /* Prefiro não comentar */
             inc('_common/content-before.php');
             inc('_common/navbar-top.php');
             inc('_common/sidebar.php');
@@ -61,7 +62,7 @@
                                                    class="input is-medium"
                                                    type="text"
                                                    placeholder=". . ."
-                                                   value="<?php echo !empty($user['name']) ? $user['name'] : ''; ?>">
+                                                   value="<?php echo !empty($user->name) ? $user->name : ''; ?>">
 
                                             <span class="icon is-medium is-left">
                                                 <i class="fa fa-address-card"></i>
@@ -93,7 +94,7 @@
                                                    class="input is-medium"
                                                    type="text"
                                                    placeholder=". . ."
-                                                   value="<?php echo !empty($user['email']) ? $user['email'] : ''; ?>">
+                                                   value="<?php echo !empty($user->email) ? $user->email : ''; ?>">
 
                                             <span class="icon is-medium is-left">
                                                 <i class="fa fa-envelope"></i>
@@ -124,9 +125,9 @@
                                             <div class="select is-medium is-fullwidth">
                                                 <select id="userPermissions" name="cms_role_id" type="select">
                                                     <option value="">Escolha a Permissão</option>
-                                                    <?php foreach ($roles as $value) : ?>
-                                                    <option value="<?php echo $value['id']; ?>" <?php if(!empty($user) && $value['id'] == $user['cms_role_id']) { echo 'selected'; } ?>>
-                                                        <?php echo $value['name']; ?>
+                                                    <?php foreach ($roles as $role) : ?>
+                                                    <option value="<?php echo $role->id; ?>" <?php if(!empty($user) && $role->id == $user->cms_role_id) { echo 'selected'; } ?>>
+                                                        <?php echo $role->name; ?>
                                                     </option>
                                                     <?php endforeach; ?>
                                                 </select>
@@ -156,8 +157,7 @@
                                                    name="password"
                                                    class="input is-medium"
                                                    type="password"
-                                                   placeholder="Minimo de 6 caracteres"
-                                                   <?php echo empty($user) ? '' : ''; ?>>
+                                                   placeholder="Minimo de 6 caracteres">
 
                                             <span class="icon is-medium is-left">
                                                 <i class="fa fa-lock"></i>
@@ -177,8 +177,7 @@
                                                    name="password_confirm"
                                                    class="input is-medium"
                                                    type="password"
-                                                   placeholder="Repetir Senha"
-                                                   <?php echo empty($user) ? '' : ''; ?>>
+                                                   placeholder="Repetir Senha">
 
                                             <span class="icon is-medium is-left">
                                                 <i class="fa fa-lock"></i>
@@ -201,7 +200,6 @@
                                     </div>
                                 </div>
                             </div>
-
 
                             <!-- INPUT -->
                             <div class="field is-horizontal" style="margin-top: 30px;">

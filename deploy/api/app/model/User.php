@@ -5,7 +5,7 @@ use core\Model;
 
 class User extends Model
 {
-    protected $table = 'cms_users';
+    protected static $table = 'cms_users';
 
     public $validation = [
         'general' => [
@@ -21,26 +21,15 @@ class User extends Model
         ]
     ];
 
-    public $fillable = [
+    public static $fillable = [
         'name',
         'email',
         'password',
         'cms_role_id'
     ];
 
-    public function getByEmail($email)
+    public static function getByEmail($email)
     {
-        $all = $this->getWhere(['email' => $email]);
-
-        if(count($all) > 1) {
-            return $all;
-        }
-
-        if(!empty($all[0])) {
-            return $all[0];
-        }
-
-        return $all;
+        return User::all(false)->where('email', $email);
     }
-
 }

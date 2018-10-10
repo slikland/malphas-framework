@@ -4,7 +4,7 @@ use core\Utils\File;
 
 class Controller
 {
-    public $isAuthenticable = true;
+    public $isAuthenticable = false;
 
     public $validation = [];
 
@@ -97,14 +97,13 @@ class Controller
     protected static function parseResponse($response)
     {
         if($response === true) {
-            $response = true;
-
-        } else {
-            $response = array(
-                'error' => true,
-                'message' => $response
-            );
+            return true;
         }
+
+        $response = [
+            'error' => true,
+            'message' => $response
+        ];
 
         return $response;
     }

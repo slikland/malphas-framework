@@ -9,8 +9,6 @@ use core\Utils\Hash;
 
 class UserController extends Controller
 {
-    private $model;
-
     public $validation = [
         'general' => [
             'name' => [
@@ -40,35 +38,29 @@ class UserController extends Controller
         ]
     ];
 
-    public function __construct()
-    {
-        $this->model = new User();
-    }
-
     public function index()
     {
         return $this->view('user/index', array(
             'pageTitle'     => 'Usuário',
             'pageSubTitle'  => 'Todos',
-            'users'         => $this->model->all()
+            'users'         => User::all()
         ));
     }
 
     public function create()
     {
-        $role = new Role();
         return $this->view('user/create', array(
             'pageTitle'     => 'Adicionar Usuário',
             'pageSubTitle'  => '',
-            'roles'         => $role->all()
+            'roles'         => Role::all()
         ));
     }
 
     public function insert()
     {
-        $filteredData = Filter::vetor($this->model->fillable, $_POST);
+        $filteredData = Filter::vetor(User::$fillable, $_POST);
         $filteredData['password'] = Hash::generate($filteredData['password']);
-        $insert = $this->model->insert($filteredData);
+        $insert = User::insert($filteredData);
         $response = parent::parseResponse($insert);
 
         return JsonResponse::set(200, $response);
@@ -76,20 +68,18 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        $role = new Role();
-
         return $this->view('user/create', array(
             'pageTitle'     => 'Editar Usuário',
             'pageSubTitle'  => '',
-            'user'          => $this->model->get($id),
-            'roles'         => $role->all()
+            'user'          => User::get($id),
+            'roles'         => Role::all()
         ));
     }
 
     public function update($id)
     {
-        $filteredData = Filter::vetor($this->model->fillable, $_POST);
-        $update = $this->model->update($id, $filteredData);
+        $filteredData = Filter::vetor(User::$fillable, $_POST);
+        $update = User::update($id, $filteredData);
         $response = parent::parseResponse($update);
 
         return JsonResponse::set(200, $response);
@@ -97,7 +87,7 @@ class UserController extends Controller
 
     public function delete($id)
     {
-        $delete = $this->model->delete($id);
+        $delete = User::delete($id);
         $response = parent::parseResponse($delete);
 
         return JsonResponse::set(200, $response);

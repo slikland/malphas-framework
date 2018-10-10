@@ -109,33 +109,33 @@
                             </tfoot>
 
                             <tbody>
-                            <?php foreach ($users as $value) :
-                                if($value['id'] != '1') : ?>
+                            <?php foreach ($users as $user) :
+                                if($user->id != '1') : ?>
                                 <tr>
                                     <th>
                                         <label class="label">
                                             <input class="table-content-select-this-row"
                                                    type="checkbox"
                                                    name="id[]"
-                                                   value="<?php echo $value['id']; ?>">
+                                                   value="<?php echo $user->id; ?>">
                                         </label>
                                     </th>
-                                    <th><?php echo $value['name']; ?></th>
+                                    <th><?php echo $user->name; ?></th>
                                     <th>
-                                        <a class="link-mailto"href="mailto:<?php echo $value['email']; ?>">
-                                            <?php echo $value['email']; ?>
+                                        <a class="link-mailto"href="mailto:<?php echo $user->email; ?>">
+                                            <?php echo $user->email; ?>
                                         </a>
                                     </th>
-                                    <th><?php echo $value['cms_role_id']; ?></th>
-                                    <th><?php echo dateFormatBR($value['created_at']); ?></th>
-                                    <th><?php echo dateFormatBR($value['updated_at']); ?></th>
+                                    <th><?php echo $user->cms_role_id; ?></th>
+                                    <th><?php echo dateFormatBR($user->created_at); ?></th>
+                                    <th><?php echo dateFormatBR($user->updated_at); ?></th>
                                     <th>
                                         <a class="button is-warning"
-                                           href="<?php echo baseUrl("user/edit/{$value['id']}"); ?>">
+                                           href="<?php echo baseUrl("user/edit/{$user->id}"); ?>">
                                             <i class="fa fa-edit"></i>
                                         </a>
                                         <a class="table-content-delete-this-register button is-danger"
-                                           href="<?php echo baseUrl("user/delete/{$value['id']}"); ?>">
+                                           href="<?php echo baseUrl("user/delete/{$user->id}"); ?>">
                                             <i class="fa fa-times"></i>
                                         </a>
                                     </th>

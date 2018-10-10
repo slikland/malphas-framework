@@ -3,7 +3,7 @@ namespace core;
 
 class Model
 {
-    protected static $db;
+    protected $db;
 
     public $validation = [];
 
@@ -11,63 +11,64 @@ class Model
 
     public function __construct()
     {
-        self::$db = DB::getInstance();
+        $this->db = DB::getInstance();
     }
 
-    public function all()
+    public static function all($fetchAll = true)
     {
-        return self::$db->fetch_all('SELECT * FROM '.$this->table);
-    }
-
-    public function get($id)
-    {
-        return self::$db->fetch_one('SELECT * FROM '.$this->table.' WHERE id = ?', ['id' => $id]);
-    }
-
-    public function insert($data)
-    {
-        $this->validate('insert');
-        return self::$db->insertFields($this->table, $data);
-    }
-
-    public function update($id, $data)
-    {
-        $this->validate('update');
-        return self::$db->updateFields($this->table, $data, "id = $id");
-    }
-
-    public function delete($id)
-    {
-        return self::$db->delete($this->table, $id);
-    }
-
-    public function getWhere($conditions)
-    {
-        $where = $this->queryBuilderWhere($conditions);
-        return self::$db->fetch_all('SELECT * FROM '.$this->table.$where, $conditions);
-    }
-
-    public function isUnique($conditions)
-    {
-        $get = self::getWhere($conditions);
-        if(count($get) >= 1) {
-            return false;
+        if(!$fetchAll) {
+            return DB::getInstance()->{static::$table}()->where('deleted_at', null);
         }
 
-        return true;
+        return DB::getInstance()->{static::$table}()->where('deleted_at', null)->fetchAll();
     }
 
-    private function queryBuilderWhere($conditions)
+    public static function get($id)
     {
-        $where = '';
-        foreach ($conditions as $fieldName => $value) {
-            $where .= empty($where) ? " WHERE $fieldName = ?" : " AND $fieldName = ?";
+        return DB::getInstance()->{static::$table}()->where('deleted_at', null)->where('id', $id)->fetch();
+    }
+
+    public static function insert($data)
+    {
+        self::validate('insert');
+
+        try {
+            $data = DB::getInstance()->createRow(static::$table, $data);
+            $data->save();
+            return true;
         }
-        return $where;
+        catch(\PDOException $e) {
+            return $e->getMessage();
+        }
     }
 
-    private function validate($method)
+    public static function update($id, $data)
     {
-        Validate::current($this, $method);
+        self::validate('update');
+
+        try {
+            self::get($id)->update($data);
+            return true;
+        }
+        catch(\PDOException $e) {
+            return $e->getMessage();
+        }
+    }
+
+    public static function delete($id)
+    {
+        $data = ['deleted_at' => date('Y-m-d H:i:s')];
+        try {
+            self::get($id)->update($data);
+            return true;
+        }
+        catch(\PDOException $e) {
+            return $e->getMessage();
+        }
+    }
+
+    private static function validate($method)
+    {
+//        Validate::current($this, $method);
     }
 }
