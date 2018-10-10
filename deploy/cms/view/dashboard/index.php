@@ -47,7 +47,7 @@
                                 <div class="message-body">
                                     <div class="has-text-centered">
                                         <p style="font-size: 100px;line-height: 100px;"><?php echo $totalUser; ?></p>
-                                        <p>TOTAL USÁRIOS</p>
+                                        <p>TOTAL USUÁRIOS</p>
                                         <p>
                                             <a class="button is-small is-dark">VER TODOS</a>
                                             <a class="button is-small is-info">ADICIONAR</a>
