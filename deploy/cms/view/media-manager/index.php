@@ -103,13 +103,19 @@
                                         <span><?php echo $value['name']; ?></span>
                                     </p>
                                     <div class="file-manager-action">
-                                        <a href="<?php echo baseUrl("mediamanager/delete/{$value['id']}"); ?>"
-                                           class="file-manager-delete">
-                                            <i class="fas fa-times"></i>
+                                        <a href="<?php echo baseUrlUpload($value['name']); ?>"
+                                           class="file-manager-download" target="_blank">
+                                            <i class="fas fa-download"></i>
                                         </a>
+
                                         <a href="<?php echo baseUrl("mediamanager/edit/{$value['id']}"); ?>"
                                            class="file-manager-edit">
                                             <i class="fas fa-edit"></i>
+                                        </a>
+
+                                        <a href="<?php echo baseUrl("mediamanager/delete/{$value['id']}"); ?>"
+                                           class="file-manager-delete">
+                                            <i class="fas fa-times"></i>
                                         </a>
                                     </div>
                                 </li>
