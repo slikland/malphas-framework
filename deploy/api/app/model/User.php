@@ -30,6 +30,6 @@ class User extends Model
 
     public static function getByEmail($email)
     {
-        return User::all(false)->where('email', $email);
+        return User::all(false)->where('email', $email)->fetch();
     }
 }

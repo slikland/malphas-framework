@@ -4,7 +4,7 @@ use core\Utils\File;
 
 class Controller
 {
-    public $isAuthenticable = false;
+    public $isAuthenticable = true;
 
     public $validation = [];
 

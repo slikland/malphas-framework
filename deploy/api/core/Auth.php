@@ -43,11 +43,11 @@ class Auth
         $post = Http::getPost();
         $user = User::getByEmail($post['email']);
 
-        if(empty($user)) {
+        if(is_null($user)) {
             return false;
         }
 
-        $password = $user['password'];
+        $password = $user->password;
         $isValidLogin = Hash::verify($post['password'], $password);
 
         return $isValidLogin;
